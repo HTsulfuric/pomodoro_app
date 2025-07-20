@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = TimerViewModel()
+    @EnvironmentObject var viewModel: TimerViewModel
     
     var body: some View {
         VStack(spacing: 20) {
@@ -123,4 +123,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .frame(minWidth: 300, minHeight: 400)
+        .environmentObject(TimerViewModel())
 }

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var viewModel = TimerViewModel()
-    @State private var isFloatingMode = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -15,18 +14,18 @@ struct ContentView: View {
                     .fontWeight(.semibold)
                 Spacer()
             }
-            .foregroundColor(.primary)
+            .foregroundColor(.nordPrimary)
             
             // Main Timer Display
             VStack(spacing: 12) {
                 // Large time display
                 Text(viewModel.pomodoroState.formattedTime)
                     .font(.system(size: 64, weight: .thin, design: .monospaced))
-                    .foregroundColor(.primary)
+                    .foregroundColor(.nordPrimary)
                 
                 // Progress bar
                 ProgressView(value: viewModel.pomodoroState.progress)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
+                    .progressViewStyle(LinearProgressViewStyle(tint: .nordAccent))
                     .scaleEffect(x: 1, y: 2, anchor: .center)
             }
             .padding(.vertical)
@@ -35,11 +34,11 @@ struct ContentView: View {
             VStack(spacing: 8) {
                 Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
                     .font(.headline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.nordSecondary)
                 
                 Text("Today: \(viewModel.totalSessionsToday) sessions")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.nordSecondary)
             }
             
             // Control buttons
@@ -107,28 +106,21 @@ struct ContentView: View {
             .controlSize(.small)
             .font(.caption)
             
-            // Floating mode toggle
-            Toggle("Floating Mode", isOn: $isFloatingMode)
-                .toggleStyle(SwitchToggleStyle())
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .onChange(of: isFloatingMode) { value in
-                    // TODO: Implement floating window mode
-                    if let window = NSApplication.shared.windows.first {
-                        window.level = value ? .floating : .normal
-                    }
-                }
             
             Spacer()
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .background(
+            VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
+        )
+        .edgesIgnoringSafeArea(.all)
+        .background(TransparentBackground())
         .preferredColorScheme(.dark)
     }
 }
 
 #Preview {
     ContentView()
-        .frame(width: 320, height: 450)
+        .frame(minWidth: 300, minHeight: 400)
 }

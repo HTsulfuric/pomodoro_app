@@ -8,12 +8,10 @@ struct PomodoroTimerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(width: 320, height: 450)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                .frame(minWidth: 300, minHeight: 400)
         }
-        .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
-        .windowToolbarStyle(.unifiedCompact)
+        .windowBackgroundDragBehavior(.enabled)
     }
 }
 

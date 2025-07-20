@@ -88,7 +88,7 @@ struct PomodoroState {
         
         // Every 4 work sessions, take a long break
         let nextPhase: PomodoroPhase
-        if currentPhase == .work && sessionCount % 4 == 0 {
+        if currentPhase == .work && (sessionCount + 1) % 4 == 0 {
             nextPhase = .longBreak
         } else {
             nextPhase = currentPhase.nextPhase

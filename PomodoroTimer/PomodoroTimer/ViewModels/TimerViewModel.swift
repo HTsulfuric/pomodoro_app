@@ -41,8 +41,22 @@ class TimerViewModel: ObservableObject {
     
     func skipPhase() {
         print("⏭️ SKIP BUTTON PRESSED")
+        let currentPhase = pomodoroState.currentPhase
+        
+        // Stop timer
+        stopTimerLoop()
+        
+        // Increment totalSessionsToday only when skipping work
+        if currentPhase == .work {
+            totalSessionsToday += 1
+            savePersistentData()
+            print("✅ Work session skipped. Total today: \(totalSessionsToday)")
+        }
+        
+        // Transition to next phase
         pomodoroState.skip()
-        handlePhaseComplete()
+        
+        print("🔄 Skipped from \(currentPhase.rawValue) to \(pomodoroState.currentPhase.rawValue)")
     }
     
     // Debug function - set timer to 3 seconds for testing

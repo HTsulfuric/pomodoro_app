@@ -7,7 +7,7 @@
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
-    <string>com.pomodoro.timer</string>
+    <string>com.local.PomodoroTimer</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
@@ -15,9 +15,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>$(CURRENT_PROJECT_VERSION)</string>
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <key>NSUserNotificationAlertStyle</key>
@@ -32,7 +32,7 @@
     <array>
         <dict>
             <key>CFBundleURLName</key>
-            <string>com.pomodoro.timer.url</string>
+            <string>com.local.PomodoroTimer.url</string>
             <key>CFBundleURLSchemes</key>
             <array>
                 <string>pomodoro</string>

@@ -9,7 +9,7 @@ struct PomodoroTimerApp: App {
     @StateObject private var sketchyBarManager = SketchyBarManager()
     
     var body: some Scene {
-        WindowGroup {
+        Window("Pomodoro Timer", id: "main") {
             ContentView()
                 .frame(minWidth: 300, minHeight: 400)
                 .environmentObject(timerViewModel)
@@ -24,6 +24,9 @@ struct PomodoroTimerApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowBackgroundDragBehavior(.enabled)
+        .commands {
+            CommandGroup(replacing: .newItem) { }
+        }
     }
     
     // MARK: - SketchyBar Integration
@@ -70,10 +73,7 @@ struct PomodoroTimerApp: App {
         
         print("📥 Received URL command: \(command)")
         
-        // Bring app to foreground for better user feedback
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        
-        // Execute command
+        // Execute command (silent background operation)
         switch command {
         case "toggle-timer":
             handleToggleCommand()
@@ -119,6 +119,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // Configure app for aerospace compatibility
         NSApplication.shared.setActivationPolicy(.regular)
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        // Prevent multiple windows when app is reactivated
+        if flag {
+            // If we have visible windows, just bring them to front
+            NSApplication.shared.activate(ignoringOtherApps: true)
+        }
+        return false
     }
     
     // Handle notification actions when app is running

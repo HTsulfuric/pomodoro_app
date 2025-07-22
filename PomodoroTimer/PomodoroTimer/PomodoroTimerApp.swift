@@ -1,6 +1,7 @@
 import SwiftUI
 import UserNotifications
 import Combine
+import AppKit
 
 @main
 struct PomodoroTimerApp: App {
@@ -121,8 +122,15 @@ struct PomodoroTimerApp: App {
     }
 }
 
+// MARK: - Notification Names
+
+extension Notification.Name {
+    static let spaceKeyPressed = Notification.Name("spaceKeyPressed")
+}
+
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     var cancellables = Set<AnyCancellable>()
+    private var keyEventMonitor: Any?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
@@ -131,16 +139,44 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Configure app for aerospace compatibility
         NSApplication.shared.setActivationPolicy(.regular)
         
+        // Setup global keyboard monitoring
+        setupKeyboardMonitoring()
+        
         print("🚀 App launched - using simple CLI integration")
     }
     
     func applicationWillTerminate(_ notification: Notification) {
+        // Clean up keyboard monitoring
+        if let monitor = keyEventMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyEventMonitor = nil
+        }
         print("🚀 App terminating")
     }
     
     deinit {
         // Cleanup managed by applicationWillTerminate
+        if let monitor = keyEventMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
         cancellables.removeAll()
+    }
+    
+    // MARK: - Keyboard Monitoring
+    
+    private func setupKeyboardMonitoring() {
+        keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            // Only handle space key
+            if event.keyCode == 49 { // Space key code is 49
+                print("🔑 Space key detected via NSEvent monitor")
+                print("🔔 Posting spaceKeyPressed notification...")
+                NotificationCenter.default.post(name: .spaceKeyPressed, object: nil)
+                print("✅ spaceKeyPressed notification posted")
+                return nil // Consume the event
+            }
+            return event // Let other events pass through
+        }
+        print("⌨️ Global keyboard monitoring setup complete")
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

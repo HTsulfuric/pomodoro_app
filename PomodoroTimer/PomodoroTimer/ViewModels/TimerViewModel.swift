@@ -62,11 +62,15 @@ class TimerViewModel: ObservableObject {
     // MARK: - Timer Control
     
     func toggleTimer() {
+        print("⏯️ toggleTimer() called - current state: isRunning=\(pomodoroState.isRunning)")
         if pomodoroState.isRunning {
+            print("⏸️ Calling pauseTimer()...")
             pauseTimer()
         } else {
+            print("▶️ Calling startTimer()...")
             startTimer()
         }
+        print("✅ toggleTimer() completed - new state: isRunning=\(pomodoroState.isRunning)")
     }
     
     func startTimer() {
@@ -244,6 +248,18 @@ class TimerViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
-        print("🔗 TimerViewModel listening for user notification actions")
+        // Space key notification observer
+        print("🔗 Setting up space key notification observer...")
+        NotificationCenter.default.publisher(for: .spaceKeyPressed)
+            .sink { [weak self] _ in
+                print("🔑 Space key notification received - toggling timer")
+                print("⏯️ Current timer state: isRunning=\(self?.pomodoroState.isRunning ?? false)")
+                self?.toggleTimer()
+                print("✅ Timer toggle completed")
+            }
+            .store(in: &cancellables)
+        print("✅ Space key notification observer setup complete")
+        
+        print("🔗 TimerViewModel listening for user notification actions and space key")
     }
 }

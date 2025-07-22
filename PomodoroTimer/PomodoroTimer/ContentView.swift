@@ -88,7 +88,7 @@ struct ContentView: View {
                             .background(Color.nordAccent.opacity(0.8))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle())
                     
                     // Skip button
                     Button(action: {
@@ -101,7 +101,7 @@ struct ContentView: View {
                             .background(Color.nordNight3.opacity(0.6))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle())
                 }
                 
                 HStack(spacing: 20) {
@@ -116,7 +116,7 @@ struct ContentView: View {
                             .background(Color.nordNight3.opacity(0.6))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle())
                     
                     // Test Sound button
                     Button(action: {
@@ -130,7 +130,7 @@ struct ContentView: View {
                             .background(Color.nordNight3.opacity(0.6))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle())
                 }
             }
             

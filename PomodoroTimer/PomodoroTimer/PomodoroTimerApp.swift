@@ -19,6 +19,9 @@ struct PomodoroTimerApp: App {
                     setupSketchyBarIntegration()
                 }
                 .onOpenURL { url in
+                    print("🔗 onOpenURL triggered with: \(url)")
+                    print("🔗 URL scheme: \(url.scheme ?? "nil")")
+                    print("🔗 URL host: \(url.host ?? "nil")")
                     handleURLCommand(url)
                 }
         }
@@ -61,6 +64,8 @@ struct PomodoroTimerApp: App {
     // MARK: - URL Command Handling
     
     private func handleURLCommand(_ url: URL) {
+        print("🎯 handleURLCommand called with URL: \(url)")
+        
         guard url.scheme == "pomodoro" else {
             print("⚠️ Unknown URL scheme: \(url.scheme ?? "nil")")
             return
@@ -75,11 +80,11 @@ struct PomodoroTimerApp: App {
         
         // Execute command (silent background operation)
         switch command {
-        case "toggle-timer":
+        case "toggle", "toggle-timer":  // Support both new simplified and legacy formats
             handleToggleCommand()
-        case "reset-timer":
+        case "reset", "reset-timer":
             handleResetCommand()
-        case "skip-phase":
+        case "skip", "skip-phase":
             handleSkipCommand()
         case "show-app":
             // App is already activated above
@@ -90,6 +95,7 @@ struct PomodoroTimerApp: App {
     }
     
     private func handleToggleCommand() {
+        print("🎯 handleToggleCommand called")
         if timerViewModel.pomodoroState.isRunning {
             print("⏸️ Pausing timer via URL command")
             timerViewModel.pauseTimer()
@@ -97,16 +103,21 @@ struct PomodoroTimerApp: App {
             print("▶️ Starting timer via URL command")
             timerViewModel.startTimer()
         }
+        print("✅ handleToggleCommand completed")
     }
     
     private func handleResetCommand() {
+        print("🎯 handleResetCommand called")
         print("🔄 Resetting timer via URL command")
         timerViewModel.resetTimer()
+        print("✅ handleResetCommand completed")
     }
     
     private func handleSkipCommand() {
+        print("🎯 handleSkipCommand called")
         print("⏭️ Skipping phase via URL command")
         timerViewModel.skipPhase()
+        print("✅ handleSkipCommand completed")
     }
 }
 
@@ -119,6 +130,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // Configure app for aerospace compatibility
         NSApplication.shared.setActivationPolicy(.regular)
+        
+        print("🚀 App launched - using simple CLI integration")
+    }
+    
+    func applicationWillTerminate(_ notification: Notification) {
+        print("🚀 App terminating")
+    }
+    
+    deinit {
+        // Cleanup managed by applicationWillTerminate
+        cancellables.removeAll()
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

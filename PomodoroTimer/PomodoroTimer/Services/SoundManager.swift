@@ -6,18 +6,18 @@ import AppKit
 class SoundManager: ObservableObject {
     static let shared = SoundManager()
     
-    private var audioPlayer: AVAudioPlayer?
+    private var currentSound: NSSound?
     
     init() {
-        // No audio session setup needed on macOS
+        print("🎵 SoundManager initialized with simple NSSound approach")
     }
     
     func playPhaseChangeSound(for phase: PomodoroPhase) {
         print("🔊 =================================")
-        print("🔊 SOUND MANAGER: playPhaseChangeSound called")
+        print("🔊 NSSound MANAGER: playPhaseChangeSound called")
         print("🔊 Phase: \(phase)")
         
-        // Use macOS system sounds
+        // Use simple NSSound approach - reliable and audible
         let soundName: String
         
         switch phase {
@@ -31,20 +31,28 @@ class SoundManager: ObservableObject {
         
         print("🔊 Selected sound name: \(soundName)")
         
-        // Play system sound once at full volume
+        // NSSound automatically handles system sounds by name (sandbox-friendly)
         if let sound = NSSound(named: soundName) {
             print("🔊 NSSound found: \(soundName)")
-            sound.volume = 1.0 // Maximum volume
+            
+            // Store reference to prevent deallocation during playback
+            currentSound = sound
+            
+            // Set maximum volume for notification priority
+            sound.volume = 1.0
+            
+            // Play the sound - simple and reliable
             let success = sound.play()
+            
             print("🔊 NSSound.play() returned: \(success)")
             if success {
-                print("✅ SUCCESS: NSSound played")
+                print("✅ SUCCESS: NSSound played - should be audible")
             } else {
                 print("❌ FAILED: NSSound.play() returned false")
             }
         } else {
             print("❌ FAILED: NSSound(named: \(soundName)) returned nil")
-            // Fallback to system beep if sound not found
+            // Fallback to system beep
             NSSound.beep()
             print("🔊 Fallback: NSSound.beep() called")
         }
@@ -52,29 +60,33 @@ class SoundManager: ObservableObject {
         print("🔊 =================================")
     }
     
+    
     func playCustomSound(named soundName: String) {
         guard let soundURL = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
             print("Could not find sound file: \(soundName)")
             return
         }
         
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
-            audioPlayer?.volume = 0.8 // Set to 80% volume to be noticeable but not jarring
-            audioPlayer?.play()
-        } catch {
-            print("Error playing sound: \(error)")
+        // Use NSSound for custom sounds as well - simpler and more reliable
+        if let sound = NSSound(contentsOf: soundURL, byReference: false) {
+            currentSound = sound
+            sound.volume = 0.8 // Set to 80% volume for custom sounds
+            let success = sound.play()
+            print(success ? "✅ Custom sound played: \(soundName)" : "❌ Failed to play custom sound: \(soundName)")
+        } else {
+            print("❌ Failed to create NSSound from: \(soundURL)")
         }
     }
     
     func playTimerTickSound() {
-        // Subtle tick sound for last 10 seconds (optional)
+        // Subtle tick sound for last 10 seconds
         if let tickSound = NSSound(named: "Tink") {
+            // Don't store reference for tick sounds (they're very short)
             tickSound.volume = 0.3 // Very quiet
             tickSound.play()
         } else {
-            // Fallback to very quiet system sound
-            AudioServicesPlaySystemSound(1000)
+            // Fallback to system beep
+            NSSound.beep()
         }
     }
 }

@@ -6,5 +6,15 @@
 	<true/>
 	<key>com.apple.security.get-task-allow</key>
 	<true/>
+	
+	<!-- Allow communication with embedded XPC service -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>com.local.PomodoroTimer.shared</string>
+	</array>
+	
+	<!-- XPC service communication -->
+	<key>com.apple.security.xpc.service.name</key>
+	<string>com.local.PomodoroTimer.TimerService</string>
 </dict>
 </plist>

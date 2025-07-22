@@ -135,17 +135,54 @@ struct ContentView: View {
             }
             
             #if DEBUG
-            // Debug button for testing (only visible in Debug builds)
-            Button("🐛 Debug: 3s Timer") {
-                viewModel.setDebugTimer()
-                viewModel.startTimer()
+            VStack(spacing: 8) {
+                // Debug button for testing (only visible in Debug builds)
+                Button("🐛 Debug: 3s Timer") {
+                    viewModel.setDebugTimer()
+                    viewModel.startTimer()
+                }
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundColor(.nordSecondary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.nordNight3.opacity(0.4))
+                .clipShape(Capsule())
+                
+                // URL Scheme Test button
+                Button("🔗 Test: URL Toggle") {
+                    print("🎯 Testing URL scheme handler directly...")
+                    let testURL = URL(string: "pomodoro://toggle")!
+                    // Simulate URL scheme handling by directly calling timer methods
+                    print("🔗 Simulating: \(testURL)")
+                    print("🔗 URL scheme: \(testURL.scheme ?? "nil")")
+                    print("🔗 URL host: \(testURL.host ?? "nil")")
+                    
+                    // Direct timer toggle (simulating what the URL handler would do)
+                    if let command = testURL.host {
+                        print("📥 Simulated URL command: \(command)")
+                        switch command {
+                        case "toggle":
+                            print("🎯 Simulated handleToggleCommand")
+                            if viewModel.pomodoroState.isRunning {
+                                print("⏸️ Pausing timer via simulated URL command")
+                                viewModel.pauseTimer()
+                            } else {
+                                print("▶️ Starting timer via simulated URL command")
+                                viewModel.startTimer()
+                            }
+                            print("✅ Simulated handleToggleCommand completed")
+                        default:
+                            print("⚠️ Unknown simulated command: \(command)")
+                        }
+                    }
+                }
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundColor(.nordFrost0)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.nordNight3.opacity(0.4))
+                .clipShape(Capsule())
             }
-            .font(.system(size: 12, weight: .medium, design: .rounded))
-            .foregroundColor(.nordSecondary)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(Color.nordNight3.opacity(0.4))
-            .clipShape(Capsule())
             #endif
             
             Spacer()

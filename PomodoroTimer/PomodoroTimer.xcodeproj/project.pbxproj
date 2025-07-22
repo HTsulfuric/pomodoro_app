@@ -23,6 +23,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		EADCFF342E2E9EEA00FB0FEF /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			name = "Embed XPC Services";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		EA3BF9B52E2CA0BA003822E9 /* PomodoroTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PomodoroTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA3BF9C32E2CA0BC003822E9 /* PomodoroTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PomodoroTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,16 +59,6 @@
 				EA923DAD2E2DBF1100796FCD /* Exceptions for "PomodoroTimer" folder in "PomodoroTimer" target */,
 			);
 			path = PomodoroTimer;
-			sourceTree = "<group>";
-		};
-		EA3BF9C62E2CA0BC003822E9 /* PomodoroTimerTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PomodoroTimerTests;
-			sourceTree = "<group>";
-		};
-		EA3BF9D02E2CA0BC003822E9 /* PomodoroTimerUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PomodoroTimerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -89,8 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				EA3BF9B72E2CA0BA003822E9 /* PomodoroTimer */,
-				EA3BF9C62E2CA0BC003822E9 /* PomodoroTimerTests */,
-				EA3BF9D02E2CA0BC003822E9 /* PomodoroTimerUITests */,
 				EA3BF9B62E2CA0BA003822E9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,6 +116,7 @@
 				EA3BF9B12E2CA0BA003822E9 /* Sources */,
 				EA3BF9B22E2CA0BA003822E9 /* Frameworks */,
 				EA3BF9B32E2CA0BA003822E9 /* Resources */,
+				EADCFF342E2E9EEA00FB0FEF /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
@@ -143,9 +145,6 @@
 			dependencies = (
 				EA3BF9C52E2CA0BC003822E9 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				EA3BF9C62E2CA0BC003822E9 /* PomodoroTimerTests */,
-			);
 			name = PomodoroTimerTests;
 			packageProductDependencies = (
 			);
@@ -165,9 +164,6 @@
 			);
 			dependencies = (
 				EA3BF9CF2E2CA0BC003822E9 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				EA3BF9D02E2CA0BC003822E9 /* PomodoroTimerUITests */,
 			);
 			name = PomodoroTimerUITests;
 			packageProductDependencies = (
@@ -411,13 +407,13 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = alpha;
 				DEVELOPMENT_TEAM = X6HL7FC8MR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PomodoroTimer/Info.plist;
-				MARKETING_VERSION = 4.1;
+				MARKETING_VERSION = 5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.local.PomodoroTimer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -435,13 +431,13 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = alpha;
 				DEVELOPMENT_TEAM = X6HL7FC8MR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PomodoroTimer/Info.plist;
-				MARKETING_VERSION = 4.1;
+				MARKETING_VERSION = 5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.local.PomodoroTimer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;

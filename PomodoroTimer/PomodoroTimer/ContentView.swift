@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: TimerViewModel
-    @State private var spaceKeyPressed = false
+    @State private var rippleTrigger: Bool = false
     
     // Version info computed properties
     private var appVersion: String {
@@ -82,12 +82,10 @@ struct ContentView: View {
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.nordPrimary)
                             .frame(width: 50, height: 50)
-                            .background(Color.nordAccent.opacity(spaceKeyPressed ? 1.0 : 0.8))
+                            .background(Color.nordAccent.opacity(0.8))
                             .clipShape(Circle())
-                            .scaleEffect(spaceKeyPressed ? 1.1 : 1.0)
                     }
                     .buttonStyle(CircleHoverButtonStyle())
-                    .animation(.easeInOut(duration: 0.1), value: spaceKeyPressed)
                     
                     // Skip button
                     Button(action: {
@@ -194,18 +192,10 @@ struct ContentView: View {
             .edgesIgnoringSafeArea(.all)
             .background(TransparentBackground())
             .preferredColorScheme(.dark)
-            .onReceive(NotificationCenter.default.publisher(for: .spaceKeyPressed)) { _ in
-                print(" Space key notification received in ContentView - showing visual feedback")
-                // Only show visual feedback, TimerViewModel handles the timer logic
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    spaceKeyPressed = true
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    withAnimation(.easeInOut(duration: 0.1)) {
-                        spaceKeyPressed = false
-                    }
-                }
+            .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
+                print("🌊 Timer start notification received - triggering ripple effect")
+                // Toggle the boolean to trigger the animation in RippleView
+                rippleTrigger.toggle()
             }
             
             // Version info overlay
@@ -225,6 +215,9 @@ struct ContentView: View {
                 .padding(.leading, 16)
                 .padding(.bottom, 12)
             }
+            
+            // Ripple effect overlay - triggered when timer starts
+            RippleView(trigger: rippleTrigger)
         }
     }
     
@@ -236,24 +229,6 @@ struct ContentView: View {
             viewModel.pauseTimer()
         } else {
             viewModel.startTimer()
-        }
-    }
-    
-    /// Toggle timer with visual feedback (for space key)
-    private func toggleTimerWithFeedback() {
-        // Trigger visual feedback
-        withAnimation(.easeInOut(duration: 0.1)) {
-            spaceKeyPressed = true
-        }
-        
-        // Toggle timer
-        toggleTimer()
-        
-        // Reset visual feedback after brief delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(.easeInOut(duration: 0.1)) {
-                spaceKeyPressed = false
-            }
         }
     }
 }

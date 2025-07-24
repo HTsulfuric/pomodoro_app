@@ -11,6 +11,7 @@ class KeyboardManager {
     private var globalKeyMonitor: Any?
     private var localKeyMonitor: Any?
     weak var timerViewModel: TimerViewModel?
+    private var pendingHideTask: DispatchWorkItem?
     
     /// Tracks whether the overlay is visible to determine which keys are active
     var isOverlayVisible: Bool = false {
@@ -132,10 +133,29 @@ class KeyboardManager {
         switch event.keyCode {
         case 49: // Space key
             if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
-                print("🎹 Space key - toggling timer")
-                viewModel.toggleTimer()
-                // Post notification for visual feedback only
-                NotificationCenter.default.post(name: .spaceKeyPressed, object: nil)
+                if viewModel.pomodoroState.isRunning {
+                    print("🎹 Space key - pausing timer (keep overlay visible)")
+                    // Cancel any pending hide task since we're pausing
+                    pendingHideTask?.cancel()
+                    pendingHideTask = nil
+                    viewModel.pauseTimer()
+                    // Post notification for quick visual feedback (pause action)
+                    NotificationCenter.default.post(name: .spaceKeyPressed, object: nil)
+                } else {
+                    print("🎹 Space key - starting timer with enhanced feedback and delayed hide")
+                    viewModel.startTimer()
+                    // Post notification for enhanced visual feedback (start action)
+                    NotificationCenter.default.post(name: .spaceKeyStartPressed, object: nil)
+                    // Cancel any existing pending hide task
+                    pendingHideTask?.cancel()
+                    // Create new hide task that can be cancelled
+                    pendingHideTask = DispatchWorkItem {
+                        print("🎹 Hiding overlay after ripple animation completes")
+                        NotificationCenter.default.post(name: .hideOverlay, object: nil)
+                    }
+                    // Schedule the hide task (1.8s + 3*0.3s stagger = 2.7s)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.7, execute: pendingHideTask!)
+                }
                 return true
             }
         case 15: // R key
@@ -161,6 +181,13 @@ class KeyboardManager {
                 NotificationCenter.default.post(name: .hideOverlay, object: nil)
                 return true
             }
+        case 53: // ESC key
+            if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
+                print("🎹 ESC key - hiding overlay")
+                // Post notification for AppDelegate to hide overlay
+                NotificationCenter.default.post(name: .hideOverlay, object: nil)
+                return true
+            }
         default:
             break
         }
@@ -175,6 +202,7 @@ extension Notification.Name {
     static let toggleOverlay = Notification.Name("toggleOverlay")
     static let hideOverlay = Notification.Name("hideOverlay")
     static let spaceKeyPressed = Notification.Name("spaceKeyPressed")
+    static let spaceKeyStartPressed = Notification.Name("spaceKeyStartPressed")
     static let resetKeyPressed = Notification.Name("resetKeyPressed")
     static let skipKeyPressed = Notification.Name("skipKeyPressed")
 }

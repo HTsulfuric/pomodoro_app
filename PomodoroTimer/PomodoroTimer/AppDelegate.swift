@@ -137,9 +137,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Floating Overlay Setup
     
     private func setupFloatingOverlay() {
-        // Create floating panel centered on screen
+        // Create floating panel centered on screen (use current theme size, not minimal)
         let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1920, height: 1080)
-        let windowSize = NSSize(width: 300, height: 400)
+        let windowSize = timerViewModel.currentTheme.preferredWindowSize // Use current theme size
         let panelFrame = NSRect(
             x: (screenFrame.width - windowSize.width) / 2,
             y: (screenFrame.height - windowSize.height) / 2,
@@ -147,20 +147,45 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             height: windowSize.height
         )
         
+        print("🪟 setupFloatingOverlay() - Creating panel with frame: \(panelFrame)")
+        print("🪟 setupFloatingOverlay() - Using theme: \(timerViewModel.currentTheme.displayName)")
+        print("🪟 setupFloatingOverlay() - Expected size: \(windowSize)")
+        
         // Create Alfred-style overlay panel (key difference!)
         overlayPanel = OverlayPanel(contentRect: panelFrame)
         
         guard let panel = overlayPanel else {
-            print("Failed to create overlay panel")
+            print("🪟 ❌ Failed to create overlay panel")
             return
         }
         
-        // Create hosting controller with ContentView
-        let contentView = AnyView(ContentView()
-            .environmentObject(timerViewModel))
+        print("🪟 setupFloatingOverlay() - Panel created with actual frame: \(panel.frame)")
         
+        // Create hosting controller with ContentView.
+        // The problematic .frame modifier is removed to prevent a layout feedback loop.
+        let contentView = AnyView(
+            ContentView()
+                .environmentObject(timerViewModel)
+        )
+
         hostingController = NSHostingController(rootView: contentView)
+
+        // CRITICAL: Set sizing options to empty set to break the layout recursion.
+        // This prevents NSHostingController from creating constraints based on SwiftUI content size,
+        // making the AppKit-managed panel the definitive source of truth for sizing.
+        hostingController?.sizingOptions = []
+        
         panel.contentViewController = hostingController
+        
+        // CRITICAL: Set panel content size to full screen
+        let fullScreenSize = timerViewModel.currentTheme.preferredWindowSize
+        panel.setContentSize(fullScreenSize)
+        
+        // Ensure hosting controller view fills the panel content
+        if let contentView = panel.contentView, let controller = hostingController {
+            controller.view.frame = contentView.bounds
+            controller.view.autoresizingMask = [.width, .height]
+        }
         
         // Set delegate for auto-dismiss behavior
         panel.delegate = self
@@ -168,14 +193,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Start hidden
         panel.orderOut(nil)
         
-        print(" Alfred-style overlay panel created and configured")
+        print("🪟 setupFloatingOverlay() - Alfred-style overlay panel created and configured")
     }
     
     // MARK: - Debug Window Setup
     
     private func setupDebugWindow() {
+        let preferredSize = timerViewModel.currentTheme.preferredWindowSize // Use current theme size
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 300, height: 400),
+            contentRect: NSRect(x: 0, y: 0, width: preferredSize.width, height: preferredSize.height),
             styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -187,8 +213,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         let contentView = ContentView()
             .environmentObject(timerViewModel)
-        
+
         let hostingController = NSHostingController(rootView: contentView)
+        
+        // Use empty sizing options for consistency and to prevent potential layout issues,
+        // especially since the debug window is user-resizable.
+        hostingController.sizingOptions = []
+
         window.contentViewController = hostingController
         
         window.makeKeyAndOrderFront(nil)
@@ -214,17 +245,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     private func showOverlay() {
         guard let panel = overlayPanel else {
+            print("🪟 ❌ showOverlay() - No panel available")
             return
         }
+        
+        print("🪟 showOverlay() - Panel frame before show: \(panel.frame)")
+        print("🪟 showOverlay() - Panel content size: \(panel.contentView?.frame.size ?? CGSize.zero)")
         
         // Center panel on current screen (in case user moved between monitors)
         if let screen = NSScreen.main {
             let screenFrame = screen.frame
             let panelSize = panel.frame.size
+            print("🪟 showOverlay() - Screen frame: \(screenFrame)")
+            print("🪟 showOverlay() - Panel size: \(panelSize)")
+            
             let newOrigin = NSPoint(
                 x: (screenFrame.width - panelSize.width) / 2 + screenFrame.minX,
                 y: (screenFrame.height - panelSize.height) / 2 + screenFrame.minY
             )
+            print("🪟 showOverlay() - Setting panel origin to: \(newOrigin)")
             panel.setFrameOrigin(newOrigin)
         }
         
@@ -232,10 +271,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // This is the key difference from our old approach that stole focus
         panel.makeKeyAndOrderFront(nil)
         
+        print("🪟 showOverlay() - Panel frame after show: \(panel.frame)")
+        
         // Notify KeyboardManager that overlay is now visible
         KeyboardManager.shared.isOverlayVisible = true
         
-        print(" Alfred-style overlay shown (no focus stealing)")
+        print("🪟 showOverlay() - Alfred-style overlay shown (no focus stealing)")
     }
     
     private func hideOverlay() {
@@ -268,8 +309,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
             .store(in: &cancellables)
         
+        // Note: Dynamic sizing removed - all themes now use full screen
+        
         print(" Overlay notification observers setup complete")
+        
+        // No need to resize - panel will be created with correct theme size
     }
+    
     
     // Public method to retry permission setup (can be called from menu or overlay)
     func checkAndSetupGlobalHotkey() {

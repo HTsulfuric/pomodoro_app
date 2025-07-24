@@ -55,30 +55,6 @@ struct RippleView: View {
                 )
             }
             
-            #if DEBUG
-            // Debug overlay - only visible in debug builds
-            VStack(spacing: 4) {
-                Text("🐛 RIPPLE DEBUG")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.red)
-                
-                Text("Trigger: \(trigger ? "TRUE" : "FALSE")")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.yellow)
-                
-                Text("Boolean toggle")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.green)
-                
-                Text("Self-contained circles")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.green)
-            }
-            .padding(8)
-            .background(Color.black.opacity(0.7))
-            .cornerRadius(8)
-            .offset(y: -100) // Position above the ripples
-            #endif
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity) // Allow full expansion
         .allowsHitTesting(false) // Don't interfere with UI interactions

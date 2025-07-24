@@ -1,6 +1,4 @@
 import Foundation
-import AVFoundation
-import AudioToolbox
 import AppKit
 
 class SoundManager: ObservableObject {

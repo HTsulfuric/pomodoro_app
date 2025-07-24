@@ -6,6 +6,7 @@ import AppKit
 class TimerViewModel: ObservableObject {
     @Published var pomodoroState = PomodoroState()
     @Published var totalSessionsToday: Int = 0
+    @Published var currentTheme: Theme = .minimal
     
     // Timer management
     private var timer: Timer?
@@ -23,6 +24,7 @@ class TimerViewModel: ObservableObject {
     
     init() {
         loadPersistentData()
+        loadTheme()
         setupNotificationObservers()
         createStateFileDirectory()
         writeStateFile()
@@ -177,6 +179,34 @@ class TimerViewModel: ObservableObject {
         )
         
         print(" Phase completed. New phase: \(pomodoroState.currentPhase.rawValue)")
+    }
+    
+    // MARK: - Theme Management
+    
+    func setTheme(_ newTheme: Theme) {
+        print("🎨 Setting theme to: \(newTheme.displayName)")
+        print("🎨 Theme dimensions: \(newTheme.preferredWindowSize.width)×\(newTheme.preferredWindowSize.height)")
+        print("🎨 Previous theme was: \(currentTheme.displayName)")
+        
+        currentTheme = newTheme
+        UserDefaults.standard.set(newTheme.rawValue, forKey: "selectedTheme")
+        
+        // Request window resize for the new theme
+        // Note: Window resize removed - all themes now use full screen
+        print("🎨 setTheme() completed")
+    }
+    
+    
+    private func loadTheme() {
+        if let savedThemeName = UserDefaults.standard.string(forKey: "selectedTheme"),
+           let savedTheme = Theme(rawValue: savedThemeName) {
+            currentTheme = savedTheme
+            print("🎨 Loaded theme: \(savedTheme.displayName)")
+        } else {
+            print("🎨 Using default theme: \(currentTheme.displayName)")
+        }
+        
+        // Note: Window resize will be handled by AppDelegate after setup is complete
     }
     
     // MARK: - State File Management for SketchyBar

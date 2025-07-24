@@ -54,12 +54,12 @@ struct ContentView: View {
                     }) {
                         Image(systemName: viewModel.pomodoroState.isRunning ? "pause.fill" : "play.fill")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.nordPrimary)
+                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
                             .frame(width: 50, height: 50)
-                            .background(Color.nordAccent.opacity(0.8))
+                            .background(viewModel.currentTheme.primaryButtonColor)
                             .clipShape(Circle())
                     }
-                    .buttonStyle(CircleHoverButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
                     
                     // Skip button
                     Button(action: {
@@ -67,12 +67,12 @@ struct ContentView: View {
                     }) {
                         Image(systemName: "forward.end.fill")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.nordPrimary)
+                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
                             .frame(width: 44, height: 44)
-                            .background(Color.nordNight3.opacity(0.6))
+                            .background(viewModel.currentTheme.secondaryButtonColor)
                             .clipShape(Circle())
                     }
-                    .buttonStyle(CircleHoverButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
                 }
                 
                 HStack(spacing: 20) {
@@ -82,12 +82,12 @@ struct ContentView: View {
                     }) {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.nordPrimary)
+                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
                             .frame(width: 44, height: 44)
-                            .background(Color.nordNight3.opacity(0.6))
+                            .background(viewModel.currentTheme.secondaryButtonColor)
                             .clipShape(Circle())
                     }
-                    .buttonStyle(CircleHoverButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
                     
                     // Test Sound button
                     Button(action: {
@@ -96,12 +96,12 @@ struct ContentView: View {
                     }) {
                         Image(systemName: "speaker.2.fill")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.nordPrimary)
+                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
                             .frame(width: 44, height: 44)
-                            .background(Color.nordNight3.opacity(0.6))
+                            .background(viewModel.currentTheme.secondaryButtonColor)
                             .clipShape(Circle())
                     }
-                    .buttonStyle(CircleHoverButtonStyle())
+                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
                 }
             }
             
@@ -112,10 +112,9 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
             .background(
-                VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
+                themeBackground
             )
             .edgesIgnoringSafeArea(.all)
-            .background(TransparentBackground())
             .preferredColorScheme(.dark)
             .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
                 print("🌊 Timer start notification received - triggering ripple effect")
@@ -147,6 +146,30 @@ struct ContentView: View {
     }
     
     // MARK: - Helper Functions
+    
+    /// Theme-aware background based on current theme settings
+    @ViewBuilder
+    private var themeBackground: some View {
+        switch viewModel.currentTheme.windowBackgroundType {
+        case .blur:
+            // Minimal theme: keep existing blur effect with transparent background
+            VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
+                .background(TransparentBackground())
+        case .solid:
+            // Grid and Terminal themes: solid color backgrounds
+            viewModel.currentTheme.windowBackgroundColor
+        case .gradient:
+            // Future enhancement: gradient backgrounds
+            LinearGradient(
+                colors: [
+                    viewModel.currentTheme.windowBackgroundColor,
+                    viewModel.currentTheme.windowBackgroundColor.opacity(0.8)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
     
     /// Toggle timer without visual feedback (for button clicks)
     private func toggleTimer() {

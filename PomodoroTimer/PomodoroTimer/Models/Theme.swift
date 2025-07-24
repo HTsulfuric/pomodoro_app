@@ -1,6 +1,13 @@
 import SwiftUI
 import AppKit
 
+/// Window background type options for themes
+enum WindowBackgroundType {
+    case blur
+    case solid
+    case gradient
+}
+
 /// Represents different visual themes for the Pomodoro timer
 enum Theme: String, CaseIterable, Identifiable {
     case minimal
@@ -102,6 +109,94 @@ enum Theme: String, CaseIterable, Identifiable {
             return "grid"
         case .terminal:
             return "terminal"
+        }
+    }
+    
+    // MARK: - Button Theme Properties
+    
+    /// Primary button background color (play/pause button)
+    var primaryButtonColor: Color {
+        switch self {
+        case .minimal:
+            return .nordAccent.opacity(0.8)
+        case .grid:
+            return .green.opacity(0.8)
+        case .terminal:
+            return Color(red: 0, green: 0.8, blue: 0).opacity(0.8)
+        }
+    }
+    
+    /// Secondary button background color (reset, skip, sound buttons)
+    var secondaryButtonColor: Color {
+        switch self {
+        case .minimal:
+            return .nordNight3.opacity(0.6)
+        case .grid:
+            return .nordNight2.opacity(0.7)
+        case .terminal:
+            return Color(red: 0, green: 0.4, blue: 0).opacity(0.6)
+        }
+    }
+    
+    /// Button text/icon color
+    var buttonTextColor: Color {
+        switch self {
+        case .minimal:
+            return .nordPrimary
+        case .grid:
+            return .nordPrimary
+        case .terminal:
+            return Color(red: 0, green: 1, blue: 0)
+        }
+    }
+    
+    /// Button hover background color
+    var buttonHoverColor: Color {
+        switch self {
+        case .minimal:
+            return .nordAccent
+        case .grid:
+            return .green
+        case .terminal:
+            return Color(red: 0, green: 1, blue: 0)
+        }
+    }
+    
+    /// Button shadow color
+    var buttonShadowColor: Color {
+        switch self {
+        case .minimal:
+            return .black
+        case .grid:
+            return .black
+        case .terminal:
+            return Color(red: 0, green: 0.5, blue: 0) // Dark green shadow for terminal theme
+        }
+    }
+    
+    // MARK: - Window Theme Properties
+    
+    /// Window background type
+    var windowBackgroundType: WindowBackgroundType {
+        switch self {
+        case .minimal:
+            return .blur
+        case .grid:
+            return .solid
+        case .terminal:
+            return .solid
+        }
+    }
+    
+    /// Window background color (used with solid/gradient types)
+    var windowBackgroundColor: Color {
+        switch self {
+        case .minimal:
+            return .clear // Blur effect handles background
+        case .grid:
+            return .nordNight0.opacity(0.95)
+        case .terminal:
+            return .black
         }
     }
     

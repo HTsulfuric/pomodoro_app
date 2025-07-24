@@ -15,14 +15,14 @@ struct ThemePickerView: View {
             }) {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.nordSecondary.opacity(0.8))
+                    .foregroundColor(viewModel.currentTheme.buttonTextColor.opacity(0.8))
                     .frame(width: 32, height: 32)
-                    .background(Color.nordNight3.opacity(0.3))
+                    .background(viewModel.currentTheme.secondaryButtonColor.opacity(0.7))
                     .clipShape(Circle())
                     .scaleEffect(isExpanded ? 1.1 : 1.0)
                     .rotationEffect(.degrees(isExpanded ? 90 : 0))
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
             
             // Theme selection panel
             if isExpanded {

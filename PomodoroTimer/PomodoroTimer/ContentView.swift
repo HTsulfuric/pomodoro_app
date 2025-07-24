@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: TimerViewModel
+    @State private var spaceKeyPressed = false
     
     // Version info computed properties
     private var appVersion: String {
@@ -73,22 +74,20 @@ struct ContentView: View {
             // Control buttons
             VStack(spacing: 16) {
                 HStack(spacing: 20) {
-                    // Play/Pause button (primary)
+                    // Play/Pause button (primary) with space key feedback
                     Button(action: {
-                        if viewModel.pomodoroState.isRunning {
-                            viewModel.pauseTimer()
-                        } else {
-                            viewModel.startTimer()
-                        }
+                        toggleTimer()
                     }) {
                         Image(systemName: viewModel.pomodoroState.isRunning ? "pause.fill" : "play.fill")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.nordPrimary)
                             .frame(width: 50, height: 50)
-                            .background(Color.nordAccent.opacity(0.8))
+                            .background(Color.nordAccent.opacity(spaceKeyPressed ? 1.0 : 0.8))
                             .clipShape(Circle())
+                            .scaleEffect(spaceKeyPressed ? 1.1 : 1.0)
                     }
                     .buttonStyle(CircleHoverButtonStyle())
+                    .animation(.easeInOut(duration: 0.1), value: spaceKeyPressed)
                     
                     // Skip button
                     Button(action: {
@@ -149,30 +148,30 @@ struct ContentView: View {
                 .clipShape(Capsule())
                 
                 // URL Scheme Test button
-                Button("🔗 Test: URL Toggle") {
-                    print("🎯 Testing URL scheme handler directly...")
+                Button(" Test: URL Toggle") {
+                    print(" Testing URL scheme handler directly...")
                     let testURL = URL(string: "pomodoro://toggle")!
                     // Simulate URL scheme handling by directly calling timer methods
-                    print("🔗 Simulating: \(testURL)")
-                    print("🔗 URL scheme: \(testURL.scheme ?? "nil")")
-                    print("🔗 URL host: \(testURL.host ?? "nil")")
+                    print(" Simulating: \(testURL)")
+                    print(" URL scheme: \(testURL.scheme ?? "nil")")
+                    print(" URL host: \(testURL.host ?? "nil")")
                     
                     // Direct timer toggle (simulating what the URL handler would do)
                     if let command = testURL.host {
-                        print("📥 Simulated URL command: \(command)")
+                        print(" Simulated URL command: \(command)")
                         switch command {
                         case "toggle":
-                            print("🎯 Simulated handleToggleCommand")
+                            print(" Simulated handleToggleCommand")
                             if viewModel.pomodoroState.isRunning {
-                                print("⏸️ Pausing timer via simulated URL command")
+                                print(" Pausing timer via simulated URL command")
                                 viewModel.pauseTimer()
                             } else {
-                                print("▶️ Starting timer via simulated URL command")
+                                print(" Starting timer via simulated URL command")
                                 viewModel.startTimer()
                             }
-                            print("✅ Simulated handleToggleCommand completed")
+                            print(" Simulated handleToggleCommand completed")
                         default:
-                            print("⚠️ Unknown simulated command: \(command)")
+                            print(" Unknown simulated command: \(command)")
                         }
                     }
                 }
@@ -195,6 +194,19 @@ struct ContentView: View {
             .edgesIgnoringSafeArea(.all)
             .background(TransparentBackground())
             .preferredColorScheme(.dark)
+            .onReceive(NotificationCenter.default.publisher(for: .spaceKeyPressed)) { _ in
+                print(" Space key notification received in ContentView - showing visual feedback")
+                // Only show visual feedback, TimerViewModel handles the timer logic
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    spaceKeyPressed = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation(.easeInOut(duration: 0.1)) {
+                        spaceKeyPressed = false
+                    }
+                }
+            }
             
             // Version info overlay
             VStack {
@@ -212,6 +224,35 @@ struct ContentView: View {
                 }
                 .padding(.leading, 16)
                 .padding(.bottom, 12)
+            }
+        }
+    }
+    
+    // MARK: - Helper Functions
+    
+    /// Toggle timer without visual feedback (for button clicks)
+    private func toggleTimer() {
+        if viewModel.pomodoroState.isRunning {
+            viewModel.pauseTimer()
+        } else {
+            viewModel.startTimer()
+        }
+    }
+    
+    /// Toggle timer with visual feedback (for space key)
+    private func toggleTimerWithFeedback() {
+        // Trigger visual feedback
+        withAnimation(.easeInOut(duration: 0.1)) {
+            spaceKeyPressed = true
+        }
+        
+        // Toggle timer
+        toggleTimer()
+        
+        // Reset visual feedback after brief delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.easeInOut(duration: 0.1)) {
+                spaceKeyPressed = false
             }
         }
     }

@@ -46,12 +46,12 @@ class SoundManager: ObservableObject {
             
             print("🔊 NSSound.play() returned: \(success)")
             if success {
-                print("✅ SUCCESS: NSSound played - should be audible")
+                print(" SUCCESS: NSSound played - should be audible")
             } else {
-                print("❌ FAILED: NSSound.play() returned false")
+                print(" FAILED: NSSound.play() returned false")
             }
         } else {
-            print("❌ FAILED: NSSound(named: \(soundName)) returned nil")
+            print(" FAILED: NSSound(named: \(soundName)) returned nil")
             // Fallback to system beep
             NSSound.beep()
             print("🔊 Fallback: NSSound.beep() called")
@@ -72,9 +72,9 @@ class SoundManager: ObservableObject {
             currentSound = sound
             sound.volume = 0.8 // Set to 80% volume for custom sounds
             let success = sound.play()
-            print(success ? "✅ Custom sound played: \(soundName)" : "❌ Failed to play custom sound: \(soundName)")
+            print(success ? " Custom sound played: \(soundName)" : " Failed to play custom sound: \(soundName)")
         } else {
-            print("❌ Failed to create NSSound from: \(soundURL)")
+            print(" Failed to create NSSound from: \(soundURL)")
         }
     }
     

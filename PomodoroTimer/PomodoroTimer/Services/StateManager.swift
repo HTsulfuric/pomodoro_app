@@ -40,9 +40,9 @@ class StateManager {
         if !FileManager.default.fileExists(atPath: pomodoroDir.path) {
             do {
                 try FileManager.default.createDirectory(at: pomodoroDir, withIntermediateDirectories: true, attributes: nil)
-                print("✅ Created state directory: \(pomodoroDir.path)")
+                print(" Created state directory: \(pomodoroDir.path)")
             } catch {
-                print("❌ Failed to create state directory: \(error)")
+                print(" Failed to create state directory: \(error)")
             }
         }
         
@@ -80,7 +80,7 @@ class StateManager {
                 print("💾 State written: \(state.phase) - \(state.timeRemaining)s - running: \(state.isRunning)")
                 
             } catch {
-                print("❌ Failed to write state: \(error)")
+                print(" Failed to write state: \(error)")
                 
                 // Clean up temporary file on error
                 let tempURL = self.fileURL.appendingPathExtension(UUID().uuidString)
@@ -111,13 +111,13 @@ class StateManager {
                 let staleness = now - state.lastUpdateTimestamp
                 
                 if staleness > 10.0 {
-                    print("⚠️ State file is stale (age: \(Int(staleness))s), ignoring")
+                    print(" State file is stale (age: \(Int(staleness))s), ignoring")
                     return nil
                 }
                 
                 // Validate process is still running
                 if !isProcessRunning(pid: state.appPid) {
-                    print("⚠️ App process \(state.appPid) is no longer running, ignoring stale state")
+                    print(" App process \(state.appPid) is no longer running, ignoring stale state")
                     return nil
                 }
                 
@@ -125,7 +125,7 @@ class StateManager {
                 return state
                 
             } catch {
-                print("❌ Failed to read state: \(error)")
+                print(" Failed to read state: \(error)")
                 return nil
             }
         }
@@ -141,7 +141,7 @@ class StateManager {
                     try FileManager.default.removeItem(at: self.fileURL)
                     print("🗑️ State file cleared")
                 } catch {
-                    print("❌ Failed to clear state file: \(error)")
+                    print(" Failed to clear state file: \(error)")
                 }
             }
         }

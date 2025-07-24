@@ -64,17 +64,17 @@ class TimerViewModel: ObservableObject {
     func toggleTimer() {
         print("⏯️ toggleTimer() called - current state: isRunning=\(pomodoroState.isRunning)")
         if pomodoroState.isRunning {
-            print("⏸️ Calling pauseTimer()...")
+            print(" Calling pauseTimer()...")
             pauseTimer()
         } else {
-            print("▶️ Calling startTimer()...")
+            print(" Calling startTimer()...")
             startTimer()
         }
-        print("✅ toggleTimer() completed - new state: isRunning=\(pomodoroState.isRunning)")
+        print(" toggleTimer() completed - new state: isRunning=\(pomodoroState.isRunning)")
     }
     
     func startTimer() {
-        print("▶️ Starting timer: \(pomodoroState.currentPhase.rawValue)")
+        print(" Starting timer: \(pomodoroState.currentPhase.rawValue)")
         pomodoroState.start()
         beginBackgroundActivity()  // Prevent App Nap while timer runs
         startTimerLoop()
@@ -82,7 +82,7 @@ class TimerViewModel: ObservableObject {
     }
     
     func pauseTimer() {
-        print("⏸️ Pausing timer: \(pomodoroState.currentPhase.rawValue)")
+        print(" Pausing timer: \(pomodoroState.currentPhase.rawValue)")
         pomodoroState.pause()
         endBackgroundActivity()  // Allow App Nap when timer paused
         stopTimerLoop()
@@ -90,7 +90,7 @@ class TimerViewModel: ObservableObject {
     }
     
     func resetTimer() {
-        print("🔄 Resetting timer: \(pomodoroState.currentPhase.rawValue)")
+        print(" Resetting timer: \(pomodoroState.currentPhase.rawValue)")
         pomodoroState.reset()
         endBackgroundActivity()  // Allow App Nap when timer reset
         stopTimerLoop()
@@ -98,7 +98,7 @@ class TimerViewModel: ObservableObject {
     }
     
     func skipPhase() {
-        print("⏭️ Skipping phase: \(pomodoroState.currentPhase.rawValue)")
+        print(" Skipping phase: \(pomodoroState.currentPhase.rawValue)")
         let wasWork = pomodoroState.currentPhase == .work
         
         endBackgroundActivity()  // Allow App Nap when phase skipped
@@ -112,7 +112,7 @@ class TimerViewModel: ObservableObject {
         pomodoroState.skip()
         writeStateFile()
         
-        print("🔄 Skipped to: \(pomodoroState.currentPhase.rawValue)")
+        print(" Skipped to: \(pomodoroState.currentPhase.rawValue)")
     }
     
     // Debug function for testing
@@ -157,7 +157,7 @@ class TimerViewModel: ObservableObject {
         if completedPhase == .work {
             totalSessionsToday += 1
             savePersistentData()
-            print("✅ Work session completed. Total today: \(totalSessionsToday)")
+            print(" Work session completed. Total today: \(totalSessionsToday)")
         }
         
         endBackgroundActivity()  // Allow App Nap when phase completes
@@ -176,7 +176,7 @@ class TimerViewModel: ObservableObject {
             sessionCount: totalSessionsToday
         )
         
-        print("🔄 Phase completed. New phase: \(pomodoroState.currentPhase.rawValue)")
+        print(" Phase completed. New phase: \(pomodoroState.currentPhase.rawValue)")
     }
     
     // MARK: - State File Management for SketchyBar
@@ -195,7 +195,7 @@ class TimerViewModel: ObservableObject {
             let jsonData = try JSONSerialization.data(withJSONObject: stateData, options: [.prettyPrinted])
             try jsonData.write(to: stateFileURL)
         } catch {
-            print("❌ Failed to write state file: \(error)")
+            print(" Failed to write state file: \(error)")
         }
     }
     
@@ -248,18 +248,6 @@ class TimerViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
-        // Space key notification observer
-        print("🔗 Setting up space key notification observer...")
-        NotificationCenter.default.publisher(for: .spaceKeyPressed)
-            .sink { [weak self] _ in
-                print("🔑 Space key notification received - toggling timer")
-                print("⏯️ Current timer state: isRunning=\(self?.pomodoroState.isRunning ?? false)")
-                self?.toggleTimer()
-                print("✅ Timer toggle completed")
-            }
-            .store(in: &cancellables)
-        print("✅ Space key notification observer setup complete")
-        
-        print("🔗 TimerViewModel listening for user notification actions and space key")
+        print(" TimerViewModel listening for user notification actions")
     }
 }

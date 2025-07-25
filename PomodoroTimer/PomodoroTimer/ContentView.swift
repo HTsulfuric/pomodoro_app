@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var screenContext: ScreenContext
     @State private var rippleTrigger: Bool = false
     
     // Version info computed properties
@@ -20,9 +21,67 @@ struct ContentView: View {
         viewModel.currentTheme.createExperience()
     }
     
+    // MARK: - Dynamic Sizing Properties
+    
+    /// Dynamic font size for session info primary text
+    private var sessionInfoLargeFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 18,
+            minSize: 14,
+            maxSize: 24
+        )
+    }
+    
+    /// Dynamic font size for session info secondary text
+    private var sessionInfoSmallFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 14,
+            minSize: 11,
+            maxSize: 18
+        )
+    }
+    
+    /// Dynamic font size for version info
+    private var versionInfoLargeFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 10,
+            minSize: 8,
+            maxSize: 13
+        )
+    }
+    
+    /// Dynamic font size for version info secondary
+    private var versionInfoSmallFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 9,
+            minSize: 7,
+            maxSize: 12
+        )
+    }
+    
+    /// Dynamic spacing between session info elements
+    private var sessionInfoSpacing: CGFloat {
+        return screenContext.elementSpacing * 0.3
+    }
+    
+    /// Dynamic spacing between main sections
+    private var mainSectionSpacing: CGFloat {
+        return screenContext.elementSpacing
+    }
+    
+    /// Dynamic version info spacing
+    private var versionInfoSpacing: CGFloat {
+        return screenContext.elementSpacing * 0.1
+    }
+    
+    /// Dynamic padding for version and theme picker overlays
+    private var overlayPadding: CGFloat {
+        return screenContext.contentPadding * 0.67
+    }
+    
     var body: some View {
         ZStack {
-        VStack(spacing: 20) {
+        VStack(spacing: mainSectionSpacing) {
             Spacer()
             
             // Theme-controlled content view (timer display, animations, etc.)
@@ -33,14 +92,14 @@ struct ContentView: View {
             .id("content-\(viewModel.currentTheme.id)")
             .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
             
-            // Session info - now theme-aware with dynamic colors for terminal theme
-            VStack(spacing: 6) {
+            // Session info with dynamic sizing and colors
+            VStack(spacing: sessionInfoSpacing) {
                 Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .font(.system(size: sessionInfoLargeFontSize, weight: .semibold, design: .rounded))
                     .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                 
                 Text("Today: \(viewModel.totalSessionsToday) sessions")
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .font(.system(size: sessionInfoSmallFontSize, weight: .medium, design: .rounded))
                     .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
             }
             
@@ -51,7 +110,7 @@ struct ContentView: View {
             
             Spacer()
         }
-            .padding(24)
+            .padding(screenContext.contentPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
             .background(
@@ -67,22 +126,22 @@ struct ContentView: View {
                 rippleTrigger.toggle()
             }
             
-            // Version info overlay
+            // Version info overlay with dynamic sizing
             VStack {
                 Spacer()
                 HStack {
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: versionInfoSpacing) {
                         Text("PomodoroTimer v\(appVersion)")
-                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .font(.system(size: versionInfoLargeFontSize, weight: .medium, design: .monospaced))
                             .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.6))
                         Text("macOS \(macOSVersion)")
-                            .font(.system(size: 9, weight: .regular, design: .monospaced))
+                            .font(.system(size: versionInfoSmallFontSize, weight: .regular, design: .monospaced))
                             .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.4))
                     }
                     Spacer()
                 }
-                .padding(.leading, 16)
-                .padding(.bottom, 12)
+                .padding(.leading, overlayPadding)
+                .padding(.bottom, overlayPadding * 0.5)
             }
             
             // Theme picker overlay
@@ -122,4 +181,5 @@ struct ContentView: View {
     ContentView()
         .frame(minWidth: 300, minHeight: 400)
         .environmentObject(TimerViewModel())
+        .environmentObject(ScreenContext())
 }

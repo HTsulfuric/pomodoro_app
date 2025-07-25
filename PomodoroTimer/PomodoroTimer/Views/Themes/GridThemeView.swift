@@ -3,39 +3,111 @@ import SwiftUI
 /// A GitHub contribution graph inspired theme with discrete time squares
 struct GridThemeView: View {
     @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var screenContext: ScreenContext
     @Binding var rippleTrigger: Bool
     
+    // MARK: - Dynamic Sizing Properties
+    
+    /// Main horizontal spacing between left and right sections
+    private var mainSpacing: CGFloat {
+        return screenContext.elementSpacing * 1.2
+    }
+    
+    /// Vertical spacing between elements
+    private var elementSpacing: CGFloat {
+        return screenContext.elementSpacing * 0.8
+    }
+    
+    /// Dynamic font size for phase emoji
+    private var emojiFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 56,
+            minSize: 42,
+            maxSize: 80
+        )
+    }
+    
+    /// Dynamic font size for main timer display
+    private var timerFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 32,
+            minSize: 24,
+            maxSize: 48
+        )
+    }
+    
+    /// Dynamic font size for phase name
+    private var phaseNameFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 12,
+            minSize: 10,
+            maxSize: 16
+        )
+    }
+    
+    /// Dynamic font size for session info
+    private var sessionInfoLargeFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 14,
+            minSize: 12,
+            maxSize: 18
+        )
+    }
+    
+    /// Dynamic font size for session info secondary text
+    private var sessionInfoSmallFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 12,
+            minSize: 10,
+            maxSize: 16
+        )
+    }
+    
+    /// Dynamic font size for progress percentage
+    private var progressFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 14,
+            minSize: 11,
+            maxSize: 18
+        )
+    }
+    
+    /// Dynamic padding for the entire view
+    private var viewPadding: CGFloat {
+        return screenContext.contentPadding
+    }
+    
     var body: some View {
-        // Horizontal layout optimized for square-ish 400×380 format
-        HStack(spacing: 24) {
+        // Horizontal layout with dynamic spacing
+        HStack(spacing: mainSpacing) {
             // Left side: Timer info and session details
-            VStack(spacing: 16) {
-                // Phase emoji and timer
-                VStack(spacing: 8) {
+            VStack(spacing: elementSpacing) {
+                // Phase emoji and timer with dynamic spacing
+                VStack(spacing: elementSpacing * 0.5) {
                     Text(viewModel.pomodoroState.currentPhase.emoji)
-                        .font(.system(size: 56))
+                        .font(.system(size: emojiFontSize))
                     
                     Text(viewModel.pomodoroState.formattedTime)
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .font(.system(size: timerFontSize, weight: .bold, design: .rounded))
                         .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .monospacedDigit()
                     
                     Text(viewModel.pomodoroState.currentPhase.rawValue.uppercased())
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.system(size: phaseNameFontSize, weight: .medium, design: .rounded))
                         .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .tracking(1.2)
                 }
                 
                 Spacer()
                 
-                // Session progress info
-                VStack(spacing: 6) {
+                // Session progress info with dynamic font sizes
+                VStack(spacing: elementSpacing * 0.3) {
                     Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: sessionInfoLargeFontSize, weight: .semibold, design: .rounded))
                         .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                     
                     Text("Today: \(viewModel.totalSessionsToday)")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.system(size: sessionInfoSmallFontSize, weight: .medium, design: .rounded))
                         .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                 }
                 
@@ -46,28 +118,30 @@ struct GridThemeView: View {
             }
             .frame(maxWidth: 160)
             
-            // Right side: Grid visualization
-            VStack(spacing: 12) {
+            // Right side: Grid visualization with dynamic spacing
+            VStack(spacing: elementSpacing * 0.6) {
                 if viewModel.pomodoroState.currentPhase == .work {
                     WorkGridView(
                         progress: viewModel.pomodoroState.progress,
-                        accentColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase)
+                        accentColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase),
+                        screenContext: screenContext
                     )
                 } else {
                     BreakGridView(
                         progress: viewModel.pomodoroState.progress,
-                        accentColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase)
+                        accentColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase),
+                        screenContext: screenContext
                     )
                 }
                 
-                // Progress percentage
+                // Progress percentage with dynamic font size
                 Text("\(Int(viewModel.pomodoroState.progress * 100))%")
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(.system(size: progressFontSize, weight: .medium, design: .monospaced))
                     .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
             }
             .frame(maxWidth: .infinity)
         }
-        .padding(20)
+        .padding(viewPadding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
@@ -76,10 +150,19 @@ struct GridThemeView: View {
 struct WorkGridView: View {
     let progress: Double
     let accentColor: Color
+    let screenContext: ScreenContext
     
     private let gridSize = 5
-    private let squareSize: CGFloat = 28
-    private let squareSpacing: CGFloat = 6
+    
+    /// Dynamic square size based on screen context
+    private var squareSize: CGFloat {
+        return screenContext.gridSquareSize
+    }
+    
+    /// Dynamic spacing based on screen context
+    private var squareSpacing: CGFloat {
+        return screenContext.gridSpacing
+    }
     
     /// Spiral pattern starting from outside corners, moving inward
     private var spiralOrder: [Int] {
@@ -126,9 +209,17 @@ struct WorkGridView: View {
 struct BreakGridView: View {
     let progress: Double
     let accentColor: Color
+    let screenContext: ScreenContext
     
-    private let squareSize: CGFloat = 36
-    private let squareSpacing: CGFloat = 8
+    /// Dynamic square size for break grid (slightly larger than work grid)
+    private var squareSize: CGFloat {
+        return screenContext.gridSquareSize * 1.3
+    }
+    
+    /// Dynamic spacing for break grid (slightly larger spacing)
+    private var squareSpacing: CGFloat {
+        return screenContext.gridSpacing * 1.3
+    }
     
     var filledSquares: Int {
         Int(progress * 5) // 5 total squares for 5 minutes
@@ -190,5 +281,6 @@ struct RippleIndicator: View {
     GridThemeView(rippleTrigger: .constant(false))
         .frame(minWidth: 300, minHeight: 400)
         .environmentObject(TimerViewModel())
+        .environmentObject(ScreenContext())
         .background(Color.black.opacity(0.8))
 }

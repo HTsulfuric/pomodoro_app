@@ -3,13 +3,18 @@ import SwiftUI
 /// Sophisticated terminal theme with structured TUI layout and ASCII art timer display
 struct TerminalThemeView: View {
     @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var screenContext: ScreenContext
     @Binding var rippleTrigger: Bool
     
     @State private var currentProgressBar: String = ""
     
+    // MARK: - Color Properties
+    
     private var terminalColor: Color {
         viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase)
     }
+    
+    // MARK: - Data Properties
     
     private var progressPercentage: Int {
         Int(viewModel.pomodoroState.progress * 100)
@@ -19,6 +24,69 @@ struct TerminalThemeView: View {
         "Sessions Today: \(viewModel.totalSessionsToday)"
     }
     
+    // MARK: - Dynamic Sizing Properties
+    
+    /// Dynamic font sizes for terminal theme
+    private var fontSizes: (timer: CGFloat, header: CGFloat, controls: CGFloat) {
+        return screenContext.terminalFontSizes
+    }
+    
+    /// Dynamic font size for the main timer display
+    private var timerFontSize: CGFloat {
+        return fontSizes.timer
+    }
+    
+    /// Dynamic font size for header and footer borders
+    private var headerFontSize: CGFloat {
+        return fontSizes.header
+    }
+    
+    /// Dynamic font size for controls text
+    private var controlsFontSize: CGFloat {
+        return fontSizes.controls
+    }
+    
+    /// Dynamic font size for phase indicator
+    private var phaseIndicatorFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 18,
+            minSize: 14,
+            maxSize: 24
+        )
+    }
+    
+    /// Dynamic font size for progress bar
+    private var progressBarFontSize: CGFloat {
+        return screenContext.scaledFont(
+            baseSize: 16,
+            minSize: 12,
+            maxSize: 20
+        )
+    }
+    
+    /// Dynamic spacing between main sections
+    private var sectionSpacing: CGFloat {
+        return screenContext.elementSpacing
+    }
+    
+    /// Dynamic horizontal padding for content
+    private var horizontalPadding: CGFloat {
+        return screenContext.contentPadding * 0.67 // Slightly less padding for terminal
+    }
+    
+    /// Dynamic progress bar length based on screen width
+    private var progressBarLength: Int {
+        let baseLength = 50
+        let screenWidth = screenContext.screenFrame.width
+        
+        // Scale progress bar length based on screen width
+        // For larger screens, use longer progress bars
+        let scaleFactor = screenWidth / 1920.0
+        let scaledLength = Int(Double(baseLength) * scaleFactor)
+        
+        // Clamp between reasonable bounds
+        return max(30, min(100, scaledLength))
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -30,13 +98,13 @@ struct TerminalThemeView: View {
                 // Structured TUI layout with box-drawing characters
                 VStack(spacing: 0) {
                     // Header with box-drawing characters
-                    headerView(width: geometry.size.width)
+                    headerView()
                     
                     // Main content area
                     mainContentView(geometry: geometry)
                     
                     // Footer with controls
-                    footerView(width: geometry.size.width)
+                    footerView()
                 }
             }
         }
@@ -47,28 +115,28 @@ struct TerminalThemeView: View {
         }
     }
     
-    private func headerView(width: CGFloat) -> some View {
+    private func headerView() -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Text("┌─ Pomodoro Timer ")
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: headerFontSize, design: .monospaced))
                     .foregroundColor(terminalColor)
                 
                 // Let SwiftUI fill the space with repeating characters
                 HStack(spacing: 0) {
                     ForEach(0..<200, id: \.self) { _ in
                         Text("─")
-                            .font(.system(size: 14, design: .monospaced))
+                            .font(.system(size: headerFontSize, design: .monospaced))
                             .foregroundColor(terminalColor)
                     }
                 }
                 .clipped()
                 
                 Text(" \(sessionInfo) ┐")
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: headerFontSize, design: .monospaced))
                     .foregroundColor(terminalColor)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, horizontalPadding)
         }
     }
     
@@ -76,103 +144,103 @@ struct TerminalThemeView: View {
         VStack(spacing: 0) {
             // Main content area with side borders
             ZStack {
-                // Central timer display
-                VStack(spacing: 24) {
+                // Central timer display with dynamic spacing
+                VStack(spacing: sectionSpacing) {
                     Spacer()
                     
                     // Clean 7-segment timer display
-                    segmentTimerView(geometry: geometry)
+                    segmentTimerView()
                     
-                    // Phase indicator
+                    // Phase indicator with dynamic font size
                     Text("[ \(viewModel.pomodoroState.currentPhase.rawValue.uppercased()) ]")
-                        .font(.system(size: 18, weight: .bold, design: .monospaced))
+                        .font(.system(size: phaseIndicatorFontSize, weight: .bold, design: .monospaced))
                         .foregroundColor(terminalColor)
                         .tracking(1.0)
                     
                     // Full-width progress bar
-                    progressBarView(width: geometry.size.width)
+                    progressBarView()
                     
                     Spacer()
                 }
                 
-                // Side borders overlay
+                // Side borders overlay with dynamic font and padding
                 HStack(spacing: 0) {
                     Text("│")
-                        .font(.system(size: 14, design: .monospaced))
+                        .font(.system(size: headerFontSize, design: .monospaced))
                         .foregroundColor(terminalColor)
-                        .padding(.leading, 16)
+                        .padding(.leading, horizontalPadding)
                     
                     Spacer()
                     
                     Text("│")
-                        .font(.system(size: 14, design: .monospaced))
+                        .font(.system(size: headerFontSize, design: .monospaced))
                         .foregroundColor(terminalColor)
-                        .padding(.trailing, 16)
+                        .padding(.trailing, horizontalPadding)
                 }
             }
         }
     }
     
-    private func segmentTimerView(geometry: GeometryProxy) -> some View {
+    private func segmentTimerView() -> some View {
         let timeString = viewModel.pomodoroState.formattedTime
         return Text(timeString)
-            .font(.custom("DSEG7Classic-Bold", size: 48))
+            .font(.custom("DSEG7Classic-Bold", size: timerFontSize))
             .foregroundColor(terminalColor)
             .multilineTextAlignment(.center)
     }
     
-    private func progressBarView(width: CGFloat) -> some View {
-        VStack(spacing: 8) {
+    private func progressBarView() -> some View {
+        VStack(spacing: sectionSpacing * 0.33) {
             Text(currentProgressBar)
-                .font(.system(size: 16, design: .monospaced))
+                .font(.system(size: progressBarFontSize, design: .monospaced))
                 .foregroundColor(terminalColor)
                 .tracking(0.5)
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, horizontalPadding * 1.33)
     }
     
-    private func footerView(width: CGFloat) -> some View {
+    private func footerView() -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Text("└")
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: headerFontSize, design: .monospaced))
                     .foregroundColor(terminalColor)
                 
                 // Let SwiftUI fill the space with repeating characters
                 HStack(spacing: 0) {
                     ForEach(0..<200, id: \.self) { _ in
                         Text("─")
-                            .font(.system(size: 14, design: .monospaced))
+                            .font(.system(size: headerFontSize, design: .monospaced))
                             .foregroundColor(terminalColor)
                     }
                 }
                 .clipped()
                 
                 Text("┘")
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: headerFontSize, design: .monospaced))
                     .foregroundColor(terminalColor)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, horizontalPadding)
             
-            // Keyboard controls
-            HStack(spacing: 20) {
+            // Keyboard controls with dynamic font and spacing
+            HStack(spacing: sectionSpacing) {
                 Text("[S]pace: Start/Pause")
                 Text("[R]eset")
                 Text("[S]kip")
                 Text("[O/ESC]: Hide")
             }
-            .font(.system(size: 12, design: .monospaced))
+            .font(.system(size: controlsFontSize, design: .monospaced))
             .foregroundColor(terminalColor.opacity(0.7))
-            .padding(.top, 4)
-            .padding(.bottom, 8)
+            .padding(.top, sectionSpacing * 0.2)
+            .padding(.bottom, sectionSpacing * 0.33)
         }
     }
     
     
     private func updateProgressBar() {
-        let progressBarLength = 50 // Much longer progress bar for better visibility
-        let filledBlocks = Int(Double(progressBarLength) * viewModel.pomodoroState.progress)
-        let emptyBlocks = progressBarLength - filledBlocks
+        let barLength = progressBarLength // Dynamic length based on screen size
+        let filledBlocks = Int(Double(barLength) * viewModel.pomodoroState.progress)
+        let emptyBlocks = barLength - filledBlocks
         
         let filled = String(repeating: "█", count: filledBlocks)
         let empty = String(repeating: "░", count: emptyBlocks)
@@ -187,5 +255,6 @@ struct TerminalThemeView: View {
     TerminalThemeView(rippleTrigger: .constant(false))
         .frame(minWidth: 800, minHeight: 600)
         .environmentObject(TimerViewModel())
+        .environmentObject(ScreenContext())
         .background(Color.black)
 }

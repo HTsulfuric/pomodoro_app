@@ -11,6 +11,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // State management (moved from PomodoroTimerApp)
     let timerViewModel = TimerViewModel()
     
+    // Screen context for dynamic theme sizing
+    let screenContext = ScreenContext()
+    
     // Floating overlay window components
     var overlayPanel: OverlayPanel?
     private var hostingController: NSHostingController<AnyView>?
@@ -174,6 +177,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let contentView = AnyView(
             ContentView()
                 .environmentObject(timerViewModel)
+                .environmentObject(screenContext)
         )
 
         hostingController = NSHostingController(rootView: contentView)
@@ -221,6 +225,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         let contentView = ContentView()
             .environmentObject(timerViewModel)
+            .environmentObject(screenContext)
 
         let hostingController = NSHostingController(rootView: contentView)
         
@@ -260,16 +265,45 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         print("🪟 showOverlay() - Panel frame before show: \(panel.frame)")
         print("🪟 showOverlay() - Panel content size: \(panel.contentView?.frame.size ?? CGSize.zero)")
         
-        // Center panel on current screen (in case user moved between monitors)
+        // Center panel on current screen and resize if screen changed
         if let screen = NSScreen.main {
             let screenFrame = screen.frame
-            let panelSize = panel.frame.size
-            print("🪟 showOverlay() - Screen frame: \(screenFrame)")
-            print("🪟 showOverlay() - Panel size: \(panelSize)")
+            let currentPanelSize = panel.frame.size
+            let expectedPanelSize = timerViewModel.currentTheme.preferredWindowSize
             
+            print("🪟 showOverlay() - Screen frame: \(screenFrame)")
+            print("🪟 showOverlay() - Current panel size: \(currentPanelSize)")
+            print("🪟 showOverlay() - Expected panel size: \(expectedPanelSize)")
+            
+            // Update screen context if screen changed (triggers theme re-sizing)
+            screenContext.updateScreen(screen)
+            
+            // CRITICAL FIX: Resize the actual panel if screen changed
+            // Compare expected size vs current size to detect if we need to resize
+            let sizeMismatch = abs(currentPanelSize.width - expectedPanelSize.width) > 1.0 || 
+                              abs(currentPanelSize.height - expectedPanelSize.height) > 1.0
+            
+            if sizeMismatch {
+                print("🪟 showOverlay() - Panel size mismatch detected, resizing panel")
+                print("🪟 showOverlay() - Resizing panel from \(Int(currentPanelSize.width))×\(Int(currentPanelSize.height)) to \(Int(expectedPanelSize.width))×\(Int(expectedPanelSize.height))")
+                
+                // Resize the panel to match the new screen
+                panel.setContentSize(expectedPanelSize)
+                
+                // Update hostingController view frame to match new panel size
+                if let contentView = panel.contentView, let controller = hostingController {
+                    controller.view.frame = contentView.bounds
+                    controller.view.autoresizingMask = [.width, .height]
+                }
+                
+                print("🪟 showOverlay() - Panel resized successfully")
+            }
+            
+            // Center the panel on the new screen
+            let finalPanelSize = panel.frame.size // Get the actual size after potential resize
             let newOrigin = NSPoint(
-                x: (screenFrame.width - panelSize.width) / 2 + screenFrame.minX,
-                y: (screenFrame.height - panelSize.height) / 2 + screenFrame.minY
+                x: (screenFrame.width - finalPanelSize.width) / 2 + screenFrame.minX,
+                y: (screenFrame.height - finalPanelSize.height) / 2 + screenFrame.minY
             )
             print("🪟 showOverlay() - Setting panel origin to: \(newOrigin)")
             panel.setFrameOrigin(newOrigin)

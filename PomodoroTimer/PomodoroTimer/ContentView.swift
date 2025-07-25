@@ -15,96 +15,39 @@ struct ContentView: View {
         return "\(version.majorVersion).\(version.minorVersion)"
     }
     
+    /// Current theme experience for sophisticated behavioral architecture
+    private var currentExperience: AnyThemeExperience {
+        viewModel.currentTheme.experience
+    }
+    
     var body: some View {
         ZStack {
         VStack(spacing: 20) {
             Spacer()
             
-            // Theme-based Timer Display
-            Group {
-                switch viewModel.currentTheme {
-                case .minimal:
-                    MinimalThemeView(rippleTrigger: $rippleTrigger)
-                case .grid:
-                    GridThemeView(rippleTrigger: $rippleTrigger)
-                case .terminal:
-                    TerminalThemeView(rippleTrigger: $rippleTrigger)
-                }
-            }
+            // Theme-controlled content view (timer display, animations, etc.)
+            currentExperience.makeContentView(
+                viewModel: viewModel,
+                rippleTrigger: $rippleTrigger
+            )
+            .id("content-\(viewModel.currentTheme.rawValue)")
             .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme)
             
-            
-            // Session info
+            // Session info - now theme-aware
             VStack(spacing: 6) {
                 Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundColor(.nordPrimary)
+                    .foregroundColor(viewModel.currentTheme.primaryTextColor)
                 
                 Text("Today: \(viewModel.totalSessionsToday) sessions")
                     .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundColor(.nordSecondary)
+                    .foregroundColor(viewModel.currentTheme.secondaryTextColor)
             }
             
-            // Control buttons
-            VStack(spacing: 16) {
-                HStack(spacing: 20) {
-                    // Play/Pause button (primary) with space key feedback
-                    Button(action: {
-                        toggleTimer()
-                    }) {
-                        Image(systemName: viewModel.pomodoroState.isRunning ? "pause.fill" : "play.fill")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
-                            .frame(width: 50, height: 50)
-                            .background(viewModel.currentTheme.primaryButtonColor)
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
-                    
-                    // Skip button
-                    Button(action: {
-                        viewModel.skipPhase()
-                    }) {
-                        Image(systemName: "forward.end.fill")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
-                            .frame(width: 44, height: 44)
-                            .background(viewModel.currentTheme.secondaryButtonColor)
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
-                }
-                
-                HStack(spacing: 20) {
-                    // Reset button
-                    Button(action: {
-                        viewModel.resetTimer()
-                    }) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
-                            .frame(width: 44, height: 44)
-                            .background(viewModel.currentTheme.secondaryButtonColor)
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
-                    
-                    // Test Sound button
-                    Button(action: {
-                        print("🔊 Testing sound manually...")
-                        SoundManager.shared.playPhaseChangeSound(for: .work)
-                    }) {
-                        Image(systemName: "speaker.2.fill")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(viewModel.currentTheme.buttonTextColor)
-                            .frame(width: 44, height: 44)
-                            .background(viewModel.currentTheme.secondaryButtonColor)
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
-                }
-            }
-            
+            // Theme-controlled controls (buttons or EmptyView for terminal)
+            currentExperience.makeControlsView(viewModel: viewModel)
+                .id("controls-\(viewModel.currentTheme.rawValue)")
+                .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme)
             
             Spacer()
         }
@@ -116,6 +59,8 @@ struct ContentView: View {
             )
             .edgesIgnoringSafeArea(.all)
             .preferredColorScheme(.dark)
+            .id("theme-\(viewModel.currentTheme.rawValue)") // Explicit view identity for performance
+            .transition(.opacity)
             .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
                 print("🌊 Timer start notification received - triggering ripple effect")
                 // Toggle the boolean to trigger the animation in RippleView
@@ -171,14 +116,6 @@ struct ContentView: View {
         }
     }
     
-    /// Toggle timer without visual feedback (for button clicks)
-    private func toggleTimer() {
-        if viewModel.pomodoroState.isRunning {
-            viewModel.pauseTimer()
-        } else {
-            viewModel.startTimer()
-        }
-    }
 }
 
 #Preview {

@@ -124,12 +124,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     func applicationWillTerminate(_ notification: Notification) {
         // Clean up keyboard monitoring
         KeyboardManager.shared.stopKeyboardMonitoring()
+        
+        // Ensure sleep prevention is stopped
+        SleepPreventionManager.shared.stopPreventingSleep()
+        
         cancellables.removeAll()
         print(" App terminating")
     }
     
     deinit {
         KeyboardManager.shared.stopKeyboardMonitoring()
+        SleepPreventionManager.shared.stopPreventingSleep()
         cancellables.removeAll()
     }
     
@@ -276,6 +281,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Notify KeyboardManager that overlay is now visible
         KeyboardManager.shared.isOverlayVisible = true
         
+        // Start sleep prevention when overlay is shown
+        SleepPreventionManager.shared.startPreventingSleep()
+        
         print("🪟 showOverlay() - Alfred-style overlay shown (no focus stealing)")
     }
     
@@ -284,6 +292,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // Notify KeyboardManager that overlay is now hidden
         KeyboardManager.shared.isOverlayVisible = false
+        
+        // Stop sleep prevention when overlay is hidden
+        SleepPreventionManager.shared.stopPreventingSleep()
         
         print(" Floating overlay hidden")
     }

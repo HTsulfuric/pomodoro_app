@@ -1,5 +1,111 @@
 import SwiftUI
 
+// MARK: - Minimal Theme Definition
+
+/// The classic minimal theme with circular progress and clean aesthetics
+struct MinimalTheme: ThemeDefinition {
+    
+    // MARK: - Theme Identity
+    
+    let id = "minimal"
+    let displayName = "Minimal"
+    let description = "Clean circular progress with subtle animations"
+    let icon = "circle"
+    
+    // MARK: - Color Properties
+    
+    let accentColor: ThemeColor = .triPhase(
+        work: .nordAccent,
+        shortBreak: .nordAccent,
+        longBreak: .nordAccent
+    )
+    
+    let backgroundColor: Color = .clear
+    
+    let primaryTextColor: ThemeColor = .triPhase(
+        work: .nordPrimary,
+        shortBreak: .nordPrimary,
+        longBreak: .nordPrimary
+    )
+    
+    let secondaryTextColor: ThemeColor = .triPhase(
+        work: .nordSecondary,
+        shortBreak: .nordSecondary,
+        longBreak: .nordSecondary
+    )
+    
+    let timerFont: Font = .system(size: 72, weight: .bold, design: .rounded)
+    
+    // MARK: - Button Theme Properties
+    
+    let primaryButtonColor: ThemeColor = .triPhase(
+        work: .nordAccent.opacity(0.8),
+        shortBreak: .nordAccent.opacity(0.8),
+        longBreak: .nordAccent.opacity(0.8)
+    )
+    
+    let secondaryButtonColor: ThemeColor = .triPhase(
+        work: .nordNight3.opacity(0.6),
+        shortBreak: .nordNight3.opacity(0.6),
+        longBreak: .nordNight3.opacity(0.6)
+    )
+    
+    let buttonTextColor: ThemeColor = .triPhase(
+        work: .nordPrimary,
+        shortBreak: .nordPrimary,
+        longBreak: .nordPrimary
+    )
+    
+    let buttonHoverColor: ThemeColor = .triPhase(
+        work: .nordAccent,
+        shortBreak: .nordAccent,
+        longBreak: .nordAccent
+    )
+    
+    let buttonShadowColor: Color = .black
+    
+    // MARK: - Window Theme Properties
+    
+    let windowBackgroundType: WindowBackgroundType = .blur
+    let windowBackgroundColor: Color = .clear
+    
+    // MARK: - Theme Experience Factory
+    
+    func createExperience() -> AnyThemeExperience {
+        return AnyThemeExperience(MinimalExperience())
+    }
+    
+    // MARK: - Registration
+    
+    static func register() {
+        ThemeRegistry.shared.register(MinimalTheme())
+    }
+}
+
+// MARK: - Minimal Theme Experience
+
+/// Minimal theme experience with circular progress and standard controls
+struct MinimalExperience: ThemeExperience {
+    
+    // MARK: - Behavioral Characteristics
+    
+    let allowsVisualControls = true
+    let preferredInteractionModel = InteractionModel.graphical
+    
+    // MARK: - View Factories
+    
+    @ViewBuilder
+    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
+        MinimalThemeView(rippleTrigger: rippleTrigger)
+            .environmentObject(viewModel)
+    }
+    
+    @ViewBuilder
+    func makeControlsView(viewModel: TimerViewModel) -> some View {
+        StandardControlsView(viewModel: viewModel)
+    }
+}
+
 // MARK: - Shared Controls View
 
 /// Standard control layout used by graphical themes (Minimal and Grid)
@@ -77,102 +183,9 @@ struct StandardControlsView: View {
     }
 }
 
-// MARK: - Concrete Theme Experiences
-
-/// Minimal theme experience with circular progress and standard controls
-struct MinimalExperience: ThemeExperience {
-    
-    // MARK: - Behavioral Characteristics
-    
-    let allowsVisualControls = true
-    let preferredInteractionModel = InteractionModel.graphical
-    
-    // MARK: - View Factories
-    
-    @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
-        MinimalThemeView(rippleTrigger: rippleTrigger)
-            .environmentObject(viewModel)
-    }
-    
-    @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> some View {
-        StandardControlsView(viewModel: viewModel)
-    }
-}
-
-/// Grid theme experience with contribution-style visualization and standard controls
-struct GridExperience: ThemeExperience {
-    
-    // MARK: - Behavioral Characteristics
-    
-    let allowsVisualControls = true
-    let preferredInteractionModel = InteractionModel.hybrid
-    
-    // MARK: - View Factories
-    
-    @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
-        GridThemeView(rippleTrigger: rippleTrigger)
-            .environmentObject(viewModel)
-    }
-    
-    @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> some View {
-        StandardControlsView(viewModel: viewModel)
-    }
-}
-
-/// Terminal theme experience with command-line aesthetic and invisible controls
-struct TerminalExperience: ThemeExperience {
-    
-    // MARK: - Behavioral Characteristics
-    
-    let allowsVisualControls = false  // This is the key architectural difference
-    let preferredInteractionModel = InteractionModel.commandLine
-    let requiresKeyboardFocus = true
-    
-    // MARK: - View Factories
-    
-    @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
-        TerminalThemeView(rippleTrigger: rippleTrigger)
-            .environmentObject(viewModel)
-    }
-    
-    @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> some View {
-        EmptyView()  // No visible controls - purely keyboard driven
-    }
-    
-    // MARK: - Custom Keyboard Behaviors
-    
-    func customKeyboardBehavior(for keyCode: UInt16) -> KeyboardBehavior? {
-        switch keyCode {
-        case 46: // M key - could toggle minimal mode overlay within terminal
-            return .enhanced(
-                action: {
-                    // Future enhancement: show/hide minimal stats overlay
-                    print("🖥️ Terminal: Enhanced info mode")
-                },
-                visualFeedback: "INFO_MODE"
-            )
-        case 18: // 1 key - could show session shortcuts
-            return .enhanced(
-                action: {
-                    print("🖥️ Terminal: Session shortcuts displayed")
-                },
-                visualFeedback: "SHORTCUTS"
-            )
-        default:
-            return nil // Use default behavior
-        }
-    }
-}
-
 // MARK: - Preview Support
 
-#Preview("Standard Controls") {
+#Preview("Minimal Theme Controls") {
     StandardControlsView(viewModel: TimerViewModel())
         .frame(width: 300, height: 150)
         .background(Color.black.opacity(0.8))
@@ -185,13 +198,4 @@ struct TerminalExperience: ThemeExperience {
     experience.makeContentView(viewModel: TimerViewModel(), rippleTrigger: .constant(false))
         .frame(width: 300, height: 400)
         .background(Color.black.opacity(0.8))
-}
-
-#Preview("Terminal Experience Content") {
-    @Previewable @State var rippleTrigger = false
-    let experience = TerminalExperience()
-    
-    experience.makeContentView(viewModel: TimerViewModel(), rippleTrigger: .constant(false))
-        .frame(width: 300, height: 400)
-        .background(Color.black)
 }

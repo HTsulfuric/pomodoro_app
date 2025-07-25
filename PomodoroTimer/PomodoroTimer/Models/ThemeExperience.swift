@@ -141,21 +141,3 @@ struct AnyThemeExperience {
         _customKeyboardBehavior(keyCode)
     }
 }
-
-// MARK: - Theme Integration
-
-extension Theme {
-    /// Returns the theme experience for this theme
-    var experience: AnyThemeExperience {
-        switch self.id {
-        case "minimal":
-            return AnyThemeExperience(MinimalExperience())
-        case "grid":
-            return AnyThemeExperience(GridExperience())
-        case "terminal":
-            return AnyThemeExperience(TerminalExperience())
-        default:
-            return AnyThemeExperience(MinimalExperience()) // Fallback
-        }
-    }
-}

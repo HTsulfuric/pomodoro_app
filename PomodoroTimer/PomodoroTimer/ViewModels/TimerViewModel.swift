@@ -6,7 +6,7 @@ import AppKit
 class TimerViewModel: ObservableObject {
     @Published var pomodoroState = PomodoroState()
     @Published var totalSessionsToday: Int = 0
-    @Published var currentTheme: Theme = Theme.minimal
+    @Published var currentTheme: AnyTheme = ThemeRegistry.shared.defaultTheme ?? AnyTheme(MinimalTheme())
     
     // Timer management
     private var timer: Timer?
@@ -183,7 +183,7 @@ class TimerViewModel: ObservableObject {
     
     // MARK: - Theme Management
     
-    func setTheme(_ newTheme: Theme) {
+    func setTheme(_ newTheme: AnyTheme) {
         print("🎨 Setting theme to: \(newTheme.displayName)")
         print("🎨 Theme dimensions: \(newTheme.preferredWindowSize.width)×\(newTheme.preferredWindowSize.height)")
         print("🎨 Previous theme was: \(currentTheme.displayName)")
@@ -199,11 +199,17 @@ class TimerViewModel: ObservableObject {
     
     private func loadTheme() {
         if let savedThemeId = UserDefaults.standard.string(forKey: "selectedTheme"),
-           let savedTheme = Theme.allCases.first(where: { $0.id == savedThemeId }) {
+           let savedTheme = ThemeRegistry.shared.theme(withId: savedThemeId) {
             currentTheme = savedTheme
             print("🎨 Loaded theme: \(savedTheme.displayName)")
         } else {
-            print("🎨 Using default theme: \(currentTheme.displayName)")
+            // Use default theme from registry or fallback to minimal
+            if let defaultTheme = ThemeRegistry.shared.defaultTheme {
+                currentTheme = defaultTheme
+                print("🎨 Using default theme: \(defaultTheme.displayName)")
+            } else {
+                print("🎨 No themes in registry, using fallback minimal theme")
+            }
         }
         
         // Note: Window resize will be handled by AppDelegate after setup is complete

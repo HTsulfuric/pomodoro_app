@@ -28,6 +28,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     func applicationDidFinishLaunching(_ notification: Notification) {
         print(" AppDelegate.applicationDidFinishLaunching")
         
+        // Register built-in themes with the registry
+        ThemeRegistrationHelper.registerBuiltInThemes()
+        
         // Configure app for menu bar mode
         NSApplication.shared.setActivationPolicy(.accessory)
         

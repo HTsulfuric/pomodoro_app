@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CircleHoverButtonStyle: ButtonStyle {
-    let theme: Theme?
+    let theme: AnyTheme?
     
     @State private var isHovering = false
     
@@ -11,7 +11,7 @@ struct CircleHoverButtonStyle: ButtonStyle {
     }
     
     // Theme-aware initializer
-    init(theme: Theme) {
+    init(theme: AnyTheme) {
         self.theme = theme
     }
     

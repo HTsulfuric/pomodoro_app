@@ -3,6 +3,7 @@ import SwiftUI
 /// Compact theme selection interface with smooth transitions
 struct ThemePickerView: View {
     @EnvironmentObject var viewModel: TimerViewModel
+    @ObservedObject private var themeRegistry = ThemeRegistry.shared
     @State private var isExpanded: Bool = false
     
     var body: some View {
@@ -27,10 +28,10 @@ struct ThemePickerView: View {
             // Theme selection panel
             if isExpanded {
                 VStack(alignment: .trailing, spacing: 8) {
-                    ForEach(Theme.allCases) { theme in
+                    ForEach(themeRegistry.availableThemes, id: \.id) { theme in
                         ThemeOption(
                             theme: theme,
-                            isSelected: viewModel.currentTheme == theme,
+                            isSelected: viewModel.currentTheme.id == theme.id,
                             onSelect: {
                                 viewModel.setTheme(theme)
                                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -70,7 +71,7 @@ struct ThemePickerView: View {
 
 /// Individual theme selection option
 struct ThemeOption: View {
-    let theme: Theme
+    let theme: AnyTheme
     let isSelected: Bool
     let onSelect: () -> Void
     @EnvironmentObject var viewModel: TimerViewModel

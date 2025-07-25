@@ -17,7 +17,7 @@ struct ContentView: View {
     
     /// Current theme experience for sophisticated behavioral architecture
     private var currentExperience: AnyThemeExperience {
-        viewModel.currentTheme.experience
+        viewModel.currentTheme.createExperience()
     }
     
     var body: some View {

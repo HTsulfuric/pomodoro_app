@@ -1,6 +1,26 @@
 import SwiftUI
 import AppKit
 
+/// Represents a theme color that can vary by Pomodoro phase
+enum ThemeColor: Equatable {
+    case triPhase(work: Color, shortBreak: Color, longBreak: Color)
+    
+    /// Returns the appropriate color for the given Pomodoro phase
+    func color(for phase: PomodoroPhase) -> Color {
+        switch self {
+        case .triPhase(let work, let shortBreak, let longBreak):
+            switch phase {
+            case .work:
+                return work
+            case .shortBreak:
+                return shortBreak
+            case .longBreak:
+                return longBreak
+            }
+        }
+    }
+}
+
 /// Window background type options for themes
 enum WindowBackgroundType {
     case blur
@@ -9,202 +29,130 @@ enum WindowBackgroundType {
 }
 
 /// Represents different visual themes for the Pomodoro timer
-enum Theme: String, CaseIterable, Identifiable {
-    case minimal
-    case grid
-    case terminal
+struct Theme: Identifiable, Equatable {
+    let id: String
+    let displayName: String
+    let description: String
+    let icon: String
     
-    var id: String { self.rawValue }
+    // Color properties using ThemeColor
+    let accentColor: ThemeColor
+    let backgroundColor: Color
+    let primaryTextColor: ThemeColor
+    let secondaryTextColor: ThemeColor
+    let timerFont: Font
     
-    /// Display name for the theme selector
-    var displayName: String {
-        switch self {
-        case .minimal:
-            return "Minimal"
-        case .grid:
-            return "Grid"
-        case .terminal:
-            return "Terminal"
-        }
-    }
+    // Button theme properties
+    let primaryButtonColor: ThemeColor
+    let secondaryButtonColor: ThemeColor
+    let buttonTextColor: ThemeColor
+    let buttonHoverColor: ThemeColor
+    let buttonShadowColor: Color
     
-    /// Description of the theme's aesthetic
-    var description: String {
-        switch self {
-        case .minimal:
-            return "Clean circular progress with subtle animations"
-        case .grid:
-            return "GitHub-style contribution grid visualization"
-        case .terminal:
-            return "Retro green-on-black hacker aesthetic"
-        }
-    }
+    // Window theme properties
+    let windowBackgroundType: WindowBackgroundType
+    let windowBackgroundColor: Color
+    let preferredWindowSize: CGSize
     
-    /// Primary accent color for the theme
-    var accentColor: Color {
-        switch self {
-        case .minimal:
-            return .nordAccent
-        case .grid:
-            return .green
-        case .terminal:
-            return Color(red: 0, green: 1, blue: 0) // Terminal green
-        }
-    }
-    
-    /// Background color for the theme
-    var backgroundColor: Color {
-        switch self {
-        case .minimal:
-            return .clear // Uses existing blur background
-        case .grid:
-            return .nordNight0.opacity(0.95)
-        case .terminal:
-            return .black
-        }
-    }
-    
-    /// Primary text color for the theme
-    var primaryTextColor: Color {
-        switch self {
-        case .minimal:
-            return .nordPrimary
-        case .grid:
-            return .nordPrimary
-        case .terminal:
-            return Color(red: 0, green: 1, blue: 0) // Terminal green
-        }
-    }
-    
-    /// Secondary text color for the theme
-    var secondaryTextColor: Color {
-        switch self {
-        case .minimal:
-            return .nordSecondary
-        case .grid:
-            return .nordSecondary
-        case .terminal:
-            return Color(red: 0, green: 0.8, blue: 0) // Dimmer terminal green
-        }
-    }
-    
-    /// Font to use for the main timer display
-    var timerFont: Font {
-        switch self {
-        case .minimal:
-            return .system(size: 72, weight: .bold, design: .rounded)
-        case .grid:
-            return .system(size: 48, weight: .bold, design: .rounded)
-        case .terminal:
-            return .system(size: 56, weight: .bold, design: .monospaced)
-        }
-    }
-    
-    /// Icon to display in theme selector
-    var icon: String {
-        switch self {
-        case .minimal:
-            return "circle"
-        case .grid:
-            return "grid"
-        case .terminal:
-            return "terminal"
-        }
-    }
-    
-    // MARK: - Button Theme Properties
-    
-    /// Primary button background color (play/pause button)
-    var primaryButtonColor: Color {
-        switch self {
-        case .minimal:
-            return .nordAccent.opacity(0.8)
-        case .grid:
-            return .green.opacity(0.8)
-        case .terminal:
-            return Color(red: 0, green: 0.8, blue: 0).opacity(0.8)
-        }
-    }
-    
-    /// Secondary button background color (reset, skip, sound buttons)
-    var secondaryButtonColor: Color {
-        switch self {
-        case .minimal:
-            return .nordNight3.opacity(0.6)
-        case .grid:
-            return .nordNight2.opacity(0.7)
-        case .terminal:
-            return Color(red: 0, green: 0.4, blue: 0).opacity(0.6)
-        }
-    }
-    
-    /// Button text/icon color
-    var buttonTextColor: Color {
-        switch self {
-        case .minimal:
-            return .nordPrimary
-        case .grid:
-            return .nordPrimary
-        case .terminal:
-            return Color(red: 0, green: 1, blue: 0)
-        }
-    }
-    
-    /// Button hover background color
-    var buttonHoverColor: Color {
-        switch self {
-        case .minimal:
-            return .nordAccent
-        case .grid:
-            return .green
-        case .terminal:
-            return Color(red: 0, green: 1, blue: 0)
-        }
-    }
-    
-    /// Button shadow color
-    var buttonShadowColor: Color {
-        switch self {
-        case .minimal:
-            return .black
-        case .grid:
-            return .black
-        case .terminal:
-            return Color(red: 0, green: 0.5, blue: 0) // Dark green shadow for terminal theme
-        }
-    }
-    
-    // MARK: - Window Theme Properties
-    
-    /// Window background type
-    var windowBackgroundType: WindowBackgroundType {
-        switch self {
-        case .minimal:
-            return .blur
-        case .grid:
-            return .solid
-        case .terminal:
-            return .solid
-        }
-    }
-    
-    /// Window background color (used with solid/gradient types)
-    var windowBackgroundColor: Color {
-        switch self {
-        case .minimal:
-            return .clear // Blur effect handles background
-        case .grid:
-            return .nordNight0.opacity(0.95)
-        case .terminal:
-            return .black
-        }
-    }
-    
-    /// Full screen dimensions for all themes (simplified approach)
-    var preferredWindowSize: CGSize {
+    // Static initializer for consistent window size calculation
+    private static var fullScreenSize: CGSize {
         if let screen = NSScreen.main {
             return screen.frame.size
         }
-        return CGSize(width: 1920, height: 1080) // Fallback to common large size
+        return CGSize(width: 1920, height: 1080) // Fallback
     }
+    
+    // MARK: - Static Theme Instances
+    
+    static let minimal = Theme(
+        id: "minimal",
+        displayName: "Minimal",
+        description: "Clean circular progress with subtle animations",
+        icon: "circle",
+        accentColor: .triPhase(work: .nordAccent, shortBreak: .nordAccent, longBreak: .nordAccent),
+        backgroundColor: .clear,
+        primaryTextColor: .triPhase(work: .nordPrimary, shortBreak: .nordPrimary, longBreak: .nordPrimary),
+        secondaryTextColor: .triPhase(work: .nordSecondary, shortBreak: .nordSecondary, longBreak: .nordSecondary),
+        timerFont: .system(size: 72, weight: .bold, design: .rounded),
+        primaryButtonColor: .triPhase(work: .nordAccent.opacity(0.8), shortBreak: .nordAccent.opacity(0.8), longBreak: .nordAccent.opacity(0.8)),
+        secondaryButtonColor: .triPhase(work: .nordNight3.opacity(0.6), shortBreak: .nordNight3.opacity(0.6), longBreak: .nordNight3.opacity(0.6)),
+        buttonTextColor: .triPhase(work: .nordPrimary, shortBreak: .nordPrimary, longBreak: .nordPrimary),
+        buttonHoverColor: .triPhase(work: .nordAccent, shortBreak: .nordAccent, longBreak: .nordAccent),
+        buttonShadowColor: .black,
+        windowBackgroundType: .blur,
+        windowBackgroundColor: .clear,
+        preferredWindowSize: fullScreenSize
+    )
+    
+    static let grid = Theme(
+        id: "grid",
+        displayName: "Grid",
+        description: "GitHub-style contribution grid visualization",
+        icon: "grid",
+        accentColor: .triPhase(work: .green, shortBreak: .green, longBreak: .green),
+        backgroundColor: .nordNight0.opacity(0.95),
+        primaryTextColor: .triPhase(work: .nordPrimary, shortBreak: .nordPrimary, longBreak: .nordPrimary),
+        secondaryTextColor: .triPhase(work: .nordSecondary, shortBreak: .nordSecondary, longBreak: .nordSecondary),
+        timerFont: .system(size: 48, weight: .bold, design: .rounded),
+        primaryButtonColor: .triPhase(work: .green.opacity(0.8), shortBreak: .green.opacity(0.8), longBreak: .green.opacity(0.8)),
+        secondaryButtonColor: .triPhase(work: .nordNight2.opacity(0.7), shortBreak: .nordNight2.opacity(0.7), longBreak: .nordNight2.opacity(0.7)),
+        buttonTextColor: .triPhase(work: .nordPrimary, shortBreak: .nordPrimary, longBreak: .nordPrimary),
+        buttonHoverColor: .triPhase(work: .green, shortBreak: .green, longBreak: .green),
+        buttonShadowColor: .black,
+        windowBackgroundType: .solid,
+        windowBackgroundColor: .nordNight0.opacity(0.95),
+        preferredWindowSize: fullScreenSize
+    )
+    
+    static let terminal = Theme(
+        id: "terminal",
+        displayName: "Terminal",
+        description: "Retro green-on-black hacker aesthetic",
+        icon: "terminal",
+        accentColor: .triPhase(
+            work: Color(red: 0, green: 1, blue: 0),
+            shortBreak: Color(red: 1, green: 0.75, blue: 0),
+            longBreak: Color(red: 0.5, green: 0.5, blue: 1)
+        ),
+        backgroundColor: .black,
+        primaryTextColor: .triPhase(
+            work: Color(red: 0, green: 1, blue: 0),
+            shortBreak: Color(red: 1, green: 0.75, blue: 0),
+            longBreak: Color(red: 0.5, green: 0.5, blue: 1)
+        ),
+        secondaryTextColor: .triPhase(
+            work: Color(red: 0, green: 0.8, blue: 0),
+            shortBreak: Color(red: 1, green: 0.6, blue: 0),
+            longBreak: Color(red: 0.4, green: 0.4, blue: 0.8)
+        ),
+        timerFont: .system(size: 56, weight: .bold, design: .monospaced),
+        primaryButtonColor: .triPhase(
+            work: Color(red: 0, green: 0.8, blue: 0).opacity(0.8),
+            shortBreak: Color(red: 1, green: 0.6, blue: 0).opacity(0.8),
+            longBreak: Color(red: 0.4, green: 0.4, blue: 0.8).opacity(0.8)
+        ),
+        secondaryButtonColor: .triPhase(
+            work: Color(red: 0, green: 0.4, blue: 0).opacity(0.6),
+            shortBreak: Color(red: 0.6, green: 0.3, blue: 0).opacity(0.6),
+            longBreak: Color(red: 0.2, green: 0.2, blue: 0.4).opacity(0.6)
+        ),
+        buttonTextColor: .triPhase(
+            work: Color(red: 0, green: 1, blue: 0),
+            shortBreak: Color(red: 1, green: 0.75, blue: 0),
+            longBreak: Color(red: 0.5, green: 0.5, blue: 1)
+        ),
+        buttonHoverColor: .triPhase(
+            work: Color(red: 0, green: 1, blue: 0),
+            shortBreak: Color(red: 1, green: 0.75, blue: 0),
+            longBreak: Color(red: 0.5, green: 0.5, blue: 1)
+        ),
+        buttonShadowColor: Color(red: 0, green: 0.5, blue: 0),
+        windowBackgroundType: .solid,
+        windowBackgroundColor: .black,
+        preferredWindowSize: fullScreenSize
+    )
+    
+    // MARK: - Theme Collection
+    
+    static let allCases: [Theme] = [minimal, grid, terminal]
 }

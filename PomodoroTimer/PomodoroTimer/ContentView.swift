@@ -30,24 +30,24 @@ struct ContentView: View {
                 viewModel: viewModel,
                 rippleTrigger: $rippleTrigger
             )
-            .id("content-\(viewModel.currentTheme.rawValue)")
-            .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme)
+            .id("content-\(viewModel.currentTheme.id)")
+            .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
             
-            // Session info - now theme-aware
+            // Session info - now theme-aware with dynamic colors for terminal theme
             VStack(spacing: 6) {
                 Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundColor(viewModel.currentTheme.primaryTextColor)
+                    .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                 
                 Text("Today: \(viewModel.totalSessionsToday) sessions")
                     .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundColor(viewModel.currentTheme.secondaryTextColor)
+                    .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
             }
             
             // Theme-controlled controls (buttons or EmptyView for terminal)
             currentExperience.makeControlsView(viewModel: viewModel)
-                .id("controls-\(viewModel.currentTheme.rawValue)")
-                .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme)
+                .id("controls-\(viewModel.currentTheme.id)")
+                .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
             
             Spacer()
         }
@@ -59,7 +59,7 @@ struct ContentView: View {
             )
             .edgesIgnoringSafeArea(.all)
             .preferredColorScheme(.dark)
-            .id("theme-\(viewModel.currentTheme.rawValue)") // Explicit view identity for performance
+            .id("theme-\(viewModel.currentTheme.id)") // Explicit view identity for performance
             .transition(.opacity)
             .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
                 print("🌊 Timer start notification received - triggering ripple effect")
@@ -74,10 +74,10 @@ struct ContentView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("PomodoroTimer v\(appVersion)")
                             .font(.system(size: 10, weight: .medium, design: .monospaced))
-                            .foregroundColor(.nordMuted)
+                            .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.6))
                         Text("macOS \(macOSVersion)")
                             .font(.system(size: 9, weight: .regular, design: .monospaced))
-                            .foregroundColor(.nordNight3)
+                            .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.4))
                     }
                     Spacer()
                 }

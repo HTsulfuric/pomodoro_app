@@ -17,12 +17,12 @@ struct GridThemeView: View {
                     
                     Text(viewModel.pomodoroState.formattedTime)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(viewModel.currentTheme.primaryTextColor)
+                        .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .monospacedDigit()
                     
                     Text(viewModel.pomodoroState.currentPhase.rawValue.uppercased())
                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(viewModel.currentTheme.secondaryTextColor)
+                        .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .tracking(1.2)
                 }
                 
@@ -32,11 +32,11 @@ struct GridThemeView: View {
                 VStack(spacing: 6) {
                     Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundColor(viewModel.currentTheme.primaryTextColor)
+                        .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                     
                     Text("Today: \(viewModel.totalSessionsToday)")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(viewModel.currentTheme.secondaryTextColor)
+                        .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                 }
                 
                 // Simple ripple effect for this theme
@@ -51,19 +51,19 @@ struct GridThemeView: View {
                 if viewModel.pomodoroState.currentPhase == .work {
                     WorkGridView(
                         progress: viewModel.pomodoroState.progress,
-                        accentColor: viewModel.currentTheme.accentColor
+                        accentColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase)
                     )
                 } else {
                     BreakGridView(
                         progress: viewModel.pomodoroState.progress,
-                        accentColor: .blue
+                        accentColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase)
                     )
                 }
                 
                 // Progress percentage
                 Text("\(Int(viewModel.pomodoroState.progress * 100))%")
                     .font(.system(size: 14, weight: .medium, design: .monospaced))
-                    .foregroundColor(viewModel.currentTheme.secondaryTextColor)
+                    .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
             }
             .frame(maxWidth: .infinity)
         }

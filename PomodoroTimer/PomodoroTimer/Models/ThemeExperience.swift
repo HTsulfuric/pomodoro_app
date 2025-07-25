@@ -147,13 +147,15 @@ struct AnyThemeExperience {
 extension Theme {
     /// Returns the theme experience for this theme
     var experience: AnyThemeExperience {
-        switch self {
-        case .minimal:
+        switch self.id {
+        case "minimal":
             return AnyThemeExperience(MinimalExperience())
-        case .grid:
+        case "grid":
             return AnyThemeExperience(GridExperience())
-        case .terminal:
+        case "terminal":
             return AnyThemeExperience(TerminalExperience())
+        default:
+            return AnyThemeExperience(MinimalExperience()) // Fallback
         }
     }
 }

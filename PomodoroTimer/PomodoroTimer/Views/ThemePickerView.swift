@@ -15,9 +15,9 @@ struct ThemePickerView: View {
             }) {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(viewModel.currentTheme.buttonTextColor.opacity(0.8))
+                    .foregroundColor(viewModel.currentTheme.buttonTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.8))
                     .frame(width: 32, height: 32)
-                    .background(viewModel.currentTheme.secondaryButtonColor.opacity(0.7))
+                    .background(viewModel.currentTheme.secondaryButtonColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.7))
                     .clipShape(Circle())
                     .scaleEffect(isExpanded ? 1.1 : 1.0)
                     .rotationEffect(.degrees(isExpanded ? 90 : 0))
@@ -43,7 +43,9 @@ struct ThemePickerView: View {
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.nordNight1.opacity(0.9))
+                        .fill(viewModel.currentTheme.id == "terminal" ? 
+                            Color.black.opacity(0.9) : 
+                            Color.nordNight1.opacity(0.9))
                         .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
                 )
                 .transition(.asymmetric(
@@ -71,6 +73,7 @@ struct ThemeOption: View {
     let theme: Theme
     let isSelected: Bool
     let onSelect: () -> Void
+    @EnvironmentObject var viewModel: TimerViewModel
     
     var body: some View {
         Button(action: onSelect) {
@@ -78,18 +81,26 @@ struct ThemeOption: View {
                 // Theme icon
                 Image(systemName: theme.icon)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(isSelected ? theme.accentColor : .nordSecondary)
+                    .foregroundColor(isSelected ? theme.accentColor.color(for: viewModel.pomodoroState.currentPhase) : 
+                        (viewModel.currentTheme.id == "terminal" ? 
+                            viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase) : 
+                            .nordSecondary))
                     .frame(width: 20, height: 20)
                 
                 // Theme name and description
                 VStack(alignment: .leading, spacing: 2) {
                     Text(theme.displayName)
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundColor(isSelected ? theme.accentColor : .nordPrimary)
+                        .foregroundColor(isSelected ? theme.accentColor.color(for: viewModel.pomodoroState.currentPhase) : 
+                            (viewModel.currentTheme.id == "terminal" ? 
+                                viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase) : 
+                                .nordPrimary))
                     
                     Text(theme.description)
                         .font(.system(size: 11, weight: .regular))
-                        .foregroundColor(.nordSecondary)
+                        .foregroundColor(viewModel.currentTheme.id == "terminal" ? 
+                            viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase) : 
+                            .nordSecondary)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                 }
@@ -99,7 +110,7 @@ struct ThemeOption: View {
                 // Selection indicator
                 if isSelected {
                     Circle()
-                        .fill(theme.accentColor)
+                        .fill(theme.accentColor.color(for: viewModel.pomodoroState.currentPhase))
                         .frame(width: 8, height: 8)
                 }
             }
@@ -107,10 +118,10 @@ struct ThemeOption: View {
             .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? theme.accentColor.opacity(0.1) : Color.clear)
+                    .fill(isSelected ? theme.accentColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.1) : Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(isSelected ? theme.accentColor.opacity(0.3) : Color.clear, lineWidth: 1)
+                            .stroke(isSelected ? theme.accentColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.3) : Color.clear, lineWidth: 1)
                     )
             )
             .scaleEffect(isSelected ? 1.02 : 1.0)

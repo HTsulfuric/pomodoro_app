@@ -6,7 +6,7 @@ import AppKit
 class TimerViewModel: ObservableObject {
     @Published var pomodoroState = PomodoroState()
     @Published var totalSessionsToday: Int = 0
-    @Published var currentTheme: Theme = .minimal
+    @Published var currentTheme: Theme = Theme.minimal
     
     // Timer management
     private var timer: Timer?
@@ -189,7 +189,7 @@ class TimerViewModel: ObservableObject {
         print("🎨 Previous theme was: \(currentTheme.displayName)")
         
         currentTheme = newTheme
-        UserDefaults.standard.set(newTheme.rawValue, forKey: "selectedTheme")
+        UserDefaults.standard.set(newTheme.id, forKey: "selectedTheme")
         
         // Request window resize for the new theme
         // Note: Window resize removed - all themes now use full screen
@@ -198,8 +198,8 @@ class TimerViewModel: ObservableObject {
     
     
     private func loadTheme() {
-        if let savedThemeName = UserDefaults.standard.string(forKey: "selectedTheme"),
-           let savedTheme = Theme(rawValue: savedThemeName) {
+        if let savedThemeId = UserDefaults.standard.string(forKey: "selectedTheme"),
+           let savedTheme = Theme.allCases.first(where: { $0.id == savedThemeId }) {
             currentTheme = savedTheme
             print("🎨 Loaded theme: \(savedTheme.displayName)")
         } else {

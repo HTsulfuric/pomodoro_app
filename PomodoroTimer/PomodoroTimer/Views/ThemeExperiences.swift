@@ -15,9 +15,9 @@ struct StandardControlsView: View {
                 }) {
                     Image(systemName: viewModel.pomodoroState.isRunning ? "pause.fill" : "play.fill")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(viewModel.currentTheme.buttonTextColor)
+                        .foregroundColor(viewModel.currentTheme.buttonTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .frame(width: 50, height: 50)
-                        .background(viewModel.currentTheme.primaryButtonColor)
+                        .background(viewModel.currentTheme.primaryButtonColor.color(for: viewModel.pomodoroState.currentPhase))
                         .clipShape(Circle())
                 }
                 .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
@@ -28,9 +28,9 @@ struct StandardControlsView: View {
                 }) {
                     Image(systemName: "forward.end.fill")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(viewModel.currentTheme.buttonTextColor)
+                        .foregroundColor(viewModel.currentTheme.buttonTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .frame(width: 44, height: 44)
-                        .background(viewModel.currentTheme.secondaryButtonColor)
+                        .background(viewModel.currentTheme.secondaryButtonColor.color(for: viewModel.pomodoroState.currentPhase))
                         .clipShape(Circle())
                 }
                 .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
@@ -43,9 +43,9 @@ struct StandardControlsView: View {
                 }) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(viewModel.currentTheme.buttonTextColor)
+                        .foregroundColor(viewModel.currentTheme.buttonTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .frame(width: 44, height: 44)
-                        .background(viewModel.currentTheme.secondaryButtonColor)
+                        .background(viewModel.currentTheme.secondaryButtonColor.color(for: viewModel.pomodoroState.currentPhase))
                         .clipShape(Circle())
                 }
                 .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))
@@ -57,9 +57,9 @@ struct StandardControlsView: View {
                 }) {
                     Image(systemName: "speaker.2.fill")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(viewModel.currentTheme.buttonTextColor)
+                        .foregroundColor(viewModel.currentTheme.buttonTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .frame(width: 44, height: 44)
-                        .background(viewModel.currentTheme.secondaryButtonColor)
+                        .background(viewModel.currentTheme.secondaryButtonColor.color(for: viewModel.pomodoroState.currentPhase))
                         .clipShape(Circle())
                 }
                 .buttonStyle(CircleHoverButtonStyle(theme: viewModel.currentTheme))

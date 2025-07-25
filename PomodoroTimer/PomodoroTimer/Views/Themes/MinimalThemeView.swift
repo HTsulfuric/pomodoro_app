@@ -16,7 +16,7 @@ struct MinimalThemeView: View {
             Circle()
                 .trim(from: 0, to: viewModel.pomodoroState.progress)
                 .stroke(
-                    viewModel.currentTheme.accentColor,
+                    viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase),
                     style: StrokeStyle(lineWidth: 12, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
@@ -34,7 +34,7 @@ struct MinimalThemeView: View {
                 // Main timer display (larger in tall window)
                 Text(viewModel.pomodoroState.formattedTime)
                     .font(.system(size: 64, weight: .bold, design: .rounded))
-                    .foregroundColor(viewModel.currentTheme.primaryTextColor)
+                    .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                     .monospacedDigit()
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
@@ -42,13 +42,13 @@ struct MinimalThemeView: View {
                 // Phase name (de-emphasized)
                 Text(viewModel.pomodoroState.currentPhase.rawValue.uppercased())
                     .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundColor(viewModel.currentTheme.secondaryTextColor)
+                    .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                     .tracking(1.5)
                 
                 // Progress percentage
                 Text("\(Int(viewModel.pomodoroState.progress * 100))%")
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(viewModel.currentTheme.secondaryTextColor.opacity(0.8))
+                    .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.8))
             }
         }
         .frame(width: 280, height: 280) // Slightly smaller to leave more room for session info

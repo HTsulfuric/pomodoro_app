@@ -4,6 +4,7 @@ import SwiftUI
 struct RippleCircle: View {
     let trigger: Bool
     let delay: Double
+    let rippleColor: Color
     
     @State private var scale: CGFloat = 0.0
     @State private var opacity: Double = 1.0
@@ -12,7 +13,7 @@ struct RippleCircle: View {
     
     var body: some View {
         Circle()
-            .stroke(Color.nordAccent.opacity(0.8), lineWidth: 3)
+            .stroke(rippleColor.opacity(0.8), lineWidth: 3)
             .frame(width: 60, height: 60)
             .scaleEffect(scale)
             .opacity(opacity)
@@ -42,6 +43,8 @@ struct RippleView: View {
     /// An external trigger to start the animation. The animation runs whenever this value changes.
     let trigger: Bool
     
+    @EnvironmentObject var viewModel: TimerViewModel
+    
     private let rippleCount = 4
     private let staggerDelay: Double = 0.3
     
@@ -51,7 +54,8 @@ struct RippleView: View {
             ForEach(0..<rippleCount, id: \.self) { index in
                 RippleCircle(
                     trigger: trigger,
-                    delay: Double(index) * staggerDelay
+                    delay: Double(index) * staggerDelay,
+                    rippleColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase)
                 )
             }
             
@@ -67,6 +71,7 @@ struct RippleView: View {
     ZStack {
         Color.black.opacity(0.8)
         RippleView(trigger: trigger)
+            .environmentObject(TimerViewModel())
         
         VStack {
             Spacer()

@@ -44,9 +44,7 @@ struct ThemePickerView: View {
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(viewModel.currentTheme.id == "terminal" ? 
-                            Color.black.opacity(0.9) : 
-                            Color.nordNight1.opacity(0.9))
+                        .fill(viewModel.currentTheme.windowBackgroundColor.opacity(0.9))
                         .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
                 )
                 .transition(.asymmetric(
@@ -83,9 +81,7 @@ struct ThemeOption: View {
                 Image(systemName: theme.icon)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(isSelected ? theme.accentColor.color(for: viewModel.pomodoroState.currentPhase) : 
-                        (viewModel.currentTheme.id == "terminal" ? 
-                            viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase) : 
-                            .nordSecondary))
+                        viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                     .frame(width: 20, height: 20)
                 
                 // Theme name and description
@@ -93,15 +89,11 @@ struct ThemeOption: View {
                     Text(theme.displayName)
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundColor(isSelected ? theme.accentColor.color(for: viewModel.pomodoroState.currentPhase) : 
-                            (viewModel.currentTheme.id == "terminal" ? 
-                                viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase) : 
-                                .nordPrimary))
+                            viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                     
                     Text(theme.description)
                         .font(.system(size: 11, weight: .regular))
-                        .foregroundColor(viewModel.currentTheme.id == "terminal" ? 
-                            viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase) : 
-                            .nordSecondary)
+                        .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                 }

@@ -64,7 +64,7 @@ struct MinimalThemeView: View {
         ZStack {
             // Background ring with dynamic sizing
             Circle()
-                .stroke(Color.nordNight3.opacity(0.3), lineWidth: circleSpecs.lineWidth)
+                .stroke(viewModel.currentTheme.secondaryButtonColor.color(for: viewModel.pomodoroState.currentPhase), lineWidth: circleSpecs.lineWidth)
             
             // Progress ring with dynamic sizing
             Circle()

@@ -247,11 +247,11 @@ struct GridSquare: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 4)
-            .fill(isFilled ? fillColor : Color.nordNight3.opacity(0.3))
+            .fill(isFilled ? fillColor : Color.gray.opacity(0.3))
             .frame(width: size, height: size)
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.nordNight3.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
             )
             .scaleEffect(isFilled ? 1.05 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isFilled)

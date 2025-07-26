@@ -18,9 +18,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     var overlayPanel: OverlayPanel?
     private var hostingController: NSHostingController<AnyView>?
     
-    // Debug mode support
-    private var debugWindow: NSWindow?
-    private let isDebugMode = CommandLine.arguments.contains("--debug-window") || ProcessInfo.processInfo.environment["POMODORO_DEBUG"] != nil
     
     // Permission handling
     private var permissionWindow: NSWindow?
@@ -64,12 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     private func setupAppWithPermissions() {
         // Setup UI components
-        if isDebugMode {
-            setupDebugWindow()
-            print(" Debug mode: Using regular window instead of overlay")
-        } else {
-            setupFloatingOverlay()
-        }
+        setupFloatingOverlay()
         
         // Setup keyboard manager (requires permissions)
         KeyboardManager.shared.startKeyboardMonitoring()
@@ -77,12 +69,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     private func setupAppWithoutPermissions() {
         // Setup UI components (overlay still works, just no global hotkey)
-        if isDebugMode {
-            setupDebugWindow()
-            print(" Debug mode: Using regular window instead of overlay")
-        } else {
-            setupFloatingOverlay()
-        }
+        setupFloatingOverlay()
         
         // Don't setup keyboard manager
         print(" Global hotkey disabled - accessibility permissions required")
@@ -158,19 +145,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             height: windowSize.height
         )
         
-        print("🪟 setupFloatingOverlay() - Creating panel with frame: \(panelFrame)")
-        print("🪟 setupFloatingOverlay() - Using theme: \(timerViewModel.currentTheme.displayName)")
-        print("🪟 setupFloatingOverlay() - Expected size: \(windowSize)")
         
         // Create Alfred-style overlay panel (key difference!)
         overlayPanel = OverlayPanel(contentRect: panelFrame)
         
         guard let panel = overlayPanel else {
-            print("🪟 ❌ Failed to create overlay panel")
+            print("Failed to create overlay panel")
             return
         }
         
-        print("🪟 setupFloatingOverlay() - Panel created with actual frame: \(panel.frame)")
         
         // Create hosting controller with ContentView.
         // The problematic .frame modifier is removed to prevent a layout feedback loop.
@@ -205,41 +188,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Start hidden
         panel.orderOut(nil)
         
-        print("🪟 setupFloatingOverlay() - Alfred-style overlay panel created and configured")
     }
     
-    // MARK: - Debug Window Setup
-    
-    private func setupDebugWindow() {
-        let preferredSize = timerViewModel.currentTheme.preferredWindowSize // Use current theme size
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: preferredSize.width, height: preferredSize.height),
-            styleMask: [.titled, .closable, .resizable, .miniaturizable],
-            backing: .buffered,
-            defer: false
-        )
-        
-        window.title = "Pomodoro Timer (Debug Mode)"
-        window.center()
-        window.isReleasedWhenClosed = false
-        
-        let contentView = ContentView()
-            .environmentObject(timerViewModel)
-            .environmentObject(screenContext)
-
-        let hostingController = NSHostingController(rootView: contentView)
-        
-        // Use empty sizing options for consistency and to prevent potential layout issues,
-        // especially since the debug window is user-resizable.
-        hostingController.sizingOptions = []
-
-        window.contentViewController = hostingController
-        
-        window.makeKeyAndOrderFront(nil)
-        
-        debugWindow = window
-        print(" Debug window created")
-    }
     
     // MARK: - Overlay Control
     
@@ -258,12 +208,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     private func showOverlay() {
         guard let panel = overlayPanel else {
-            print("🪟 ❌ showOverlay() - No panel available")
+            print("No overlay panel available")
             return
         }
         
-        print("🪟 showOverlay() - Panel frame before show: \(panel.frame)")
-        print("🪟 showOverlay() - Panel content size: \(panel.contentView?.frame.size ?? CGSize.zero)")
         
         // Center panel on current screen and resize if screen changed
         if let screen = NSScreen.main {
@@ -271,9 +219,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             let currentPanelSize = panel.frame.size
             let expectedPanelSize = timerViewModel.currentTheme.preferredWindowSize
             
-            print("🪟 showOverlay() - Screen frame: \(screenFrame)")
-            print("🪟 showOverlay() - Current panel size: \(currentPanelSize)")
-            print("🪟 showOverlay() - Expected panel size: \(expectedPanelSize)")
             
             // Update screen context if screen changed (triggers theme re-sizing)
             screenContext.updateScreen(screen)
@@ -284,8 +229,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                               abs(currentPanelSize.height - expectedPanelSize.height) > 1.0
             
             if sizeMismatch {
-                print("🪟 showOverlay() - Panel size mismatch detected, resizing panel")
-                print("🪟 showOverlay() - Resizing panel from \(Int(currentPanelSize.width))×\(Int(currentPanelSize.height)) to \(Int(expectedPanelSize.width))×\(Int(expectedPanelSize.height))")
                 
                 // Resize the panel to match the new screen
                 panel.setContentSize(expectedPanelSize)
@@ -296,7 +239,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                     controller.view.autoresizingMask = [.width, .height]
                 }
                 
-                print("🪟 showOverlay() - Panel resized successfully")
             }
             
             // Center the panel on the new screen
@@ -305,7 +247,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 x: (screenFrame.width - finalPanelSize.width) / 2 + screenFrame.minX,
                 y: (screenFrame.height - finalPanelSize.height) / 2 + screenFrame.minY
             )
-            print("🪟 showOverlay() - Setting panel origin to: \(newOrigin)")
             panel.setFrameOrigin(newOrigin)
         }
         
@@ -313,7 +254,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // This is the key difference from our old approach that stole focus
         panel.makeKeyAndOrderFront(nil)
         
-        print("🪟 showOverlay() - Panel frame after show: \(panel.frame)")
         
         // Notify KeyboardManager that overlay is now visible
         KeyboardManager.shared.isOverlayVisible = true
@@ -321,7 +261,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Start sleep prevention when overlay is shown
         SleepPreventionManager.shared.startPreventingSleep()
         
-        print("🪟 showOverlay() - Alfred-style overlay shown (no focus stealing)")
     }
     
     private func hideOverlay() {
@@ -408,9 +347,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         case "skip", "skip-phase":
             handleSkipCommand()
         case "show-app":
-            if !isDebugMode {
-                showOverlay()
-            }
+            showOverlay()
         default:
             print(" Unknown command: \(command)")
         }
@@ -446,7 +383,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         // For overlay apps, show overlay when dock icon is clicked (if visible)
-        if !isDebugMode && !flag {
+        if !flag {
             showOverlay()
         }
         return false
@@ -462,9 +399,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Only show overlay if user clicked the notification body (not an action button)
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
             print(" User clicked notification body - showing overlay")
-            if !isDebugMode {
-                showOverlay()
-            }
+            showOverlay()
         } else {
             print(" User clicked action button - executing silently")
         }

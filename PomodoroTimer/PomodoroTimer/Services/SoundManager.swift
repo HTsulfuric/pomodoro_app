@@ -7,13 +7,9 @@ class SoundManager: ObservableObject {
     private var currentSound: NSSound?
     
     init() {
-        print("🎵 SoundManager initialized with simple NSSound approach")
     }
     
     func playPhaseChangeSound(for phase: PomodoroPhase) {
-        print("🔊 =================================")
-        print("🔊 NSSound MANAGER: playPhaseChangeSound called")
-        print("🔊 Phase: \(phase)")
         
         // Use simple NSSound approach - reliable and audible
         let soundName: String
@@ -27,11 +23,9 @@ class SoundManager: ObservableObject {
             soundName = "Sosumi" // Long break complete - distinctive sound
         }
         
-        print("🔊 Selected sound name: \(soundName)")
         
         // NSSound automatically handles system sounds by name (sandbox-friendly)
         if let sound = NSSound(named: soundName) {
-            print("🔊 NSSound found: \(soundName)")
             
             // Store reference to prevent deallocation during playback
             currentSound = sound
@@ -42,20 +36,11 @@ class SoundManager: ObservableObject {
             // Play the sound - simple and reliable
             let success = sound.play()
             
-            print("🔊 NSSound.play() returned: \(success)")
-            if success {
-                print(" SUCCESS: NSSound played - should be audible")
-            } else {
-                print(" FAILED: NSSound.play() returned false")
-            }
         } else {
-            print(" FAILED: NSSound(named: \(soundName)) returned nil")
             // Fallback to system beep
             NSSound.beep()
-            print("🔊 Fallback: NSSound.beep() called")
         }
         
-        print("🔊 =================================")
     }
     
     

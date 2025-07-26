@@ -72,9 +72,8 @@ class ThemeRegistry: ObservableObject {
                     self.objectWillChange.send()
                 }
                 
-                print("🎨 Registered theme: \(anyTheme.displayName) (id: \(anyTheme.id))")
             } else {
-                print("⚠️ Theme with ID '\(anyTheme.id)' already registered")
+                print("Warning: Theme with ID '\(anyTheme.id)' already registered")
             }
         }
     }
@@ -87,7 +86,6 @@ class ThemeRegistry: ObservableObject {
         return registrationQueue.sync {
             if let index = registeredThemes.firstIndex(where: { $0.id == id }) {
                 let removedTheme = registeredThemes.remove(at: index)
-                print("🗑️ Unregistered theme: \(removedTheme.displayName)")
                 
                 DispatchQueue.main.async { [weak self] in
                     self?.objectWillChange.send()
@@ -116,7 +114,6 @@ class ThemeRegistry: ObservableObject {
                 self.objectWillChange.send()
             }
             
-            print("🧹 Cleared \(count) themes from registry")
         }
     }
     
@@ -127,7 +124,6 @@ class ThemeRegistry: ObservableObject {
     private func setupDefaultThemes() {
         // Themes will register themselves when their files are loaded
         // This method exists for backward compatibility during migration
-        print("🎨 ThemeRegistry initialized - awaiting theme registrations...")
     }
     
     // MARK: - Debug Support
@@ -135,7 +131,7 @@ class ThemeRegistry: ObservableObject {
     /// Print all registered themes (debug utility)
     func printRegisteredThemes() {
         let themes = availableThemes
-        print("📋 Registered Themes (\(themes.count)):")
+        print("Registered Themes (\(themes.count)):")
         for (index, theme) in themes.enumerated() {
             print("  \(index + 1). \(theme.displayName) (id: \(theme.id))")
         }
@@ -151,11 +147,11 @@ class ThemeRegistry: ObservableObject {
         let hasUniqueDisplayNames = uniqueDisplayNames.count == themes.count
         
         if !hasUniqueIds {
-            print("⚠️ Registry validation failed: Duplicate theme IDs detected")
+            print("Error: Registry validation failed - Duplicate theme IDs detected")
         }
         
         if !hasUniqueDisplayNames {
-            print("⚠️ Registry validation failed: Duplicate display names detected")
+            print("Error: Registry validation failed - Duplicate display names detected")
         }
         
         return hasUniqueIds && hasUniqueDisplayNames
@@ -176,11 +172,9 @@ struct ThemeRegistrationHelper {
         GridTheme.register()
         TerminalTheme.register()
         
-        print("✅ Built-in theme registration completed")
         
         // Validate the registry after registration
         if ThemeRegistry.shared.validateRegistry() {
-            print("✅ Theme registry validation passed")
         }
     }
 }

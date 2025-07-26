@@ -64,7 +64,6 @@ class TimerViewModel: ObservableObject {
     // MARK: - Timer Control
     
     func toggleTimer() {
-        print("⏯️ toggleTimer() called - current state: isRunning=\(pomodoroState.isRunning)")
         if pomodoroState.isRunning {
             print(" Calling pauseTimer()...")
             pauseTimer()
@@ -117,14 +116,6 @@ class TimerViewModel: ObservableObject {
         print(" Skipped to: \(pomodoroState.currentPhase.rawValue)")
     }
     
-    // Debug function for testing
-    func setDebugTimer() {
-        print("🐛 DEBUG: Setting 3-second timer")
-        stopTimerLoop()
-        pomodoroState.timeRemaining = 3
-        pomodoroState.reset()
-        writeStateFile()
-    }
     
     // MARK: - Timer Loop Management
     
@@ -154,7 +145,6 @@ class TimerViewModel: ObservableObject {
     
     private func handlePhaseComplete() {
         let completedPhase = pomodoroState.currentPhase
-        print("⏰ PHASE COMPLETE: \(completedPhase.rawValue)")
         
         if completedPhase == .work {
             totalSessionsToday += 1
@@ -184,16 +174,12 @@ class TimerViewModel: ObservableObject {
     // MARK: - Theme Management
     
     func setTheme(_ newTheme: AnyTheme) {
-        print("🎨 Setting theme to: \(newTheme.displayName)")
-        print("🎨 Theme dimensions: \(newTheme.preferredWindowSize.width)×\(newTheme.preferredWindowSize.height)")
-        print("🎨 Previous theme was: \(currentTheme.displayName)")
         
         currentTheme = newTheme
         UserDefaults.standard.set(newTheme.id, forKey: "selectedTheme")
         
         // Request window resize for the new theme
         // Note: Window resize removed - all themes now use full screen
-        print("🎨 setTheme() completed")
     }
     
     
@@ -201,14 +187,11 @@ class TimerViewModel: ObservableObject {
         if let savedThemeId = UserDefaults.standard.string(forKey: "selectedTheme"),
            let savedTheme = ThemeRegistry.shared.theme(withId: savedThemeId) {
             currentTheme = savedTheme
-            print("🎨 Loaded theme: \(savedTheme.displayName)")
         } else {
             // Use default theme from registry or fallback to minimal
             if let defaultTheme = ThemeRegistry.shared.defaultTheme {
                 currentTheme = defaultTheme
-                print("🎨 Using default theme: \(defaultTheme.displayName)")
             } else {
-                print("🎨 No themes in registry, using fallback minimal theme")
             }
         }
         

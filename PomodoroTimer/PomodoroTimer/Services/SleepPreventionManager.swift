@@ -11,7 +11,6 @@ class SleepPreventionManager {
     
     // MARK: - Initialization
     private init() {
-        print("🛡️ SleepPreventionManager initialized")
     }
     
     deinit {
@@ -25,34 +24,38 @@ class SleepPreventionManager {
     /// Only starts if not already active to avoid duplicate assertions
     func startPreventingSleep() {
         guard !isActive else {
-            print("🛡️ Sleep prevention already active")
             return
         }
         
         let reason = "Pomodoro timer overlay is visible"
         
         // Use modern ProcessInfo API - automatically cleaned up when activity is deallocated
+        // .idleDisplaySleepDisabled specifically prevents screensaver/display sleep
         activity = ProcessInfo.processInfo.beginActivity(
-            options: .userInitiated,
+            options: .idleDisplaySleepDisabled,
             reason: reason
         )
         
-        isActive = true
-        print("🛡️ Sleep prevention started: \(reason)")
+        if activity != nil {
+            isActive = true
+            print("Sleep prevention started: \(reason)")
+        } else {
+            print("Failed to create sleep prevention activity")
+            isActive = false
+        }
     }
     
     /// Stop preventing system sleep
     /// Safe to call multiple times
     func stopPreventingSleep() {
         guard isActive, let currentActivity = activity else {
-            print("🛡️ Sleep prevention not active")
             return
         }
         
         ProcessInfo.processInfo.endActivity(currentActivity)
         activity = nil
         isActive = false
-        print("🛡️ Sleep prevention stopped")
+        print("Sleep prevention stopped")
     }
     
     /// Current state of sleep prevention

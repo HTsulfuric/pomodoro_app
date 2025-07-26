@@ -86,7 +86,6 @@ PomodoroTimer/
 - **Play/Pause**: Start or pause the current timer
 - **Skip**: Jump to the next phase (work → break → work)
 - **Reset**: Reset current phase to full duration
-- **Debug Timer**: 3-second timer for testing notifications
 
 ### Notification Interactions
 When a phase completes, you'll receive an interactive notification with:
@@ -138,10 +137,6 @@ xcodebuild -project PomodoroTimer.xcodeproj -scheme PomodoroTimer -destination "
 ### Testing
 Run unit tests and UI tests in Xcode (⌘+U) or via the Test navigator.
 
-### Debug Features
-- **3-Second Timer**: For rapid testing of phase transitions
-- **Manual Sound Test**: Verify audio notifications work
-- **Console Logging**: Detailed state change and notification logs
 
 ## 📱 Compatibility
 
@@ -160,7 +155,6 @@ Run unit tests and UI tests in Xcode (⌘+U) or via the Test navigator.
 ### Notifications Not Appearing
 1. Check System Preferences → Notifications → Pomodoro Timer
 2. Ensure "Lock Screen" and "Banners" are enabled
-3. Test with the debug 3-second timer
 
 ### SketchyBar Not Updating
 1. Verify SketchyBar is installed and running

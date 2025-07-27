@@ -15,7 +15,7 @@ class KeyboardManager {
     /// Tracks whether the overlay is visible to determine which keys are active
     var isOverlayVisible: Bool = false {
         didSet {
-            print("🎹 KeyboardManager: overlay visibility changed to \(isOverlayVisible)")
+            Logger.keyboard("Overlay visibility changed to \(isOverlayVisible)")
         }
     }
     
@@ -26,7 +26,7 @@ class KeyboardManager {
     
     // MARK: - Initialization
     private init() {
-        print("🎹 KeyboardManager initialized")
+        Logger.keyboard("KeyboardManager initialized")
     }
     
     deinit {
@@ -38,12 +38,12 @@ class KeyboardManager {
     /// Start keyboard monitoring (requires accessibility permissions)
     func startKeyboardMonitoring() {
         guard hasAccessibilityPermission else {
-            print("🎹 Cannot start keyboard monitoring - accessibility permissions required")
+            Logger.warning("Cannot start keyboard monitoring - accessibility permissions required", category: .permissions)
             return
         }
         
         guard globalKeyMonitor == nil else {
-            print("🎹 Keyboard monitoring already active")
+            Logger.keyboard("Keyboard monitoring already active")
             return
         }
         
@@ -57,7 +57,7 @@ class KeyboardManager {
             return self?.handleLocalKeyEvent(event) == true ? nil : event
         }
         
-        print("🎹 Global keyboard monitoring started (Opt+Shift+P + overlay keys)")
+        Logger.info("Global keyboard monitoring started (Opt+Shift+P + overlay keys)", category: .keyboard)
     }
     
     /// Stop keyboard monitoring
@@ -72,7 +72,7 @@ class KeyboardManager {
             localKeyMonitor = nil
         }
         
-        print("🎹 Keyboard monitoring stopped")
+        Logger.info("Keyboard monitoring stopped", category: .keyboard)
     }
     
     /// Check and restart monitoring if permissions were granted
@@ -89,7 +89,7 @@ class KeyboardManager {
         if event.keyCode == 35 && // P key
            event.modifierFlags.contains([.option, .shift]) &&
            !event.modifierFlags.contains([.command, .control]) {
-            print("🎹 Global Opt+Shift+P detected - toggling overlay")
+            Logger.keyboard("Global Opt+Shift+P detected - toggling overlay")
             handleOverlayToggle()
             return
         }
@@ -105,7 +105,7 @@ class KeyboardManager {
         if event.keyCode == 35 && // P key
            event.modifierFlags.contains([.option, .shift]) &&
            !event.modifierFlags.contains([.command, .control]) {
-            print("🎹 Local Opt+Shift+P detected - toggling overlay")
+            Logger.keyboard("Local Opt+Shift+P detected - toggling overlay")
             handleOverlayToggle()
             return true // Consume the event
         }
@@ -130,27 +130,27 @@ class KeyboardManager {
         
         switch event.keyCode {
         case 38: // j key
-            print("🎹 j key - next theme")
+            Logger.keyboard("j key - next theme")
             viewModel.selectNextTheme()
             return true
         case 40: // k key
-            print("🎹 k key - previous theme")
+            Logger.keyboard("k key - previous theme")
             viewModel.selectPreviousTheme()
             return true
         case 125: // Down arrow
-            print("🎹 Down arrow - next theme")
+            Logger.keyboard("Down arrow - next theme")
             viewModel.selectNextTheme()
             return true
         case 126: // Up arrow
-            print("🎹 Up arrow - previous theme")
+            Logger.keyboard("Up arrow - previous theme")
             viewModel.selectPreviousTheme()
             return true
         case 36: // Enter key
-            print("🎹 Enter key - confirm theme selection")
+            Logger.keyboard("Enter key - confirm theme selection")
             viewModel.confirmThemeSelection()
             return true
         case 53: // ESC key
-            print("🎹 ESC key - cancel theme selection")
+            Logger.keyboard("ESC key - cancel theme selection")
             viewModel.cancelThemeSelection()
             return true
         default:
@@ -160,7 +160,7 @@ class KeyboardManager {
     
     private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
         guard let viewModel = timerViewModel else {
-            print("🎹 Warning: TimerViewModel not available")
+            Logger.warning("TimerViewModel not available", category: .keyboard)
             return false
         }
         
@@ -171,7 +171,7 @@ class KeyboardManager {
         
         // Handle T key to activate theme picker when overlay is visible but theme picker is not
         if event.keyCode == 17 && !event.modifierFlags.contains([.command, .control, .option, .shift]) { // T key
-            print("🎹 T key - opening theme picker")
+            Logger.keyboard("T key - opening theme picker")
             viewModel.presentThemePicker()
             return true
         }
@@ -180,12 +180,12 @@ class KeyboardManager {
         case 49: // Space key
             if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
                 if viewModel.pomodoroState.isRunning {
-                    print("🎹 Space key - pausing timer (keep overlay visible)")
+                    Logger.keyboard("Space key - pausing timer (keep overlay visible)")
                     viewModel.pauseTimer()
                     // Post notification for quick visual feedback (pause action)
                     NotificationCenter.default.post(name: .spaceKeyPressed, object: nil)
                 } else {
-                    print("🎹 Space key - starting timer with enhanced feedback (keep overlay visible)")
+                    Logger.keyboard("Space key - starting timer with enhanced feedback (keep overlay visible)")
                     viewModel.startTimer()
                     // Post notification for enhanced visual feedback (start action)
                     NotificationCenter.default.post(name: .spaceKeyStartPressed, object: nil)
@@ -194,7 +194,7 @@ class KeyboardManager {
             }
         case 15: // R key
             if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
-                print("🎹 R key - resetting timer")
+                Logger.keyboard("R key - resetting timer")
                 viewModel.resetTimer()
                 // Post notification for visual feedback only
                 NotificationCenter.default.post(name: .resetKeyPressed, object: nil)
@@ -202,7 +202,7 @@ class KeyboardManager {
             }
         case 1: // S key
             if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
-                print("🎹 S key - skipping phase")
+                Logger.keyboard("S key - skipping phase")
                 viewModel.skipPhase()
                 // Post notification for visual feedback only
                 NotificationCenter.default.post(name: .skipKeyPressed, object: nil)
@@ -210,14 +210,14 @@ class KeyboardManager {
             }
         case 31: // O key
             if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
-                print("🎹 O key - hiding overlay")
+                Logger.keyboard("O key - hiding overlay")
                 // Post notification for AppDelegate to hide overlay
                 NotificationCenter.default.post(name: .hideOverlay, object: nil)
                 return true
             }
         case 53: // ESC key
             if !event.modifierFlags.contains([.command, .control, .option, .shift]) {
-                print("🎹 ESC key - hiding overlay")
+                Logger.keyboard("ESC key - hiding overlay")
                 // Post notification for AppDelegate to hide overlay
                 NotificationCenter.default.post(name: .hideOverlay, object: nil)
                 return true

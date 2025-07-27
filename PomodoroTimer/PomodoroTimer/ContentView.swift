@@ -164,8 +164,8 @@ struct ContentView: View {
                 }
             }
             
-            // Theme picker overlay (always visible)
-            ThemePickerView()
+            // Theme picker overlay (replaced with EmptyView - use T key for text-based picker)
+            EmptyView()
             
             // Text-based theme picker overlay (nnn/yazi style)
             if viewModel.isThemePickerPresented {

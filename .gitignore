@@ -70,3 +70,4 @@ fastlane/screenshots/**/*.png
 # AI related files
 CLAUDE.md
 .claude/
+repomix-output.xml

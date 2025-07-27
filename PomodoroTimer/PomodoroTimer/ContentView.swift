@@ -80,71 +80,91 @@ struct ContentView: View {
     }
     
     var body: some View {
+        let statusInfo = StatusInfo.from(viewModel: viewModel, appVersion: appVersion, macOSVersion: macOSVersion)
+        
         ZStack {
-        VStack(spacing: mainSectionSpacing) {
-            Spacer()
-            
-            // Theme-controlled content view (timer display, animations, etc.)
-            currentExperience.makeContentView(
+            // Check if theme supports full layout control
+            if let fullLayoutView = currentExperience.makeFullLayoutView(
                 viewModel: viewModel,
+                statusInfo: statusInfo,
                 rippleTrigger: $rippleTrigger
-            )
-            .id("content-\(viewModel.currentTheme.id)")
-            .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
-            
-            // Session info with dynamic sizing and colors
-            VStack(spacing: sessionInfoSpacing) {
-                Text("Session \(viewModel.pomodoroState.sessionCount + 1)/4")
-                    .font(.system(size: sessionInfoLargeFontSize, weight: .semibold, design: .rounded))
-                    .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
-                
-                Text("Today: \(viewModel.totalSessionsToday) sessions")
-                    .font(.system(size: sessionInfoSmallFontSize, weight: .medium, design: .rounded))
-                    .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
-            }
-            
-            // Theme-controlled controls (buttons or EmptyView for terminal)
-            currentExperience.makeControlsView(viewModel: viewModel)
-                .id("controls-\(viewModel.currentTheme.id)")
-                .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
-            
-            Spacer()
-        }
-            .padding(screenContext.contentPadding)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            .background(
-                themeBackground
-            )
-            .edgesIgnoringSafeArea(.all)
-            .preferredColorScheme(.dark)
-            .id("theme-\(viewModel.currentTheme.id)") // Explicit view identity for performance
-            .transition(.opacity)
-            .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
-                print("🌊 Timer start notification received - triggering ripple effect")
-                // Toggle the boolean to trigger the animation in RippleView
-                rippleTrigger.toggle()
-            }
-            
-            // Version info overlay with dynamic sizing
-            VStack {
-                Spacer()
-                HStack {
-                    VStack(alignment: .leading, spacing: versionInfoSpacing) {
-                        Text("PomodoroTimer v\(appVersion)")
-                            .font(.system(size: versionInfoLargeFontSize, weight: .medium, design: .monospaced))
-                            .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.6))
-                        Text("macOS \(macOSVersion)")
-                            .font(.system(size: versionInfoSmallFontSize, weight: .regular, design: .monospaced))
-                            .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.4))
+            ) {
+                // Theme has complete control over layout
+                fullLayoutView
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(themeBackground)
+                    .edgesIgnoringSafeArea(.all)
+                    .preferredColorScheme(.dark)
+                    .id("theme-\(viewModel.currentTheme.id)")
+                    .transition(.opacity)
+                    .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
+                        print("🌊 Timer start notification received - triggering ripple effect")
+                        rippleTrigger.toggle()
                     }
+            } else {
+                // Use default layout system (backward compatibility)
+                VStack(spacing: mainSectionSpacing) {
+                    Spacer()
+                    
+                    // Theme-controlled content view (timer display, animations, etc.)
+                    currentExperience.makeContentView(
+                        viewModel: viewModel,
+                        rippleTrigger: $rippleTrigger
+                    )
+                    .id("content-\(viewModel.currentTheme.id)")
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
+                    
+                    // Session info with dynamic sizing and colors
+                    VStack(spacing: sessionInfoSpacing) {
+                        Text(statusInfo.sessionDisplayText)
+                            .font(.system(size: sessionInfoLargeFontSize, weight: .semibold, design: .rounded))
+                            .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
+                        
+                        Text(statusInfo.todaySessionsDisplayText)
+                            .font(.system(size: sessionInfoSmallFontSize, weight: .medium, design: .rounded))
+                            .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
+                    }
+                    
+                    // Theme-controlled controls (buttons or EmptyView for terminal)
+                    currentExperience.makeControlsView(viewModel: viewModel)
+                        .id("controls-\(viewModel.currentTheme.id)")
+                        .animation(.easeInOut(duration: 0.3), value: viewModel.currentTheme.id)
+                    
                     Spacer()
                 }
-                .padding(.leading, overlayPadding)
-                .padding(.bottom, overlayPadding * 0.5)
+                .padding(screenContext.contentPadding)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+                .background(themeBackground)
+                .edgesIgnoringSafeArea(.all)
+                .preferredColorScheme(.dark)
+                .id("theme-\(viewModel.currentTheme.id)")
+                .transition(.opacity)
+                .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
+                    print("🌊 Timer start notification received - triggering ripple effect")
+                    rippleTrigger.toggle()
+                }
+                
+                // Version info overlay with dynamic sizing (only for default layout)
+                VStack {
+                    Spacer()
+                    HStack {
+                        VStack(alignment: .leading, spacing: versionInfoSpacing) {
+                            Text(statusInfo.appVersionDisplayText)
+                                .font(.system(size: versionInfoLargeFontSize, weight: .medium, design: .monospaced))
+                                .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.6))
+                            Text(statusInfo.macOSVersionDisplayText)
+                                .font(.system(size: versionInfoSmallFontSize, weight: .regular, design: .monospaced))
+                                .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.4))
+                        }
+                        Spacer()
+                    }
+                    .padding(.leading, overlayPadding)
+                    .padding(.bottom, overlayPadding * 0.5)
+                }
             }
             
-            // Theme picker overlay
+            // Theme picker overlay (always visible)
             ThemePickerView()
         }
     }

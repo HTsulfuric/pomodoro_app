@@ -171,6 +171,7 @@ struct ThemeRegistrationHelper {
         MinimalTheme.register()
         GridTheme.register()
         TerminalTheme.register()
+        AuraMinimalistTheme.register()
         
         
         // Validate the registry after registration

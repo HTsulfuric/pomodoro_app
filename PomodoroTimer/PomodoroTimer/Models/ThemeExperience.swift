@@ -29,6 +29,14 @@ protocol ThemeExperience {
     @ViewBuilder
     func makeControlsView(viewModel: TimerViewModel) -> ControlsView
     
+    // MARK: - Advanced Layout Control (Optional)
+    
+    /// Provides complete control over the entire theme layout including status information
+    /// If implemented, this takes precedence over makeContentView + makeControlsView
+    /// Returns nil to use the default layout system (makeContentView + makeControlsView)
+    @ViewBuilder
+    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView?
+    
     // MARK: - Advanced Keyboard Customization
     
     /// Provides custom keyboard behavior for specific keys
@@ -58,6 +66,11 @@ enum KeyboardBehavior {
 // MARK: - Default Implementations
 
 extension ThemeExperience {
+    /// Default implementation returns nil (use standard layout system)
+    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
+        return nil
+    }
+    
     /// Default implementation returns nil (use standard keyboard behavior)
     func customKeyboardBehavior(for keyCode: UInt16) -> KeyboardBehavior? {
         return nil
@@ -86,6 +99,7 @@ struct AnyThemeExperience {
     private let _requiresKeyboardFocus: () -> Bool
     private let _makeContentView: (TimerViewModel, Binding<Bool>) -> AnyView
     private let _makeControlsView: (TimerViewModel) -> AnyView
+    private let _makeFullLayoutView: (TimerViewModel, StatusInfo, Binding<Bool>) -> AnyView?
     private let _customKeyboardBehavior: (UInt16) -> KeyboardBehavior?
     
     // MARK: - Initialization
@@ -102,6 +116,10 @@ struct AnyThemeExperience {
         
         _makeControlsView = { viewModel in
             AnyView(experience.makeControlsView(viewModel: viewModel))
+        }
+        
+        _makeFullLayoutView = { viewModel, statusInfo, rippleTrigger in
+            experience.makeFullLayoutView(viewModel: viewModel, statusInfo: statusInfo, rippleTrigger: rippleTrigger)
         }
         
         _customKeyboardBehavior = { keyCode in
@@ -134,6 +152,11 @@ struct AnyThemeExperience {
     /// Creates the control view for this theme
     func makeControlsView(viewModel: TimerViewModel) -> AnyView {
         _makeControlsView(viewModel)
+    }
+    
+    /// Creates the full layout view for this theme (if supported)
+    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
+        _makeFullLayoutView(viewModel, statusInfo, rippleTrigger)
     }
     
     /// Provides custom keyboard behavior for specific keys

@@ -77,7 +77,7 @@ struct MyThemeExperience: ThemeExperience {
     @ViewBuilder
     func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
         // Reuse existing circular view
-        MinimalThemeView(rippleTrigger: rippleTrigger)
+        MinimalThemeView(rippleTrigger: rippleTrigger)  // Now consolidated in MinimalTheme.swift
             .environmentObject(viewModel)
     }
     
@@ -120,7 +120,7 @@ Build the project (`⌘+R`) - your theme appears in the picker automatically!
 @ViewBuilder
 func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
     // Grid style instead of circular
-    GridThemeView(rippleTrigger: rippleTrigger)
+    GridThemeView(rippleTrigger: rippleTrigger)  // Now consolidated in GridTheme.swift
         .environmentObject(viewModel)
 }
 ```
@@ -276,9 +276,9 @@ private var adaptiveSize: CGFloat {
 
 ### Available View Components
 
-- `MinimalThemeView`: Circular progress
-- `GridThemeView`: GitHub-style grid
-- `TerminalThemeView`: Command line aesthetic
+- `MinimalThemeView`: Circular progress (in MinimalTheme.swift)
+- `GridThemeView`: GitHub-style grid (in GridTheme.swift)  
+- `TerminalThemeView`: Command line aesthetic (in TerminalTheme.swift)
 - `StandardControlsView`: Standard buttons
 
 ### Registry Methods

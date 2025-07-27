@@ -41,7 +41,7 @@ class NotificationManager: ObservableObject {
     func requestPermission() {
         notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
-                print("Notification permission error: \(error)")
+                Logger.error("Notification permission error", category: .notifications, error: error)
             } else {
                 print("Notification permission granted: \(granted)")
             }

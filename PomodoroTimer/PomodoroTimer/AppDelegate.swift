@@ -150,7 +150,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         overlayPanel = OverlayPanel(contentRect: panelFrame)
         
         guard let panel = overlayPanel else {
-            print("Failed to create overlay panel")
+            Logger.error("Failed to create overlay panel", category: .overlay)
             return
         }
         
@@ -195,7 +195,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     private func toggleOverlay() {
         guard let panel = overlayPanel else {
-            print("Overlay panel not available")
+            Logger.error("Overlay panel not available", category: .overlay)
             return
         }
         

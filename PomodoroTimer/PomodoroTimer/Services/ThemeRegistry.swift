@@ -73,7 +73,7 @@ class ThemeRegistry: ObservableObject {
                 }
                 
             } else {
-                print("Warning: Theme with ID '\(anyTheme.id)' already registered")
+                Logger.warning("Theme with ID '\(anyTheme.id)' already registered", category: .themes)
             }
         }
     }

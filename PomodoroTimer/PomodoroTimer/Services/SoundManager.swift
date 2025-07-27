@@ -46,7 +46,7 @@ class SoundManager: ObservableObject {
     
     func playCustomSound(named soundName: String) {
         guard let soundURL = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
-            print("Could not find sound file: \(soundName)")
+            Logger.error("Could not find sound file: \(soundName)", category: .sound)
             return
         }
         

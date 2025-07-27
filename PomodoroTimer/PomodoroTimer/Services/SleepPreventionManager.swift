@@ -40,7 +40,7 @@ class SleepPreventionManager {
             isActive = true
             print("Sleep prevention started: \(reason)")
         } else {
-            print("Failed to create sleep prevention activity")
+            Logger.error("Failed to create sleep prevention activity", category: .sleep)
             isActive = false
         }
     }

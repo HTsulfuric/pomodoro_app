@@ -166,6 +166,14 @@ struct ContentView: View {
             
             // Theme picker overlay (always visible)
             ThemePickerView()
+            
+            // Text-based theme picker overlay (nnn/yazi style)
+            if viewModel.isThemePickerPresented {
+                TextBasedThemePickerView()
+                    .environmentObject(viewModel)
+                    .transition(.opacity)
+                    .zIndex(1000) // Ensure it appears above everything else
+            }
         }
     }
     

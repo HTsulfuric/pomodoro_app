@@ -8,6 +8,12 @@ class TimerViewModel: ObservableObject {
     @Published var totalSessionsToday: Int = 0
     @Published var currentTheme: AnyTheme = ThemeRegistry.shared.defaultTheme ?? AnyTheme(MinimalTheme())
     
+    // Theme picker state management
+    @Published var isThemePickerPresented: Bool = false
+    @Published var highlightedTheme: AnyTheme?
+    @Published var highlightedThemeIndex: Int = 0
+    private var originalTheme: AnyTheme?
+    
     // Timer management
     private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
@@ -196,6 +202,77 @@ class TimerViewModel: ObservableObject {
         }
         
         // Note: Window resize will be handled by AppDelegate after setup is complete
+    }
+    
+    // MARK: - Theme Picker Management
+    
+    func toggleThemePicker() {
+        if isThemePickerPresented {
+            cancelThemeSelection()
+        } else {
+            presentThemePicker()
+        }
+    }
+    
+    func presentThemePicker() {
+        originalTheme = currentTheme
+        isThemePickerPresented = true
+        
+        // Initialize highlighted theme to current theme
+        if let currentIndex = ThemeRegistry.shared.availableThemes.firstIndex(where: { $0.id == currentTheme.id }) {
+            setHighlightedThemeIndex(currentIndex)
+        }
+    }
+    
+    func selectNextTheme() {
+        let themes = ThemeRegistry.shared.availableThemes
+        guard !themes.isEmpty else { return }
+        
+        highlightedThemeIndex = (highlightedThemeIndex + 1) % themes.count
+        updateHighlightedTheme()
+    }
+    
+    func selectPreviousTheme() {
+        let themes = ThemeRegistry.shared.availableThemes
+        guard !themes.isEmpty else { return }
+        
+        highlightedThemeIndex = highlightedThemeIndex > 0 ? highlightedThemeIndex - 1 : themes.count - 1
+        updateHighlightedTheme()
+    }
+    
+    func setHighlightedThemeIndex(_ index: Int) {
+        let themes = ThemeRegistry.shared.availableThemes
+        guard index >= 0 && index < themes.count else { return }
+        
+        highlightedThemeIndex = index
+        updateHighlightedTheme()
+    }
+    
+    private func updateHighlightedTheme() {
+        let themes = ThemeRegistry.shared.availableThemes
+        guard highlightedThemeIndex >= 0 && highlightedThemeIndex < themes.count else { return }
+        
+        highlightedTheme = themes[highlightedThemeIndex]
+        
+        // Apply live preview
+        currentTheme = highlightedTheme!
+    }
+    
+    func confirmThemeSelection() {
+        if let highlightedTheme = highlightedTheme {
+            setTheme(highlightedTheme)
+        }
+        isThemePickerPresented = false
+        originalTheme = nil
+    }
+    
+    func cancelThemeSelection() {
+        if let originalTheme = originalTheme {
+            currentTheme = originalTheme
+        }
+        isThemePickerPresented = false
+        highlightedTheme = nil
+        self.originalTheme = nil
     }
     
     // MARK: - State File Management for SketchyBar

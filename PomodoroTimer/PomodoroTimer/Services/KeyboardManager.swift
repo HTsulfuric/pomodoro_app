@@ -123,10 +123,57 @@ class KeyboardManager {
         NotificationCenter.default.post(name: .toggleOverlay, object: nil)
     }
     
+    private func handleThemePickerKey(_ event: NSEvent, viewModel: TimerViewModel) -> Bool {
+        guard !event.modifierFlags.contains([.command, .control, .option, .shift]) else {
+            return false // Don't handle modified keys
+        }
+        
+        switch event.keyCode {
+        case 38: // j key
+            print("🎹 j key - next theme")
+            viewModel.selectNextTheme()
+            return true
+        case 40: // k key
+            print("🎹 k key - previous theme")
+            viewModel.selectPreviousTheme()
+            return true
+        case 125: // Down arrow
+            print("🎹 Down arrow - next theme")
+            viewModel.selectNextTheme()
+            return true
+        case 126: // Up arrow
+            print("🎹 Up arrow - previous theme")
+            viewModel.selectPreviousTheme()
+            return true
+        case 36: // Enter key
+            print("🎹 Enter key - confirm theme selection")
+            viewModel.confirmThemeSelection()
+            return true
+        case 53: // ESC key
+            print("🎹 ESC key - cancel theme selection")
+            viewModel.cancelThemeSelection()
+            return true
+        default:
+            return false // Don't consume other keys
+        }
+    }
+    
     private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
         guard let viewModel = timerViewModel else {
             print("🎹 Warning: TimerViewModel not available")
             return false
+        }
+        
+        // Handle theme picker keys when theme picker is visible
+        if viewModel.isThemePickerPresented {
+            return handleThemePickerKey(event, viewModel: viewModel)
+        }
+        
+        // Handle T key to activate theme picker when overlay is visible but theme picker is not
+        if event.keyCode == 17 && !event.modifierFlags.contains([.command, .control, .option, .shift]) { // T key
+            print("🎹 T key - opening theme picker")
+            viewModel.presentThemePicker()
+            return true
         }
         
         switch event.keyCode {

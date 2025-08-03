@@ -4,7 +4,6 @@ import SwiftUI
 
 /// The GitHub contribution grid-inspired theme with discrete time visualization
 struct GridTheme: ThemeDefinition {
-    
     // MARK: - Theme Identity
     
     let id = "grid"
@@ -72,7 +71,7 @@ struct GridTheme: ThemeDefinition {
     // MARK: - Theme Experience Factory
     
     func createExperience() -> AnyThemeExperience {
-        return AnyThemeExperience(GridExperience())
+        AnyThemeExperience(GridExperience())
     }
     
     // MARK: - Registration
@@ -86,7 +85,6 @@ struct GridTheme: ThemeDefinition {
 
 /// Grid theme experience with contribution-style visualization and standard controls
 struct GridExperience: ThemeExperience {
-    
     // MARK: - Behavioral Characteristics
     
     let allowsVisualControls = true
@@ -135,17 +133,17 @@ struct GridThemeView: View {
     
     /// Main horizontal spacing between left and right sections
     private var mainSpacing: CGFloat {
-        return screenContext.elementSpacing * 1.2
+        screenContext.elementSpacing * 1.2
     }
     
     /// Vertical spacing between elements
     private var elementSpacing: CGFloat {
-        return screenContext.elementSpacing * 0.8
+        screenContext.elementSpacing * 0.8
     }
     
     /// Dynamic font size for phase emoji
     private var emojiFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 56,
             minSize: 42,
             maxSize: 80
@@ -154,7 +152,7 @@ struct GridThemeView: View {
     
     /// Dynamic font size for main timer display
     private var timerFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 32,
             minSize: 24,
             maxSize: 48
@@ -163,7 +161,7 @@ struct GridThemeView: View {
     
     /// Dynamic font size for phase name
     private var phaseNameFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 12,
             minSize: 10,
             maxSize: 16
@@ -172,7 +170,7 @@ struct GridThemeView: View {
     
     /// Dynamic font size for session info
     private var sessionInfoLargeFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 14,
             minSize: 12,
             maxSize: 18
@@ -181,7 +179,7 @@ struct GridThemeView: View {
     
     /// Dynamic font size for session info secondary text
     private var sessionInfoSmallFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 12,
             minSize: 10,
             maxSize: 16
@@ -190,7 +188,7 @@ struct GridThemeView: View {
     
     /// Dynamic font size for progress percentage
     private var progressFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 14,
             minSize: 11,
             maxSize: 18
@@ -199,7 +197,7 @@ struct GridThemeView: View {
     
     /// Dynamic padding for the entire view
     private var viewPadding: CGFloat {
-        return screenContext.contentPadding
+        screenContext.contentPadding
     }
     
     var body: some View {
@@ -281,12 +279,12 @@ struct WorkGridView: View {
     
     /// Dynamic square size based on screen context
     private var squareSize: CGFloat {
-        return screenContext.gridSquareSize
+        screenContext.gridSquareSize
     }
     
     /// Dynamic spacing based on screen context
     private var squareSpacing: CGFloat {
-        return screenContext.gridSpacing
+        screenContext.gridSpacing
     }
     
     /// Spiral pattern starting from outside corners, moving inward
@@ -338,12 +336,12 @@ struct BreakGridView: View {
     
     /// Dynamic square size for break grid (slightly larger than work grid)
     private var squareSize: CGFloat {
-        return screenContext.gridSquareSize * 1.3
+        screenContext.gridSquareSize * 1.3
     }
     
     /// Dynamic spacing for break grid (slightly larger spacing)
     private var squareSpacing: CGFloat {
-        return screenContext.gridSpacing * 1.3
+        screenContext.gridSpacing * 1.3
     }
     
     var filledSquares: Int {

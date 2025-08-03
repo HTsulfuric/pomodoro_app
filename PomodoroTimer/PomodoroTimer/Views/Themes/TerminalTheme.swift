@@ -4,7 +4,6 @@ import SwiftUI
 
 /// The retro terminal theme with command-line aesthetic and invisible controls
 struct TerminalTheme: ThemeDefinition {
-    
     // MARK: - Theme Identity
     
     let id = "terminal"
@@ -62,7 +61,7 @@ struct TerminalTheme: ThemeDefinition {
         longBreak: Color(red: 0.5, green: 0.5, blue: 1)
     )
     
-    let buttonShadowColor: Color = Color(red: 0, green: 0.5, blue: 0)
+    let buttonShadowColor = Color(red: 0, green: 0.5, blue: 0)
     
     // MARK: - Window Theme Properties
     
@@ -72,7 +71,7 @@ struct TerminalTheme: ThemeDefinition {
     // MARK: - Theme Experience Factory
     
     func createExperience() -> AnyThemeExperience {
-        return AnyThemeExperience(TerminalExperience())
+        AnyThemeExperience(TerminalExperience())
     }
     
     // MARK: - Registration
@@ -86,7 +85,6 @@ struct TerminalTheme: ThemeDefinition {
 
 /// Terminal theme experience with command-line aesthetic and invisible controls
 struct TerminalExperience: ThemeExperience {
-    
     // MARK: - Behavioral Characteristics
     
     let allowsVisualControls = false  // This is the key architectural difference
@@ -114,14 +112,14 @@ struct TerminalExperience: ThemeExperience {
             return .enhanced(
                 action: {
                     // Future enhancement: show/hide minimal stats overlay
-                    print("🖥️ Terminal: Enhanced info mode")
+                    Logger.keyboard("🖥️ Terminal: Enhanced info mode")
                 },
                 visualFeedback: "INFO_MODE"
             )
         case 18: // 1 key - could show session shortcuts
             return .enhanced(
                 action: {
-                    print("🖥️ Terminal: Session shortcuts displayed")
+                    Logger.keyboard("🖥️ Terminal: Session shortcuts displayed")
                 },
                 visualFeedback: "SHORTCUTS"
             )
@@ -172,27 +170,27 @@ struct TerminalThemeView: View {
     
     /// Dynamic font sizes for terminal theme
     private var fontSizes: (timer: CGFloat, header: CGFloat, controls: CGFloat) {
-        return screenContext.terminalFontSizes
+        screenContext.terminalFontSizes
     }
     
     /// Dynamic font size for the main timer display
     private var timerFontSize: CGFloat {
-        return fontSizes.timer
+        fontSizes.timer
     }
     
     /// Dynamic font size for header and footer borders
     private var headerFontSize: CGFloat {
-        return fontSizes.header
+        fontSizes.header
     }
     
     /// Dynamic font size for controls text
     private var controlsFontSize: CGFloat {
-        return fontSizes.controls
+        fontSizes.controls
     }
     
     /// Dynamic font size for phase indicator
     private var phaseIndicatorFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 18,
             minSize: 14,
             maxSize: 24
@@ -201,7 +199,7 @@ struct TerminalThemeView: View {
     
     /// Dynamic font size for progress bar
     private var progressBarFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 16,
             minSize: 12,
             maxSize: 20
@@ -210,12 +208,12 @@ struct TerminalThemeView: View {
     
     /// Dynamic spacing between main sections
     private var sectionSpacing: CGFloat {
-        return screenContext.elementSpacing
+        screenContext.elementSpacing
     }
     
     /// Dynamic horizontal padding for content
     private var horizontalPadding: CGFloat {
-        return screenContext.contentPadding * 0.67 // Slightly less padding for terminal
+        screenContext.contentPadding * 0.67 // Slightly less padding for terminal
     }
     
     /// Dynamic progress bar length based on screen width
@@ -379,7 +377,6 @@ struct TerminalThemeView: View {
             .padding(.bottom, sectionSpacing * 0.33)
         }
     }
-    
     
     private func updateProgressBar() {
         let barLength = progressBarLength // Dynamic length based on screen size

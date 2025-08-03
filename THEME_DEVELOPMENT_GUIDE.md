@@ -76,15 +76,37 @@ struct MyThemeExperience: ThemeExperience {
     
     @ViewBuilder
     func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
-        // Reuse existing circular view
-        MinimalThemeView(rippleTrigger: rippleTrigger)  // Now consolidated in MinimalTheme.swift
+        // Create your custom view here
+        MyCustomTimerView(rippleTrigger: rippleTrigger)
             .environmentObject(viewModel)
+            .environmentObject(screenContext)
     }
     
     @ViewBuilder
     func makeControlsView(viewModel: TimerViewModel) -> some View {
-        // Reuse standard buttons
+        // Reuse standard buttons (defined in MinimalTheme.swift)
         StandardControlsView(viewModel: viewModel)
+    }
+}
+
+// Your custom timer view
+struct MyCustomTimerView: View {
+    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var screenContext: ScreenContext
+    @Binding var rippleTrigger: Bool
+    
+    var body: some View {
+        // Simple custom layout - customize this!
+        VStack(spacing: screenContext.elementSpacing) {
+            Text(viewModel.pomodoroState.formattedTime)
+                .font(.system(size: 72, weight: .bold, design: .rounded))
+                .foregroundColor(viewModel.currentTheme.primaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
+                .monospacedDigit()
+            
+            Text(viewModel.pomodoroState.currentPhase.rawValue)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase))
+        }
     }
 }
 ```
@@ -114,14 +136,23 @@ Build the project (`⌘+R`) - your theme appears in the picker automatically!
 
 ## Custom Look: Create Your Own Style
 
-### Option 1: Use Different Existing Views
+### Option 1: Reuse Existing Theme Views
 
 ```swift
 @ViewBuilder
 func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
-    // Grid style instead of circular
-    GridThemeView(rippleTrigger: rippleTrigger)  // Now consolidated in GridTheme.swift
+    // Use circular timer from MinimalTheme
+    MinimalThemeView(rippleTrigger: rippleTrigger)
         .environmentObject(viewModel)
+        .environmentObject(screenContext)
+}
+
+// Or use grid visualization from GridTheme
+@ViewBuilder
+func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
+    GridThemeView(rippleTrigger: rippleTrigger)
+        .environmentObject(viewModel)
+        .environmentObject(screenContext)
 }
 ```
 

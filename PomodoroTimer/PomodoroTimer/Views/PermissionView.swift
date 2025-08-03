@@ -105,10 +105,10 @@ struct PermissionView: View {
     private func checkPermissionsAndDismiss() {
         // Check if accessibility permissions are now granted
         if AXIsProcessTrusted() {
-            print("✅ Accessibility permissions confirmed - dismissing permission dialog")
+            Logger.permission("✅ Accessibility permissions confirmed - dismissing permission dialog")
             onDismiss()
         } else {
-            print("❌ Accessibility permissions still not granted")
+            Logger.permission("❌ Accessibility permissions still not granted")
             withAnimation(.easeInOut(duration: 0.3)) {
                 showPermissionError = true
             }
@@ -137,7 +137,7 @@ struct PermissionView: View {
 
 #Preview {
     PermissionView {
-        print("Dismissed")
+        Logger.debug("Permission view dismissed (preview)", category: .ui)
     }
     .preferredColorScheme(.dark)
 }

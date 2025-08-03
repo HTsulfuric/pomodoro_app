@@ -10,7 +10,6 @@ struct ContentView: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
     
-    
     private var macOSVersion: String {
         let version = ProcessInfo.processInfo.operatingSystemVersion
         return "\(version.majorVersion).\(version.minorVersion)"
@@ -25,7 +24,7 @@ struct ContentView: View {
     
     /// Dynamic font size for session info primary text
     private var sessionInfoLargeFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 18,
             minSize: 14,
             maxSize: 24
@@ -34,7 +33,7 @@ struct ContentView: View {
     
     /// Dynamic font size for session info secondary text
     private var sessionInfoSmallFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 14,
             minSize: 11,
             maxSize: 18
@@ -43,7 +42,7 @@ struct ContentView: View {
     
     /// Dynamic font size for version info
     private var versionInfoLargeFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 10,
             minSize: 8,
             maxSize: 13
@@ -52,7 +51,7 @@ struct ContentView: View {
     
     /// Dynamic font size for version info secondary
     private var versionInfoSmallFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 9,
             minSize: 7,
             maxSize: 12
@@ -61,22 +60,22 @@ struct ContentView: View {
     
     /// Dynamic spacing between session info elements
     private var sessionInfoSpacing: CGFloat {
-        return screenContext.elementSpacing * 0.3
+        screenContext.elementSpacing * 0.3
     }
     
     /// Dynamic spacing between main sections
     private var mainSectionSpacing: CGFloat {
-        return screenContext.elementSpacing
+        screenContext.elementSpacing
     }
     
     /// Dynamic version info spacing
     private var versionInfoSpacing: CGFloat {
-        return screenContext.elementSpacing * 0.1
+        screenContext.elementSpacing * 0.1
     }
     
     /// Dynamic padding for version and theme picker overlays
     private var overlayPadding: CGFloat {
-        return screenContext.contentPadding * 0.67
+        screenContext.contentPadding * 0.67
     }
     
     var body: some View {
@@ -98,7 +97,7 @@ struct ContentView: View {
                     .id("theme-\(viewModel.currentTheme.id)")
                     .transition(.opacity)
                     .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
-                        print("🌊 Timer start notification received - triggering ripple effect")
+                        Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
                         rippleTrigger.toggle()
                     }
             } else {
@@ -141,7 +140,7 @@ struct ContentView: View {
                 .id("theme-\(viewModel.currentTheme.id)")
                 .transition(.opacity)
                 .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
-                    print("🌊 Timer start notification received - triggering ripple effect")
+                    Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
                     rippleTrigger.toggle()
                 }
                 
@@ -202,7 +201,6 @@ struct ContentView: View {
             )
         }
     }
-    
 }
 
 #Preview {

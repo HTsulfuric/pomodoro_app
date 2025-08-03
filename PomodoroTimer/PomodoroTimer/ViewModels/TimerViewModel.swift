@@ -18,6 +18,9 @@ class TimerViewModel: ObservableObject {
     private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
     
+    // Debounced state file writing to prevent I/O storms
+    private let stateWriteSubject = PassthroughSubject<Bool, Never>()
+    
     // Background activity management to prevent App Nap
     private var backgroundActivity: NSObjectProtocol?
     
@@ -32,8 +35,9 @@ class TimerViewModel: ObservableObject {
         loadPersistentData()
         loadTheme()
         setupNotificationObservers()
+        setupDebouncedStateFileWriter()
         createStateFileDirectory()
-        writeStateFile()
+        scheduleStateFileWrite(immediate: true)
     }
     
     deinit {
@@ -47,6 +51,29 @@ class TimerViewModel: ObservableObject {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     }
     
+    // MARK: - Debounced State File Writing
+    
+    /// Setup debounced state file writer to prevent I/O storms
+    /// Critical fix: Was writing to disk every second, now max once per 5 seconds
+    private func setupDebouncedStateFileWriter() {
+        stateWriteSubject
+            .debounce(for: .seconds(5), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.writeStateFile()
+            }
+            .store(in: &cancellables)
+    }
+    
+    /// Schedule a state file write - immediate for critical changes, debounced for routine updates
+    /// - Parameter immediate: If true, writes immediately. If false, debounces to max once per 5 seconds
+    private func scheduleStateFileWrite(immediate: Bool) {
+        if immediate {
+            writeStateFile()
+        } else {
+            stateWriteSubject.send(true)
+        }
+    }
+    
     // MARK: - Background Activity Management
     
     private func beginBackgroundActivity() {
@@ -56,14 +83,14 @@ class TimerViewModel: ObservableObject {
             options: [.background, .idleSystemSleepDisabled],
             reason: "Pomodoro timer running"
         )
-        print("🔋 Started background activity - preventing App Nap while timer runs")
+        Logger.debug("🔋 Started background activity - preventing App Nap while timer runs", category: .app)
     }
     
     private func endBackgroundActivity() {
         if let activity = backgroundActivity {
             ProcessInfo.processInfo.endActivity(activity)
             backgroundActivity = nil
-            print("🔋 Ended background activity - allowing App Nap while timer idle")
+            Logger.debug("🔋 Ended background activity - allowing App Nap while timer idle", category: .app)
         }
     }
     
@@ -71,41 +98,50 @@ class TimerViewModel: ObservableObject {
     
     func toggleTimer() {
         if pomodoroState.isRunning {
-            print(" Calling pauseTimer()...")
+            Logger.debug("Calling pauseTimer()...", category: .timer)
             pauseTimer()
         } else {
-            print(" Calling startTimer()...")
+            Logger.debug("Calling startTimer()...", category: .timer)
             startTimer()
         }
-        print(" toggleTimer() completed - new state: isRunning=\(pomodoroState.isRunning)")
+        Logger.debug("toggleTimer() completed - new state: isRunning=\(pomodoroState.isRunning)", category: .timer)
     }
     
     func startTimer() {
-        print(" Starting timer: \(pomodoroState.currentPhase.rawValue)")
+        Logger.timerState("Starting timer: \(pomodoroState.currentPhase.rawValue)")
         pomodoroState.start()
         beginBackgroundActivity()  // Prevent App Nap while timer runs
         startTimerLoop()
-        writeStateFile()
+        scheduleStateFileWrite(immediate: true)
+        
+        // Signal SketchyBar to begin monitoring
+        triggerSketchyBarEvent("pomodoro_start")
     }
     
     func pauseTimer() {
-        print(" Pausing timer: \(pomodoroState.currentPhase.rawValue)")
+        Logger.timerState("Pausing timer: \(pomodoroState.currentPhase.rawValue)")
         pomodoroState.pause()
         endBackgroundActivity()  // Allow App Nap when timer paused
         stopTimerLoop()
-        writeStateFile()
+        scheduleStateFileWrite(immediate: true)
+        
+        // Signal SketchyBar to stop monitoring
+        triggerSketchyBarEvent("pomodoro_stop")
     }
     
     func resetTimer() {
-        print(" Resetting timer: \(pomodoroState.currentPhase.rawValue)")
+        Logger.timerState("Resetting timer: \(pomodoroState.currentPhase.rawValue)")
         pomodoroState.reset()
         endBackgroundActivity()  // Allow App Nap when timer reset
         stopTimerLoop()
-        writeStateFile()
+        scheduleStateFileWrite(immediate: true)
+        
+        // Signal SketchyBar to stop monitoring
+        triggerSketchyBarEvent("pomodoro_stop")
     }
     
     func skipPhase() {
-        print(" Skipping phase: \(pomodoroState.currentPhase.rawValue)")
+        Logger.timerState("Skipping phase: \(pomodoroState.currentPhase.rawValue)")
         let wasWork = pomodoroState.currentPhase == .work
         
         endBackgroundActivity()  // Allow App Nap when phase skipped
@@ -117,11 +153,10 @@ class TimerViewModel: ObservableObject {
         }
         
         pomodoroState.skip()
-        writeStateFile()
+        scheduleStateFileWrite(immediate: true)
         
-        print(" Skipped to: \(pomodoroState.currentPhase.rawValue)")
+        Logger.timerState("Skipped to: \(pomodoroState.currentPhase.rawValue)")
     }
-    
     
     // MARK: - Timer Loop Management
     
@@ -141,8 +176,8 @@ class TimerViewModel: ObservableObject {
         let shouldComplete = pomodoroState.shouldComplete
         pomodoroState.tick()
         
-        // Write state file every tick for SketchyBar
-        writeStateFile()
+        // Only schedule debounced state write during tick
+        scheduleStateFileWrite(immediate: false)
         
         if shouldComplete {
             handlePhaseComplete()
@@ -155,7 +190,7 @@ class TimerViewModel: ObservableObject {
         if completedPhase == .work {
             totalSessionsToday += 1
             savePersistentData()
-            print(" Work session completed. Total today: \(totalSessionsToday)")
+            Logger.timerState("Work session completed. Total today: \(totalSessionsToday)")
         }
         
         endBackgroundActivity()  // Allow App Nap when phase completes
@@ -166,7 +201,7 @@ class TimerViewModel: ObservableObject {
         
         // Complete the phase (transition to next)
         pomodoroState.skip()
-        writeStateFile()
+        scheduleStateFileWrite(immediate: true)
         
         // Schedule notification
         NotificationManager.shared.schedulePhaseCompleteNotification(
@@ -174,20 +209,18 @@ class TimerViewModel: ObservableObject {
             sessionCount: totalSessionsToday
         )
         
-        print(" Phase completed. New phase: \(pomodoroState.currentPhase.rawValue)")
+        Logger.timerState("Phase completed. New phase: \(pomodoroState.currentPhase.rawValue)")
     }
     
     // MARK: - Theme Management
     
     func setTheme(_ newTheme: AnyTheme) {
-        
         currentTheme = newTheme
         UserDefaults.standard.set(newTheme.id, forKey: "selectedTheme")
         
         // Request window resize for the new theme
         // Note: Window resize removed - all themes now use full screen
     }
-    
     
     private func loadTheme() {
         if let savedThemeId = UserDefaults.standard.string(forKey: "selectedTheme"),
@@ -291,7 +324,22 @@ class TimerViewModel: ObservableObject {
             let jsonData = try JSONSerialization.data(withJSONObject: stateData, options: [.prettyPrinted])
             try jsonData.write(to: stateFileURL)
         } catch {
-            print(" Failed to write state file: \(error)")
+            Logger.error("Failed to write state file", category: .app, error: error)
+        }
+    }
+    
+    // MARK: - SketchyBar Integration
+    
+    private func triggerSketchyBarEvent(_ event: String) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/sketchybar")
+        process.arguments = ["--trigger", event]
+        
+        do {
+            try process.run()
+            Logger.debug("SketchyBar event triggered: \(event)", category: .app)
+        } catch {
+            Logger.warning("Failed to trigger SketchyBar event '\(event)': \(error.localizedDescription)", category: .app)
         }
     }
     
@@ -308,7 +356,7 @@ class TimerViewModel: ObservableObject {
             savePersistentData()
         }
         
-        print("📊 Loaded persistent data: \(totalSessionsToday) sessions today")
+        Logger.info("📊 Loaded persistent data: \(totalSessionsToday) sessions today", category: .app)
     }
     
     private func savePersistentData() {
@@ -344,6 +392,6 @@ class TimerViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
-        print(" TimerViewModel listening for user notification actions")
+        Logger.debug("TimerViewModel listening for user notification actions", category: .notifications)
     }
 }

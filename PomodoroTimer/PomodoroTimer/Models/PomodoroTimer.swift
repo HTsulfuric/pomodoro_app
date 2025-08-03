@@ -78,7 +78,7 @@ struct PomodoroState {
     
     // Check if phase should complete (for TimerViewModel to call)
     var shouldComplete: Bool {
-        return timeRemaining <= 0 && isRunning
+        timeRemaining <= 0 && isRunning
     }
     
     private mutating func completePhase() {

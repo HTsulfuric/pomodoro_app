@@ -69,7 +69,7 @@ protocol ThemeDefinition: Identifiable, Equatable {
 extension ThemeDefinition {
     /// Default equatable implementation based on ID
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
     
     /// Static helper for calculating full screen size

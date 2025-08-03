@@ -1,0 +1,140 @@
+# SwiftLint Configuration for Pomodoro Timer
+# Focuses on code quality, consistency, and maintainability
+
+# Directories to include in linting
+included:
+  - PomodoroTimer
+
+# Directories to exclude from linting
+excluded:
+  - PomodoroTimer/build
+  - PomodoroTimer/DerivedData
+  - "*.generated.swift"
+
+# Disable rules that conflict with project patterns
+disabled_rules:
+  - trailing_whitespace  # Allow trailing whitespace in comments for alignment
+  - todo                 # Allow TODO comments during development
+
+# Enable additional rules for better code quality
+opt_in_rules:
+  - array_init
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - empty_collection_literal
+  - empty_count
+  - empty_string
+  - explicit_init
+  - first_where
+  - force_unwrapping  # Warn about force unwrapping
+  - implicit_return
+  - joined_default_parameter
+  - last_where
+  - literal_expression_end_indentation
+  - multiline_arguments
+  - multiline_literal_brackets
+  - multiline_parameters
+  - operator_usage_whitespace
+  - overridden_super_call
+  - pattern_matching_keywords
+  - prefer_self_type_over_type_of_self
+  - reduce_boolean
+  - reduce_into
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - single_test_class
+  - sorted_first_last
+  - static_operator
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - yoda_condition
+
+# Custom rule configurations
+line_length:
+  warning: 120
+  error: 150
+  ignores_urls: true
+  ignores_function_declarations: true
+  ignores_comments: true
+
+function_body_length:
+  warning: 50
+  error: 80
+
+type_body_length:
+  warning: 300
+  error: 400
+
+file_length:
+  warning: 400
+  error: 600
+  ignore_comment_only_lines: true
+
+cyclomatic_complexity:
+  warning: 8
+  error: 12
+
+nesting:
+  type_level:
+    warning: 2
+    error: 3
+
+# Naming conventions
+type_name:
+  min_length: 3
+  max_length: 50
+  excluded:
+    - ID
+    - URL
+    - NSRect
+    - CGRect
+    - OSLog
+
+identifier_name:
+  min_length: 2
+  max_length: 50
+  excluded:
+    - id
+    - x
+    - y
+    - dx
+    - dy
+    - UI
+    - os
+
+# Force unwrapping should be warnings, not errors (some cases are acceptable)
+force_unwrapping:
+  severity: warning
+
+# Allow force cast in specific cases (like AppKit interop)
+force_cast:
+  severity: warning
+
+# Reporter configuration
+reporter: "xcode"
+
+# Custom rules for project-specific patterns
+custom_rules:
+  
+  # Prefer Logger over print statements
+  no_print_statements:
+    name: "No Print Statements"
+    regex: '^\s*print\('
+    message: "Use Logger instead of print() statements"
+    severity: warning
+
+# Allow certain patterns that are common in macOS/AppKit development
+large_tuple:
+  warning: 3
+  error: 4
+
+# Allow longer parameter lists for SwiftUI views and AppKit methods
+function_parameter_count:
+  warning: 6
+  error: 8

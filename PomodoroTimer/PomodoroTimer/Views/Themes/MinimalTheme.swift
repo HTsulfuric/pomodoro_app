@@ -4,7 +4,6 @@ import SwiftUI
 
 /// The classic minimal theme with circular progress and clean aesthetics
 struct MinimalTheme: ThemeDefinition {
-    
     // MARK: - Theme Identity
     
     let id = "minimal"
@@ -72,7 +71,7 @@ struct MinimalTheme: ThemeDefinition {
     // MARK: - Theme Experience Factory
     
     func createExperience() -> AnyThemeExperience {
-        return AnyThemeExperience(MinimalExperience())
+        AnyThemeExperience(MinimalExperience())
     }
     
     // MARK: - Registration
@@ -86,7 +85,6 @@ struct MinimalTheme: ThemeDefinition {
 
 /// Minimal theme experience with circular progress and standard controls
 struct MinimalExperience: ThemeExperience {
-    
     // MARK: - Behavioral Characteristics
     
     let allowsVisualControls = true
@@ -158,7 +156,7 @@ struct StandardControlsView: View {
                 
                 // Test Sound button
                 Button(action: {
-                    print("🔊 Testing sound manually...")
+                    Logger.sound("🔊 Testing sound manually...")
                     SoundManager.shared.playPhaseChangeSound(for: .work)
                 }) {
                     Image(systemName: "speaker.2.fill")
@@ -212,12 +210,12 @@ struct MinimalThemeView: View {
     
     /// Circle specifications based on current screen
     private var circleSpecs: (diameter: CGFloat, lineWidth: CGFloat) {
-        return screenContext.minimalCircleSpecs
+        screenContext.minimalCircleSpecs
     }
     
     /// Dynamic font size for main timer display
     private var timerFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 64,
             minSize: 48,
             maxSize: 96
@@ -226,7 +224,7 @@ struct MinimalThemeView: View {
     
     /// Dynamic font size for phase emoji
     private var emojiFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 36,
             minSize: 28,
             maxSize: 52
@@ -235,7 +233,7 @@ struct MinimalThemeView: View {
     
     /// Dynamic font size for phase name
     private var phaseNameFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 15,
             minSize: 12,
             maxSize: 20
@@ -244,7 +242,7 @@ struct MinimalThemeView: View {
     
     /// Dynamic font size for progress percentage
     private var progressFontSize: CGFloat {
-        return screenContext.scaledFont(
+        screenContext.scaledFont(
             baseSize: 12,
             minSize: 10,
             maxSize: 16
@@ -253,12 +251,12 @@ struct MinimalThemeView: View {
     
     /// Dynamic spacing between elements
     private var elementSpacing: CGFloat {
-        return screenContext.elementSpacing
+        screenContext.elementSpacing
     }
     
     /// Dynamic padding for the entire view
     private var viewPadding: CGFloat {
-        return screenContext.contentPadding
+        screenContext.contentPadding
     }
     
     var body: some View {

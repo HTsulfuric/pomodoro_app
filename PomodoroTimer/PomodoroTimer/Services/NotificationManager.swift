@@ -43,7 +43,7 @@ class NotificationManager: ObservableObject {
             if let error = error {
                 Logger.error("Notification permission error", category: .notifications, error: error)
             } else {
-                print("Notification permission granted: \(granted)")
+                Logger.info("Notification permission granted: \(granted)", category: .notifications)
             }
         }
     }
@@ -92,7 +92,7 @@ class NotificationManager: ObservableObject {
         
         notificationCenter.add(request) { error in
             if let error = error {
-                print("Failed to schedule notification: \(error)")
+                Logger.error("Failed to schedule notification", category: .notifications, error: error)
             }
         }
     }

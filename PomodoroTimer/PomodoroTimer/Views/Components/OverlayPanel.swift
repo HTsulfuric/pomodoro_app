@@ -2,7 +2,6 @@ import AppKit
 
 /// Custom NSPanel for Alfred-style overlay behavior that doesn't steal application focus
 class OverlayPanel: NSPanel {
-    
     init(contentRect: NSRect) {
         // Initialize with .borderless and .nonactivatingPanel - this is the key to Alfred-like behavior
         super.init(
@@ -36,18 +35,17 @@ class OverlayPanel: NSPanel {
         // Keep panel in memory when hidden
         self.isReleasedWhenClosed = false
         
-        print(" OverlayPanel configured for Alfred-style behavior")
+        Logger.overlay("OverlayPanel configured for Alfred-style behavior")
     }
     
     // ESSENTIAL: Allow panel to become key window for keyboard input
     // without making the entire application active
     override var canBecomeKey: Bool {
-        return true
+        true
     }
     
     // Optional: Ensure we can accept first responder status
     override var canBecomeMain: Bool {
-        return false // We don't want to be the main window
+        false // We don't want to be the main window
     }
-    
 }

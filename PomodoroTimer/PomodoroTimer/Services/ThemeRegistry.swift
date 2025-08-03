@@ -3,7 +3,6 @@ import SwiftUI
 
 /// Singleton registry for managing and discovering themes dynamically
 class ThemeRegistry: ObservableObject {
-    
     // MARK: - Singleton
     
     static let shared = ThemeRegistry()
@@ -25,14 +24,14 @@ class ThemeRegistry: ObservableObject {
     /// All available themes in the registry
     var availableThemes: [AnyTheme] {
         registrationQueue.sync {
-            return registeredThemes
+            registeredThemes
         }
     }
     
     /// Total number of registered themes
     var themeCount: Int {
         registrationQueue.sync {
-            return registeredThemes.count
+            registeredThemes.count
         }
     }
     
@@ -40,8 +39,8 @@ class ThemeRegistry: ObservableObject {
     /// - Parameter id: The unique identifier for the theme
     /// - Returns: The theme if found, nil otherwise
     func theme(withId id: String) -> AnyTheme? {
-        return registrationQueue.sync {
-            return registeredThemes.first { $0.id == id }
+        registrationQueue.sync {
+            registeredThemes.first { $0.id == id }
         }
     }
     
@@ -49,8 +48,8 @@ class ThemeRegistry: ObservableObject {
     /// - Parameter displayName: The display name of the theme
     /// - Returns: The theme if found, nil otherwise
     func theme(withDisplayName displayName: String) -> AnyTheme? {
-        return registrationQueue.sync {
-            return registeredThemes.first { $0.displayName == displayName }
+        registrationQueue.sync {
+            registeredThemes.first { $0.displayName == displayName }
         }
     }
     
@@ -71,7 +70,6 @@ class ThemeRegistry: ObservableObject {
                 DispatchQueue.main.async {
                     self.objectWillChange.send()
                 }
-                
             } else {
                 Logger.warning("Theme with ID '\(anyTheme.id)' already registered", category: .themes)
             }
@@ -83,7 +81,7 @@ class ThemeRegistry: ObservableObject {
     /// - Returns: True if the theme was found and removed, false otherwise
     @discardableResult
     func unregister(themeWithId id: String) -> Bool {
-        return registrationQueue.sync {
+        registrationQueue.sync {
             if let index = registeredThemes.firstIndex(where: { $0.id == id }) {
                 let removedTheme = registeredThemes.remove(at: index)
                 
@@ -99,7 +97,7 @@ class ThemeRegistry: ObservableObject {
     
     /// Get the default theme (first registered theme, typically minimal)
     var defaultTheme: AnyTheme? {
-        return availableThemes.first
+        availableThemes.first
     }
     
     /// Clear all registered themes (useful for testing)
@@ -113,7 +111,6 @@ class ThemeRegistry: ObservableObject {
             DispatchQueue.main.async {
                 self.objectWillChange.send()
             }
-            
         }
     }
     
@@ -131,9 +128,9 @@ class ThemeRegistry: ObservableObject {
     /// Print all registered themes (debug utility)
     func printRegisteredThemes() {
         let themes = availableThemes
-        print("Registered Themes (\(themes.count)):")
+        Logger.debug("Registered Themes (\(themes.count)):", category: .registry)
         for (index, theme) in themes.enumerated() {
-            print("  \(index + 1). \(theme.displayName) (id: \(theme.id))")
+            Logger.debug("  \(index + 1). \(theme.displayName) (id: \(theme.id))", category: .registry)
         }
     }
     
@@ -147,11 +144,11 @@ class ThemeRegistry: ObservableObject {
         let hasUniqueDisplayNames = uniqueDisplayNames.count == themes.count
         
         if !hasUniqueIds {
-            print("Error: Registry validation failed - Duplicate theme IDs detected")
+            Logger.error("Registry validation failed - Duplicate theme IDs detected", category: .registry)
         }
         
         if !hasUniqueDisplayNames {
-            print("Error: Registry validation failed - Duplicate display names detected")
+            Logger.error("Registry validation failed - Duplicate display names detected", category: .registry)
         }
         
         return hasUniqueIds && hasUniqueDisplayNames
@@ -162,7 +159,6 @@ class ThemeRegistry: ObservableObject {
 
 /// Helper for automatic theme registration during app startup
 struct ThemeRegistrationHelper {
-    
     /// Register all built-in themes
     /// This should be called during app initialization
     static func registerBuiltInThemes() {
@@ -172,7 +168,6 @@ struct ThemeRegistrationHelper {
         GridTheme.register()
         TerminalTheme.register()
         AuraMinimalistTheme.register()
-        
         
         // Validate the registry after registration
         if ThemeRegistry.shared.validateRegistry() {

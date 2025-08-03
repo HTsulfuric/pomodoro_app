@@ -5,7 +5,6 @@ import Combine
 /// Observable screen context that provides dynamic sizing information for themes
 /// Updates automatically when the overlay moves between different monitors
 class ScreenContext: ObservableObject {
-    
     // MARK: - Published Properties
     
     /// Current screen that the overlay is displayed on
@@ -25,7 +24,7 @@ class ScreenContext: ObservableObject {
         self.screenFrame = screen.frame
         self.screenIdentifier = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as AnyObject?)?.description ?? "unknown"
         
-        print("🖥️ ScreenContext initialized with screen: \(Int(screenFrame.width))×\(Int(screenFrame.height))")
+        Logger.screen("🖥️ ScreenContext initialized with screen: \(Int(screenFrame.width))×\(Int(screenFrame.height))")
     }
     
     // MARK: - Screen Updates
@@ -37,18 +36,18 @@ class ScreenContext: ObservableObject {
         
         // Only update if screen actually changed
         guard newIdentifier != screenIdentifier else {
-            print("🖥️ ScreenContext: Same screen, no update needed")
+            Logger.screen("🖥️ ScreenContext: Same screen, no update needed")
             return
         }
         
-        print("🖥️ ScreenContext: Updating from \(Int(screenFrame.width))×\(Int(screenFrame.height)) to \(Int(screen.frame.width))×\(Int(screen.frame.height))")
+        Logger.screen("🖥️ ScreenContext: Updating from \(Int(screenFrame.width))×\(Int(screenFrame.height)) to \(Int(screen.frame.width))×\(Int(screen.frame.height))")
         
         // Update published properties (will trigger SwiftUI re-renders)
         self.currentScreen = screen
         self.screenFrame = screen.frame
         self.screenIdentifier = newIdentifier
         
-        print("🖥️ ScreenContext: Screen update complete - themes will resize")
+        Logger.screen("🖥️ ScreenContext: Screen update complete - themes will resize")
     }
     
     // MARK: - Screen Classification
@@ -78,7 +77,7 @@ class ScreenContext: ObservableObject {
     
     /// Current screen aspect ratio (width/height)
     var aspectRatio: CGFloat {
-        return screenFrame.width / screenFrame.height
+        screenFrame.width / screenFrame.height
     }
     
     // MARK: - Proportional Sizing Helpers
@@ -156,7 +155,7 @@ class ScreenContext: ObservableObject {
     /// Calculate appropriate content padding based on current screen
     /// Larger screens get more padding, but with diminishing returns
     var contentPadding: CGFloat {
-        return scaledSize(
+        scaledSize(
             24, // Base padding for 1920px screen
             minSize: 16,  // Minimum padding
             maxSize: 48   // Maximum padding
@@ -166,7 +165,7 @@ class ScreenContext: ObservableObject {
     /// Calculate spacing between UI elements
     /// Scales more conservatively than other elements
     var elementSpacing: CGFloat {
-        return scaledSize(
+        scaledSize(
             20, // Base spacing for 1920px screen
             minSize: 12,  // Minimum spacing
             maxSize: 32   // Maximum spacing
@@ -176,7 +175,7 @@ class ScreenContext: ObservableObject {
     /// Calculate grid square size for Grid theme
     /// Scales to maintain readable grid proportions
     var gridSquareSize: CGFloat {
-        return scaledSize(
+        scaledSize(
             28, // Base square size for 1920px screen
             minSize: 20,  // Minimum readable size
             maxSize: 48   // Maximum before looking too chunky
@@ -185,7 +184,7 @@ class ScreenContext: ObservableObject {
     
     /// Calculate grid spacing for Grid theme
     var gridSpacing: CGFloat {
-        return scaledSize(
+        scaledSize(
             6, // Base spacing for 1920px screen
             minSize: 4,   // Minimum spacing
             maxSize: 12   // Maximum spacing

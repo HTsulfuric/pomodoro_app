@@ -10,7 +10,6 @@ class SoundManager: ObservableObject {
     }
     
     func playPhaseChangeSound(for phase: PomodoroPhase) {
-        
         // Use simple NSSound approach - reliable and audible
         let soundName: String
         
@@ -23,10 +22,8 @@ class SoundManager: ObservableObject {
             soundName = "Sosumi" // Long break complete - distinctive sound
         }
         
-        
         // NSSound automatically handles system sounds by name (sandbox-friendly)
         if let sound = NSSound(named: soundName) {
-            
             // Store reference to prevent deallocation during playback
             currentSound = sound
             
@@ -35,14 +32,11 @@ class SoundManager: ObservableObject {
             
             // Play the sound - simple and reliable
             let success = sound.play()
-            
         } else {
             // Fallback to system beep
             NSSound.beep()
         }
-        
     }
-    
     
     func playCustomSound(named soundName: String) {
         guard let soundURL = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
@@ -55,9 +49,13 @@ class SoundManager: ObservableObject {
             currentSound = sound
             sound.volume = 0.8 // Set to 80% volume for custom sounds
             let success = sound.play()
-            print(success ? " Custom sound played: \(soundName)" : " Failed to play custom sound: \(soundName)")
+            if success {
+                Logger.info("Custom sound played: \(soundName)", category: .sound)
+            } else {
+                Logger.warning("Failed to play custom sound: \(soundName)", category: .sound)
+            }
         } else {
-            print(" Failed to create NSSound from: \(soundURL)")
+            Logger.error("Failed to create NSSound from: \(soundURL)", category: .sound)
         }
     }
     

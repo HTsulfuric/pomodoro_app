@@ -4,7 +4,6 @@ import os.log
 /// Professional logging system for the Pomodoro Timer app
 /// Provides structured logging with categories, levels, and conditional compilation
 class Logger {
-    
     // MARK: - Log Categories
     
     enum Category: String, CaseIterable {
@@ -22,7 +21,7 @@ class Logger {
         case registry = "Registry"
         
         var osLog: OSLog {
-            return OSLog(subsystem: "com.local.PomodoroTimer", category: self.rawValue)
+            OSLog(subsystem: "com.local.PomodoroTimer", category: self.rawValue)
         }
     }
     
@@ -111,7 +110,6 @@ class Logger {
     // MARK: - Core Logging Implementation
     
     private static func log(_ message: String, level: Level, category: Category, file: String = #file, function: String = #function, line: Int = #line) {
-        
         // Use os_log for system integration
         os_log("%{public}@", log: category.osLog, type: level.osLogType, message)
         
@@ -208,7 +206,6 @@ private extension DateFormatter {
 
 /// Helper methods to ease migration from print statements
 extension Logger {
-    
     /// Quick migration from print() - use this temporarily during migration
     @available(*, deprecated, message: "Use appropriate Logger method instead")
     static func migrationHelper(_ message: String, originalFile: String = #file, originalLine: Int = #line) {

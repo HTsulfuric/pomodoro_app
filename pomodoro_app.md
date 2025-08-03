@@ -21,6 +21,13 @@
 - **新方針**: SwiftUI + UserNotifications.framework
 - **目標**: App Store配布可能な独立アプリケーション
 
+### Phase 4: プライバシー重視アーキテクチャ (現在)
+- **アーキテクチャ**: SwiftUI + Privacy-Safe Integration
+- **キーボード管理**: Carbon Event Manager (アクセシビリティ権限不要)
+- **テーマシステム**: Protocol-Oriented + Dynamic Registration
+- **外部統合**: Event-Driven SketchyBar + Menu Bar + URL Schemes
+- **動的サイズ調整**: Monitor-Aware Responsive Design
+
 ## 重要な技術的発見
 
 ### 1. ロック画面通知の制約
@@ -54,6 +61,29 @@ osascript -e 'display notification "..." with title "..."'  # ロック中NG
 # 推奨アプローチ  
 UserNotifications.framework  # ロック中でも表示、インタラクティブ対応
 ```
+
+### 5. プライバシー重視設計の実現 (Phase 4)
+```
+✅ Carbon Event Manager: Opt+Shift+Pグローバルホットキー (権限不要)
+✅ Menu Bar Integration: NSStatusItem経由の安全な制御
+✅ URL Schemes: 外部制御用の標準的なAPI
+❌ Accessibility API: 侵襲的権限が必要 → 代替手段採用
+❌ Global Key Monitoring: プライバシー侵害 → ローカル監視のみ
+```
+
+**技術的成果**: アクセシビリティ権限なしでフル機能実現
+
+### 6. テーマシステムアーキテクチャの進化
+```swift
+// Protocol-Oriented Design
+ThemeDefinition + ThemeExperience
+├── 動的テーマ登録 (ThemeRegistry)
+├── 型消去ラッパー (AnyTheme/AnyThemeExperience)  
+├── フルレイアウト制御 (makeFullLayoutView)
+└── モニター対応動的サイジング (ScreenContext)
+```
+
+**メリット**: 拡張性、保守性、パフォーマンスを同時実現
 
 ## SwiftUIアプリ設計指針
 
@@ -228,10 +258,12 @@ Canvas               // カスタム描画
 
 ---
 
-**最終更新**: 2025-07-20  
-**次のマイルストーン**: Xcodeプロジェクト作成とWindowGroup基本実装
+**最終更新**: 2025-08-03  
+**現在のステータス**: Phase 4完了 - フル機能SwiftUIアプリとして稼働中  
+**主要成果**: プライバシー重視設計 + 拡張可能テーマシステム + 外部統合
 
-このドキュメントは、SwiftUIアプリ開発時にClaude（AI）への参照資料として活用してください。
+このドキュメントは、Phase 1-4の開発経験から得られた技術的知見の記録です。
+類似プロジェクトや、SwiftUIアプリ開発の参考資料として活用してください。
 
 ## UI設計イメージ
 

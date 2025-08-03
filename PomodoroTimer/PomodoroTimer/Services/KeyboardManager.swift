@@ -1,116 +1,193 @@
 import Foundation
 import AppKit
+import Carbon
 
-/// Centralized keyboard input manager for the Pomodoro app
-/// Handles all global hotkeys and overlay-specific keys in one place
+/// Privacy-safe keyboard input manager for the Pomodoro app
+/// SECURITY: Uses Carbon hotkey registration instead of global keylogger
 class KeyboardManager {
     // MARK: - Singleton
     static let shared = KeyboardManager()
     
     // MARK: - Properties
-    private var globalKeyMonitor: Any?
     private var localKeyMonitor: Any?
+    private var statusItem: NSStatusItem?
+    private var hotKeyRef: EventHotKeyRef?
+    private var eventHandler: EventHandlerRef?
     weak var timerViewModel: TimerViewModel?
     
     /// Tracks whether the overlay is visible to determine which keys are active
     var isOverlayVisible: Bool = false {
         didSet {
             Logger.keyboard("Overlay visibility changed to \(isOverlayVisible)")
+            updateMenuBarStatus()
         }
     }
     
-    // MARK: - Permission handling
-    private var hasAccessibilityPermission: Bool {
-        return AXIsProcessTrusted()
-    }
+    // MARK: - Menu Bar Integration (Safe Alternative to Global Monitoring)
     
     // MARK: - Initialization
     private init() {
-        Logger.keyboard("KeyboardManager initialized")
+        setupMenuBar()
+        Logger.keyboard("KeyboardManager initialized with menu bar integration")
     }
     
     deinit {
         stopKeyboardMonitoring()
+        cleanupMenuBar()
     }
     
     // MARK: - Public Interface
     
-    /// Start keyboard monitoring (requires accessibility permissions)
+    /// Start keyboard monitoring (local + Carbon global hotkey)
     func startKeyboardMonitoring() {
-        guard hasAccessibilityPermission else {
-            Logger.warning("Cannot start keyboard monitoring - accessibility permissions required", category: .permissions)
-            return
-        }
-        
-        guard globalKeyMonitor == nil else {
+        guard localKeyMonitor == nil else {
             Logger.keyboard("Keyboard monitoring already active")
             return
         }
         
-        // Global monitoring for all hotkeys
-        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            self?.handleGlobalKeyEvent(event)
-        }
-        
-        // Local monitoring when app is focused
+        // Local monitoring for overlay keys when app is focused
         localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            return self?.handleLocalKeyEvent(event) == true ? nil : event
+            self?.handleLocalKeyEvent(event) == true ? nil : event
         }
         
-        Logger.info("Global keyboard monitoring started (Opt+Shift+P + overlay keys)", category: .keyboard)
+        // Register global hotkey using Carbon (privacy-safe)
+        registerGlobalHotkey()
+        
+        Logger.info("Keyboard monitoring started (local + global hotkey)", category: .keyboard)
     }
     
     /// Stop keyboard monitoring
     func stopKeyboardMonitoring() {
-        if let monitor = globalKeyMonitor {
-            NSEvent.removeMonitor(monitor)
-            globalKeyMonitor = nil
-        }
-        
         if let monitor = localKeyMonitor {
             NSEvent.removeMonitor(monitor)
             localKeyMonitor = nil
         }
         
+        // Unregister global hotkey
+        unregisterGlobalHotkey()
+        
         Logger.info("Keyboard monitoring stopped", category: .keyboard)
     }
     
-    /// Check and restart monitoring if permissions were granted
+    /// Check and restart monitoring (always available - no permissions needed)
     func checkAndRestartIfNeeded() {
-        if hasAccessibilityPermission && globalKeyMonitor == nil {
+        if localKeyMonitor == nil {
             startKeyboardMonitoring()
         }
     }
     
-    // MARK: - Key Event Handling
+    // MARK: - Menu Bar Implementation
     
-    private func handleGlobalKeyEvent(_ event: NSEvent) {
-        // Handle Opt+Shift+P for overlay toggle (works globally)
-        if event.keyCode == 35 && // P key
-           event.modifierFlags.contains([.option, .shift]) &&
-           !event.modifierFlags.contains([.command, .control]) {
-            Logger.keyboard("Global Opt+Shift+P detected - toggling overlay")
-            handleOverlayToggle()
+    private func setupMenuBar() {
+        // Create status item in menu bar
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        
+        guard let statusItem = statusItem else {
+            Logger.error("Failed to create status item", category: .keyboard)
             return
         }
         
-        // Handle overlay-specific keys (only when overlay is visible)
-        if isOverlayVisible {
-            _ = handleOverlaySpecificKey(event)
+        // Set up the status item button
+        if let button = statusItem.button {
+            button.title = "🍅"  // Tomato emoji for Pomodoro
+            button.toolTip = "Pomodoro Timer"
+        }
+        
+        // Create menu
+        let menu = NSMenu()
+        
+        // Toggle Overlay item
+        let toggleItem = NSMenuItem(title: "Toggle Overlay", action: #selector(menuToggleOverlay), keyEquivalent: "")
+        toggleItem.target = self
+        menu.addItem(toggleItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        // Timer controls (when overlay visible)
+        let startPauseItem = NSMenuItem(title: "Start/Pause Timer", action: #selector(menuToggleTimer), keyEquivalent: "")
+        startPauseItem.target = self
+        menu.addItem(startPauseItem)
+        
+        let resetItem = NSMenuItem(title: "Reset Timer", action: #selector(menuResetTimer), keyEquivalent: "")
+        resetItem.target = self
+        menu.addItem(resetItem)
+        
+        let skipItem = NSMenuItem(title: "Skip Phase", action: #selector(menuSkipPhase), keyEquivalent: "")
+        skipItem.target = self
+        menu.addItem(skipItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        // Quit item
+        let quitItem = NSMenuItem(title: "Quit", action: #selector(menuQuit), keyEquivalent: "q")
+        quitItem.target = self
+        menu.addItem(quitItem)
+        
+        statusItem.menu = menu
+        
+        updateMenuBarStatus()
+        Logger.keyboard("Menu bar integration setup complete")
+    }
+    
+    private func cleanupMenuBar() {
+        if let statusItem = statusItem {
+            NSStatusBar.system.removeStatusItem(statusItem)
+            self.statusItem = nil
         }
     }
     
-    private func handleLocalKeyEvent(_ event: NSEvent) -> Bool {
-        // Handle Opt+Shift+P for overlay toggle (when app is focused)
-        if event.keyCode == 35 && // P key
-           event.modifierFlags.contains([.option, .shift]) &&
-           !event.modifierFlags.contains([.command, .control]) {
-            Logger.keyboard("Local Opt+Shift+P detected - toggling overlay")
-            handleOverlayToggle()
-            return true // Consume the event
-        }
+    private func updateMenuBarStatus() {
+        guard let button = statusItem?.button else { return }
         
-        // Handle overlay-specific keys (only when overlay is visible)
+        // Update menu bar icon based on timer state
+        if let viewModel = timerViewModel {
+            if viewModel.pomodoroState.isRunning {
+                button.title = "🔴"  // Red for running
+            } else if isOverlayVisible {
+                button.title = "🟡"  // Yellow for overlay visible
+            } else {
+                button.title = "🍅"  // Default tomato
+            }
+        }
+    }
+    
+    // MARK: - Menu Actions
+    
+    @objc private func menuToggleOverlay() {
+        Logger.keyboard("Menu: Toggle overlay")
+        handleOverlayToggle()
+    }
+    
+    @objc private func menuToggleTimer() {
+        Logger.keyboard("Menu: Toggle timer")
+        timerViewModel?.toggleTimer()
+        updateMenuBarStatus()
+    }
+    
+    @objc private func menuResetTimer() {
+        Logger.keyboard("Menu: Reset timer")
+        timerViewModel?.resetTimer()
+        updateMenuBarStatus()
+    }
+    
+    @objc private func menuSkipPhase() {
+        Logger.keyboard("Menu: Skip phase")
+        timerViewModel?.skipPhase()
+        updateMenuBarStatus()
+    }
+    
+    @objc private func menuQuit() {
+        Logger.keyboard("Menu: Quit app")
+        NSApplication.shared.terminate(nil)
+    }
+    
+    // MARK: - Key Event Handling (Local Only)
+    
+    private func handleLocalKeyEvent(_ event: NSEvent) -> Bool {
+        // REMOVED: Global Opt+Shift+P hotkey (privacy violation)
+        // Use menu bar or URL schemes for overlay control instead
+        
+        // Handle overlay-specific keys (only when overlay is visible and app focused)
         if isOverlayVisible {
             return handleOverlaySpecificKey(event)
         }
@@ -228,6 +305,85 @@ class KeyboardManager {
         
         return false // Don't consume other keys
     }
+    
+    // MARK: - Carbon Global Hotkey Registration (Privacy-Safe)
+    
+    private func registerGlobalHotkey() {
+        // Opt+Shift+P hotkey registration using Carbon
+        let hotKeyID = EventHotKeyID(signature: OSType(fourCharCode: "POMO"), id: 1)
+        
+        // Set up event spec for hotkey pressed events
+        var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), 
+                                    eventKind: OSType(kEventHotKeyPressed))
+        
+        // Install event handler
+        let status = InstallEventHandler(
+            GetApplicationEventTarget(),
+            { (handlerCallRef, event, userData) -> OSStatus in
+                // Call the instance method - unwrap optional event
+                guard let event = event else { return OSStatus(eventNotHandledErr) }
+                return KeyboardManager.shared.handleCarbonHotkey(event: event)
+            },
+            1,
+            &eventType,
+            UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()),
+            &eventHandler
+        )
+        
+        if status != noErr {
+            Logger.warning("Failed to install Carbon event handler: \(status)", category: .keyboard)
+            return
+        }
+        
+        // Register the specific hotkey: Opt+Shift+P
+        let keyCode = UInt32(35)  // P key
+        let modifiers = UInt32(optionKey | shiftKey)  // Opt+Shift
+        
+        let hotKeyStatus = RegisterEventHotKey(
+            keyCode,
+            modifiers,
+            hotKeyID,
+            GetApplicationEventTarget(),
+            0,
+            &hotKeyRef
+        )
+        
+        if hotKeyStatus == noErr {
+            Logger.info("Carbon global hotkey registered: Opt+Shift+P", category: .keyboard)
+        } else {
+            Logger.warning("Failed to register Carbon hotkey: \(hotKeyStatus)", category: .keyboard)
+        }
+    }
+    
+    private func unregisterGlobalHotkey() {
+        // Unregister hotkey
+        if let hotKeyRef = hotKeyRef {
+            let status = UnregisterEventHotKey(hotKeyRef)
+            if status == noErr {
+                Logger.info("Carbon global hotkey unregistered", category: .keyboard)
+            } else {
+                Logger.warning("Failed to unregister Carbon hotkey: \(status)", category: .keyboard)
+            }
+            self.hotKeyRef = nil
+        }
+        
+        // Remove event handler
+        if let eventHandler = eventHandler {
+            RemoveEventHandler(eventHandler)
+            self.eventHandler = nil
+        }
+    }
+    
+    private func handleCarbonHotkey(event: EventRef) -> OSStatus {
+        Logger.keyboard("Carbon hotkey pressed: Opt+Shift+P - toggling overlay")
+        
+        // Handle the overlay toggle on main thread
+        DispatchQueue.main.async {
+            self.handleOverlayToggle()
+        }
+        
+        return noErr
+    }
 }
 
 // MARK: - Notification Names
@@ -239,4 +395,14 @@ extension Notification.Name {
     static let spaceKeyStartPressed = Notification.Name("spaceKeyStartPressed")
     static let resetKeyPressed = Notification.Name("resetKeyPressed")
     static let skipKeyPressed = Notification.Name("skipKeyPressed")
+}
+
+// MARK: - Carbon Helper Extensions
+
+extension OSType {
+    init(fourCharCode: String) {
+        precondition(fourCharCode.count == 4, "Four-character code must be exactly 4 characters")
+        let chars = Array(fourCharCode.utf8)
+        self = UInt32(chars[0]) << 24 | UInt32(chars[1]) << 16 | UInt32(chars[2]) << 8 | UInt32(chars[3])
+    }
 }

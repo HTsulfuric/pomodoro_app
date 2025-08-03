@@ -58,7 +58,6 @@ struct RippleView: View {
                     rippleColor: viewModel.currentTheme.accentColor.color(for: viewModel.pomodoroState.currentPhase)
                 )
             }
-            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity) // Allow full expansion
         .allowsHitTesting(false) // Don't interfere with UI interactions

@@ -18,15 +18,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     var overlayPanel: OverlayPanel?
     private var hostingController: NSHostingController<AnyView>?
     
-    
-    // Permission handling
-    private var permissionWindow: NSWindow?
-    private var hasAccessibilityPermission: Bool {
-        return AXIsProcessTrusted()
-    }
+    // REMOVED: Permission handling (no longer needed - privacy fix)
+    // private var permissionWindow: NSWindow?
+    // private var hasAccessibilityPermission: Bool { AXIsProcessTrusted() }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        print(" AppDelegate.applicationDidFinishLaunching")
+        Logger.lifecycle("AppDelegate.applicationDidFinishLaunching")
         
         // Register built-in themes with the registry
         ThemeRegistrationHelper.registerBuiltInThemes()
@@ -38,80 +35,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
         NotificationManager.shared.requestPermission()
         
-        // Setup KeyboardManager with TimerViewModel reference
+        // Setup KeyboardManager with TimerViewModel reference (no permissions needed)
         KeyboardManager.shared.timerViewModel = timerViewModel
         
         // Setup notification observers for overlay control
         setupOverlayNotificationObservers()
         
-        // Check accessibility permissions first
-        if hasAccessibilityPermission {
-            print(" Accessibility permissions granted")
-            setupAppWithPermissions()
-        } else {
-            print(" Accessibility permissions not granted")
-            setupAppWithoutPermissions()
-            showPermissionWindow()
-        }
+        // Setup app components (no permissions required for menu bar integration)
+        setupAppComponents()
         
-        print(" App initialization complete")
+        Logger.lifecycle("App initialization complete")
     }
     
-    // MARK: - Permission-Based Setup
+    // MARK: - App Component Setup (Privacy-Safe)
     
-    private func setupAppWithPermissions() {
+    private func setupAppComponents() {
         // Setup UI components
         setupFloatingOverlay()
         
-        // Setup keyboard manager (requires permissions)
+        // Setup local keyboard manager (no permissions required)
         KeyboardManager.shared.startKeyboardMonitoring()
-    }
-    
-    private func setupAppWithoutPermissions() {
-        // Setup UI components (overlay still works, just no global hotkey)
-        setupFloatingOverlay()
         
-        // Don't setup keyboard manager
-        print(" Global hotkey disabled - accessibility permissions required")
-    }
-    
-    private func showPermissionWindow() {
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 500),
-            styleMask: [.titled, .closable],
-            backing: .buffered,
-            defer: false
-        )
-        
-        window.title = "Accessibility Permission Required"
-        window.center()
-        window.isReleasedWhenClosed = false
-        window.level = .floating // Show above other windows
-        
-        let permissionView = PermissionView {
-            self.dismissPermissionWindow()
-        }
-        
-        let hostingController = NSHostingController(rootView: permissionView)
-        window.contentViewController = hostingController
-        
-        window.makeKeyAndOrderFront(nil)
-        
-        permissionWindow = window
-        print(" Permission guidance window shown")
-    }
-    
-    private func dismissPermissionWindow() {
-        permissionWindow?.orderOut(nil)
-        permissionWindow = nil
-        
-        // Check if permissions were granted after user interaction
-        if hasAccessibilityPermission {
-            print("Accessibility permissions now granted!")
-            KeyboardManager.shared.startKeyboardMonitoring()
-        } else {
-            print(" Continuing without global hotkey functionality")
-        }
+        Logger.info("App setup complete with menu bar integration (no invasive permissions required)", category: .app)
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -122,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         SleepPreventionManager.shared.stopPreventingSleep()
         
         cancellables.removeAll()
-        print(" App terminating")
+        Logger.lifecycle("App terminating")
     }
     
     deinit {
@@ -130,7 +75,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         SleepPreventionManager.shared.stopPreventingSleep()
         cancellables.removeAll()
     }
-    
     
     // MARK: - Floating Overlay Setup
     
@@ -145,7 +89,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             height: windowSize.height
         )
         
-        
         // Create Alfred-style overlay panel (key difference!)
         overlayPanel = OverlayPanel(contentRect: panelFrame)
         
@@ -153,7 +96,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             Logger.error("Failed to create overlay panel", category: .overlay)
             return
         }
-        
         
         // Create hosting controller with ContentView.
         // The problematic .frame modifier is removed to prevent a layout feedback loop.
@@ -187,9 +129,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // Start hidden
         panel.orderOut(nil)
-        
     }
-    
     
     // MARK: - Overlay Control
     
@@ -208,17 +148,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     private func showOverlay() {
         guard let panel = overlayPanel else {
-            print("No overlay panel available")
+            Logger.error("No overlay panel available", category: .overlay)
             return
         }
-        
         
         // Center panel on current screen and resize if screen changed
         if let screen = NSScreen.main {
             let screenFrame = screen.frame
             let currentPanelSize = panel.frame.size
             let expectedPanelSize = timerViewModel.currentTheme.preferredWindowSize
-            
             
             // Update screen context if screen changed (triggers theme re-sizing)
             screenContext.updateScreen(screen)
@@ -229,7 +167,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                               abs(currentPanelSize.height - expectedPanelSize.height) > 1.0
             
             if sizeMismatch {
-                
                 // Resize the panel to match the new screen
                 panel.setContentSize(expectedPanelSize)
                 
@@ -238,7 +175,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                     controller.view.frame = contentView.bounds
                     controller.view.autoresizingMask = [.width, .height]
                 }
-                
             }
             
             // Center the panel on the new screen
@@ -254,13 +190,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // This is the key difference from our old approach that stole focus
         panel.makeKeyAndOrderFront(nil)
         
-        
         // Notify KeyboardManager that overlay is now visible
         KeyboardManager.shared.isOverlayVisible = true
         
         // Start sleep prevention when overlay is shown
         SleepPreventionManager.shared.startPreventingSleep()
-        
     }
     
     private func hideOverlay() {
@@ -272,7 +206,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Stop sleep prevention when overlay is hidden
         SleepPreventionManager.shared.stopPreventingSleep()
         
-        print(" Floating overlay hidden")
+        Logger.overlay("Floating overlay hidden")
     }
     
     // MARK: - Global Keyboard Monitoring
@@ -283,7 +217,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Listen for overlay toggle requests from KeyboardManager
         NotificationCenter.default.publisher(for: .toggleOverlay)
             .sink { [weak self] _ in
-                print(" Toggle overlay notification received")
+                Logger.overlay("Toggle overlay notification received")
                 self?.toggleOverlay()
             }
             .store(in: &cancellables)
@@ -291,32 +225,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Listen for overlay hide requests from KeyboardManager
         NotificationCenter.default.publisher(for: .hideOverlay)
             .sink { [weak self] _ in
-                print(" Hide overlay notification received")
+                Logger.overlay("Hide overlay notification received")
                 self?.hideOverlay()
             }
             .store(in: &cancellables)
         
         // Note: Dynamic sizing removed - all themes now use full screen
         
-        print(" Overlay notification observers setup complete")
+        Logger.overlay("Overlay notification observers setup complete")
         
         // No need to resize - panel will be created with correct theme size
     }
     
-    
-    // Public method to retry permission setup (can be called from menu or overlay)
-    func checkAndSetupGlobalHotkey() {
+    // Public method to restart keyboard monitoring (no permissions needed)
+    func checkAndRestartKeyboardMonitoring() {
         KeyboardManager.shared.checkAndRestartIfNeeded()
-        if !hasAccessibilityPermission {
-            showPermissionWindow()
-        }
     }
-    
     
     // MARK: - URL Scheme Handling (moved from PomodoroTimerApp)
     
     func application(_ application: NSApplication, open urls: [URL]) {
-        print(" AppDelegate.application:open called with URLs: \(urls)")
+        Logger.info("AppDelegate.application:open called with URLs: \(urls)", category: .app)
         
         for url in urls {
             handleURLCommand(url)
@@ -324,19 +253,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
     
     private func handleURLCommand(_ url: URL) {
-        print(" handleURLCommand called with URL: \(url)")
+        Logger.debug("handleURLCommand called with URL: \(url)", category: .app)
         
         guard url.scheme == "pomodoro" else {
-            print(" Unknown URL scheme: \(url.scheme ?? "nil")")
+            Logger.warning("Unknown URL scheme: \(url.scheme ?? "nil")", category: .app)
             return
         }
         
         guard let command = url.host else {
-            print(" No command found in URL: \(url)")
+            Logger.warning("No command found in URL: \(url)", category: .app)
             return
         }
         
-        print(" Received URL command: \(command)")
+        Logger.info("Received URL command: \(command)", category: .app)
         
         // Execute command and optionally show popover
         switch command {
@@ -349,34 +278,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         case "show-app":
             showOverlay()
         default:
-            print(" Unknown command: \(command)")
+            Logger.warning("Unknown command: \(command)", category: .app)
         }
     }
     
     private func handleToggleCommand() {
-        print(" handleToggleCommand called")
+        Logger.debug("handleToggleCommand called", category: .app)
         if timerViewModel.pomodoroState.isRunning {
-            print(" Pausing timer via URL command")
+            Logger.info("Pausing timer via URL command", category: .app)
             timerViewModel.pauseTimer()
         } else {
-            print(" Starting timer via URL command")
+            Logger.info("Starting timer via URL command", category: .app)
             timerViewModel.startTimer()
         }
-        print(" handleToggleCommand completed")
+        Logger.debug("handleToggleCommand completed", category: .app)
     }
     
     private func handleResetCommand() {
-        print(" handleResetCommand called")
-        print(" Resetting timer via URL command")
+        Logger.debug("handleResetCommand called", category: .app)
+        Logger.info("Resetting timer via URL command", category: .app)
         timerViewModel.resetTimer()
-        print(" handleResetCommand completed")
+        Logger.debug("handleResetCommand completed", category: .app)
     }
     
     private func handleSkipCommand() {
-        print(" handleSkipCommand called")
-        print(" Skipping phase via URL command")
+        Logger.debug("handleSkipCommand called", category: .app)
+        Logger.info("Skipping phase via URL command", category: .app)
         timerViewModel.skipPhase()
-        print(" handleSkipCommand completed")
+        Logger.debug("handleSkipCommand completed", category: .app)
     }
     
     // MARK: - Notification Handling
@@ -391,17 +320,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // Handle notification actions when app is running
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print(" Received notification response: \(response.actionIdentifier)")
+        Logger.debug("Received notification response: \(response.actionIdentifier)", category: .notifications)
         
         // Handle the notification response
         NotificationManager.shared.handleNotificationResponse(response)
         
         // Only show overlay if user clicked the notification body (not an action button)
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-            print(" User clicked notification body - showing overlay")
+            Logger.debug("User clicked notification body - showing overlay", category: .notifications)
             showOverlay()
         } else {
-            print(" User clicked action button - executing silently")
+            Logger.debug("User clicked action button - executing silently", category: .notifications)
         }
         
         completionHandler()
@@ -427,4 +356,3 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
     */
 }
-

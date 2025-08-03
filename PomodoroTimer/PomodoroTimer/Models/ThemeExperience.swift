@@ -68,12 +68,12 @@ enum KeyboardBehavior {
 extension ThemeExperience {
     /// Default implementation returns nil (use standard layout system)
     func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
-        return nil
+        nil
     }
     
     /// Default implementation returns nil (use standard keyboard behavior)
     func customKeyboardBehavior(for keyCode: UInt16) -> KeyboardBehavior? {
-        return nil
+        nil
     }
     
     /// Default keyboard focus requirement based on interaction model

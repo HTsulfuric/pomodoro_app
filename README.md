@@ -82,10 +82,27 @@ PomodoroTimer/
 
 ## 🎮 Usage
 
-### Basic Controls
-- **Play/Pause**: Start or pause the current timer
-- **Skip**: Jump to the next phase (work → break → work)
-- **Reset**: Reset current phase to full duration
+### Control Methods
+
+**Menu Bar (Primary)**
+- Click 🍅 icon in menu bar for all timer controls
+- Color-coded status: Red (running), Yellow (overlay visible), Tomato (idle)
+
+**Global Hotkey**
+- `Opt+Shift+P`: Toggle overlay (works system-wide)
+
+**Overlay Controls (when visible)**
+- `Space`: Start/pause timer
+- `R`: Reset timer
+- `S`: Skip phase  
+- `T`: Open theme picker
+- `O` / `ESC`: Hide overlay
+
+**URL Schemes (for automation)**
+- `open "pomodoro://toggle"`: Start/pause timer
+- `open "pomodoro://reset"`: Reset timer
+- `open "pomodoro://skip"`: Skip phase
+- `open "pomodoro://show-app"`: Show overlay
 
 ### Notification Interactions
 When a phase completes, you'll receive an interactive notification with:
@@ -113,15 +130,17 @@ var duration: TimeInterval {
 }
 ```
 
-### Colors & Theme
-Customize in `Extensions/NordTheme.swift`:
-```swift
-extension Color {
-    static let nordPrimary = Color(hex: "#ECEFF4")    // Snow Storm
-    static let nordAccent = Color(hex: "#A3BE8C")     // Aurora Green
-    // ... more colors
-}
-```
+### Themes
+Switch themes using the `T` key when overlay is visible, or create custom themes:
+
+**Built-in Themes:**
+- **Minimal**: Circular progress with clean aesthetics
+- **Grid**: GitHub contribution grid visualization
+- **Terminal**: Command-line interface style
+- **Aura**: Minimalist design with subtle colors
+
+**Custom Themes:**
+See [THEME_DEVELOPMENT_GUIDE.md](THEME_DEVELOPMENT_GUIDE.md) for creating custom themes with the new protocol-oriented architecture.
 
 ### SketchyBar Integration
 Toggle integration in the app or modify `Services/SketchyBarManager.swift` for advanced customization.
@@ -150,22 +169,30 @@ Run unit tests and UI tests in Xcode (⌘+U) or via the Test navigator.
 - **Music Apps**: Doesn't interfere with ongoing music playback
 - **Focus Modes**: Compatible with macOS Do Not Disturb settings
 
-## 🛠️ Troubleshooting
+## 📚 Documentation
+
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)**: Common issues and solutions
+- **[THEME_DEVELOPMENT_GUIDE.md](THEME_DEVELOPMENT_GUIDE.md)**: Create custom themes
+- **[SECURITY.md](SECURITY.md)**: Privacy-safe architecture details  
+- **[CHANGELOG.md](CHANGELOG.md)**: Version history and migration guides
+- **[pomodoro_app.md](pomodoro_app.md)**: Complete development history and technical decisions
+
+## 🛠️ Quick Troubleshooting
 
 ### Notifications Not Appearing
-1. Check System Preferences → Notifications → Pomodoro Timer
-2. Ensure "Lock Screen" and "Banners" are enabled
+1. System Preferences → Notifications → Pomodoro Timer
+2. Enable "Lock Screen" and "Banners"
+3. Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed solutions
 
-### SketchyBar Not Updating
-1. Verify SketchyBar is installed and running
-2. Check state file exists: `~/.config/pomodoro-timer/state.json`
-3. Run installation script: `cd sketchybar_scripts && ./install.sh`
-4. Check SketchyBar logs for errors
+### Global Hotkey Not Working
+1. Try Menu Bar → "Toggle Overlay" 
+2. Use URL scheme: `open "pomodoro://show-app"`
+3. Check for hotkey conflicts with other apps
 
-### Window Issues
-- **Too Small**: Minimum size is 300×400px
-- **Not Transparent**: Restart app if visual effects don't load
-- **Tiling Problems**: Ensure aerospace is updated to latest version
+### SketchyBar Issues
+1. Run: `cd sketchybar_scripts && ./install.sh`
+2. Verify: `ls ~/.config/sketchybar/helpers/pomodoro_app_*`
+3. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for complete guide
 
 ## 🎨 Credits
 

@@ -6,7 +6,6 @@ import AppKit
 /// The perfect Aura theme for Aerospace users: "Inform, Don't Interrupt"
 /// Designed for keyboard-driven, efficiency-focused power users who need ambient awareness
 struct AuraMinimalistTheme: ThemeDefinition {
-    
     // MARK: - Theme Identity
     
     let id = "aura-minimalist"
@@ -17,9 +16,9 @@ struct AuraMinimalistTheme: ThemeDefinition {
     // MARK: - Atlassian Design System Color Palette
     
     let accentColor: ThemeColor = .triPhase(
-        work: Color(red: 0/255, green: 82/255, blue: 204/255),        // Atlassian Blue #0052CC
-        shortBreak: Color(red: 54/255, green: 179/255, blue: 126/255), // Atlassian Green #36B37E  
-        longBreak: Color(red: 54/255, green: 179/255, blue: 126/255)   // Atlassian Green #36B37E
+        work: Color(red: 0 / 255, green: 82 / 255, blue: 204 / 255),        // Atlassian Blue #0052CC
+        shortBreak: Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255), // Atlassian Green #36B37E  
+        longBreak: Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255)   // Atlassian Green #36B37E
     )
     
     let backgroundColor: Color = .clear
@@ -42,15 +41,15 @@ struct AuraMinimalistTheme: ThemeDefinition {
     // MARK: - Button Theme Properties (Minimal)
     
     let primaryButtonColor: ThemeColor = .triPhase(
-        work: Color(red: 0/255, green: 82/255, blue: 204/255).opacity(0.8),
-        shortBreak: Color(red: 54/255, green: 179/255, blue: 126/255).opacity(0.8),
-        longBreak: Color(red: 54/255, green: 179/255, blue: 126/255).opacity(0.8)
+        work: Color(red: 0 / 255, green: 82 / 255, blue: 204 / 255).opacity(0.8),
+        shortBreak: Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255).opacity(0.8),
+        longBreak: Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255).opacity(0.8)
     )
     
     let secondaryButtonColor: ThemeColor = .triPhase(
-        work: Color(red: 151/255, green: 160/255, blue: 175/255).opacity(0.6), // Atlassian Gray
-        shortBreak: Color(red: 151/255, green: 160/255, blue: 175/255).opacity(0.6),
-        longBreak: Color(red: 151/255, green: 160/255, blue: 175/255).opacity(0.6)
+        work: Color(red: 151 / 255, green: 160 / 255, blue: 175 / 255).opacity(0.6), // Atlassian Gray
+        shortBreak: Color(red: 151 / 255, green: 160 / 255, blue: 175 / 255).opacity(0.6),
+        longBreak: Color(red: 151 / 255, green: 160 / 255, blue: 175 / 255).opacity(0.6)
     )
     
     let buttonTextColor: ThemeColor = .triPhase(
@@ -60,9 +59,9 @@ struct AuraMinimalistTheme: ThemeDefinition {
     )
     
     let buttonHoverColor: ThemeColor = .triPhase(
-        work: Color(red: 0/255, green: 82/255, blue: 204/255),
-        shortBreak: Color(red: 54/255, green: 179/255, blue: 126/255),
-        longBreak: Color(red: 54/255, green: 179/255, blue: 126/255)
+        work: Color(red: 0 / 255, green: 82 / 255, blue: 204 / 255),
+        shortBreak: Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255),
+        longBreak: Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255)
     )
     
     let buttonShadowColor: Color = .clear
@@ -75,7 +74,7 @@ struct AuraMinimalistTheme: ThemeDefinition {
     // MARK: - Theme Experience Factory
     
     func createExperience() -> AnyThemeExperience {
-        return AnyThemeExperience(AuraMinimalistExperience())
+        AnyThemeExperience(AuraMinimalistExperience())
     }
     
     // MARK: - Registration
@@ -89,7 +88,6 @@ struct AuraMinimalistTheme: ThemeDefinition {
 
 /// Aerospace-optimized experience: keyboard-first, minimal, unobtrusive
 struct AuraMinimalistExperience: ThemeExperience {
-    
     // MARK: - Behavioral Characteristics
     
     let allowsVisualControls = true
@@ -99,7 +97,7 @@ struct AuraMinimalistExperience: ThemeExperience {
     
     @ViewBuilder
     func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
-        return AnyView(
+        AnyView(
             AuraMinimalistFullView(
                 viewModel: viewModel,
                 statusInfo: statusInfo,
@@ -198,19 +196,19 @@ struct FocusRing: View {
     
     private var ringColor: Color {
         if !viewModel.pomodoroState.isRunning {
-            return Color(red: 151/255, green: 160/255, blue: 175/255) // Atlassian Gray for paused
+            return Color(red: 151 / 255, green: 160 / 255, blue: 175 / 255) // Atlassian Gray for paused
         }
         
         switch viewModel.pomodoroState.currentPhase {
         case .work:
-            return Color(red: 0/255, green: 82/255, blue: 204/255) // Atlassian Blue
+            return Color(red: 0 / 255, green: 82 / 255, blue: 204 / 255) // Atlassian Blue
         case .shortBreak, .longBreak:
-            return Color(red: 54/255, green: 179/255, blue: 126/255) // Atlassian Green
+            return Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255) // Atlassian Green
         }
     }
     
     private var progress: Double {
-        return viewModel.pomodoroState.progress
+        viewModel.pomodoroState.progress
     }
     
     var body: some View {
@@ -316,12 +314,12 @@ struct MinimalControlButton: View {
         if isPrimary {
             switch viewModel.pomodoroState.currentPhase {
             case .work:
-                return Color(red: 0/255, green: 82/255, blue: 204/255) // Atlassian Blue
+                return Color(red: 0 / 255, green: 82 / 255, blue: 204 / 255) // Atlassian Blue
             case .shortBreak, .longBreak:
-                return Color(red: 54/255, green: 179/255, blue: 126/255) // Atlassian Green
+                return Color(red: 54 / 255, green: 179 / 255, blue: 126 / 255) // Atlassian Green
             }
         } else {
-            return Color(red: 151/255, green: 160/255, blue: 175/255) // Atlassian Gray
+            return Color(red: 151 / 255, green: 160 / 255, blue: 175 / 255) // Atlassian Gray
         }
     }
 }

@@ -38,7 +38,7 @@ class SleepPreventionManager {
         
         if activity != nil {
             isActive = true
-            print("Sleep prevention started: \(reason)")
+            Logger.sleep("Sleep prevention started: \(reason)")
         } else {
             Logger.error("Failed to create sleep prevention activity", category: .sleep)
             isActive = false
@@ -55,11 +55,11 @@ class SleepPreventionManager {
         ProcessInfo.processInfo.endActivity(currentActivity)
         activity = nil
         isActive = false
-        print("Sleep prevention stopped")
+        Logger.sleep("Sleep prevention stopped")
     }
     
     /// Current state of sleep prevention
     var isSleepPreventionActive: Bool {
-        return isActive
+        isActive
     }
 }

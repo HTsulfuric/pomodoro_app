@@ -350,7 +350,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     func windowDidResignKey(_ notification: Notification) {
         // Auto-hide overlay when it loses focus (Alfred-style behavior)
         if notification.object as? NSPanel == overlayPanel {
-            print(" Overlay lost focus - auto-hiding")
+            Logger.ui("Overlay lost focus - auto-hiding")
             hideOverlay()
         }
     }

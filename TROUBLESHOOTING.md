@@ -188,10 +188,12 @@ Common issues and solutions for the Pomodoro Timer app.
 **Issue**: Overlay stays visible
 
 **Solutions**:
-1. **Use Hide Keys**: Press `O` or `ESC` while overlay is focused
-2. **Click Outside**: Click on another app to hide overlay
+1. **Alfred-Style Auto-Hide**: Simply click on any other application - overlay automatically disappears
+2. **Use Hide Keys**: Press `O` or `ESC` while overlay is focused  
 3. **Menu Bar**: Click 🍅 → "Toggle Overlay"
 4. **Force Quit**: If stuck, force-quit the app
+
+**Note**: As of v3.0.1, the overlay behaves like Alfred - it automatically hides when you click on other applications for a cleaner user experience.
 
 ### Overlay Wrong Size/Position
 **Issue**: Overlay appears in wrong location or size

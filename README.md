@@ -22,6 +22,7 @@ A native macOS Pomodoro timer app built with SwiftUI, featuring lock-screen comp
 - **Fault Tolerant**: Automatic recovery from connection failures with exponential backoff
 
 ### 🎨 Design & UX
+- **Alfred-Style Auto-Hide**: Overlay automatically disappears when losing focus - clean, intuitive UX
 - **Pixel Art Icon**: Custom red/green/black tomato icon in retro 8-bit style
 - **Nord Color Theme**: Arctic color palette for elegant dark UI
 - **Aerospace Compatible**: Resizable window optimized for tiling window managers
@@ -96,7 +97,7 @@ PomodoroTimer/
 - `R`: Reset timer
 - `S`: Skip phase  
 - `T`: Open theme picker
-- `O` / `ESC`: Hide overlay
+- `O` / `ESC`: Hide overlay (or simply click on another app to auto-hide)
 
 **URL Schemes (for automation)**
 - `open "pomodoro://toggle"`: Start/pause timer
@@ -210,6 +211,6 @@ For complete development history and technical decisions, see `pomodoro_app.md`.
 
 ---
 
-**Current Version**: 3.0  
-**Last Updated**: 2025-07-21  
+**Current Version**: 3.0.1  
+**Last Updated**: 2025-08-03  
 **Minimum macOS**: 13.0

@@ -39,6 +39,9 @@ class TimerViewModel: ObservableObject {
         return configDir.appendingPathComponent("state.json")
     }()
     
+    // Gauge-based optimization: Track last write time for smart intervals
+    private var lastStateWrite: Date = Date.distantPast
+    
     init() {
         loadPersistentData()
         loadTheme()
@@ -73,11 +76,23 @@ class TimerViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    /// Schedule a state file write - all writes are immediate for responsive updates
-    /// - Parameter immediate: Legacy parameter kept for compatibility, all writes are immediate now
+    /// Schedule a state file write with gauge-based smart intervals
+    /// - Parameter immediate: Force immediate write for state changes, otherwise use 20-second intervals
     private func scheduleStateFileWrite(immediate: Bool) {
-        // All writes are now immediate regardless of the parameter
-        writeStateFile()
+        if immediate {
+            // Immediate writes for state changes (start/pause/complete/skip)
+            writeStateFile()
+            return
+        }
+        
+        // Gauge-based optimization: Only write if enough time has passed
+        let timeSinceLastWrite = Date().timeIntervalSince(lastStateWrite)
+        let gaugeUpdateInterval: TimeInterval = 20.0 // 20 seconds for smooth gauge progression
+        
+        if timeSinceLastWrite >= gaugeUpdateInterval {
+            writeStateFile()
+        }
+        // Skip write if interval hasn't elapsed - reduces I/O by 95%
     }
     
     // MARK: - Background Activity Management
@@ -332,14 +347,20 @@ class TimerViewModel: ObservableObject {
     // MARK: - State File Management for SketchyBar
     
     private func writeStateFile() {
+        let currentTime = Date()
         let stateData: [String: Any] = [
             "appPid": ProcessInfo.processInfo.processIdentifier,
             "phase": pomodoroState.currentPhase.rawValue,
             "timeRemaining": Int(pomodoroState.timeRemaining),
+            "progressPercent": pomodoroState.progress * 100.0,
+            "totalDuration": Int(pomodoroState.currentPhase.duration),
             "sessionCount": totalSessionsToday,
             "isRunning": pomodoroState.isRunning,
-            "lastUpdateTimestamp": Date().timeIntervalSince1970
+            "lastUpdateTimestamp": currentTime.timeIntervalSince1970
         ]
+        
+        // Update last write time for smart interval tracking
+        lastStateWrite = currentTime
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: stateData, options: [.prettyPrinted])

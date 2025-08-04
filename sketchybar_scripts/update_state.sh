@@ -35,6 +35,31 @@ is_app_running() {
     fi
 }
 
+# Function to render progress gauge using blocks
+render_gauge() {
+    local progress=$1
+    local total_blocks=10
+    
+    # Calculate filled blocks (round to nearest)
+    local filled_blocks=$(printf "%.0f" $(echo "($progress * $total_blocks) / 100" | bc -l))
+    
+    # Ensure bounds
+    [[ $filled_blocks -lt 0 ]] && filled_blocks=0
+    [[ $filled_blocks -gt $total_blocks ]] && filled_blocks=$total_blocks
+    
+    # Build gauge string
+    local gauge=""
+    for ((i=1; i<=total_blocks; i++)); do
+        if [[ $i -le $filled_blocks ]]; then
+            gauge+="█"  # Filled block
+        else
+            gauge+="░"  # Empty block
+        fi
+    done
+    
+    echo "$gauge"
+}
+
 # Main execution
 main() {
     # Check if state file exists
@@ -49,16 +74,18 @@ main() {
         exit 0
     fi
 
-    # Read state values
+    # Read state values (gauge-based system)
     APP_PID=$(jq -r '.appPid // empty' "$STATE_FILE" 2>/dev/null)
     PHASE=$(jq -r '.phase // empty' "$STATE_FILE" 2>/dev/null)
     TIME_REMAINING=$(jq -r '.timeRemaining // empty' "$STATE_FILE" 2>/dev/null)
+    PROGRESS_PERCENT=$(jq -r '.progressPercent // empty' "$STATE_FILE" 2>/dev/null)
+    TOTAL_DURATION=$(jq -r '.totalDuration // empty' "$STATE_FILE" 2>/dev/null)
     SESSION_COUNT=$(jq -r '.sessionCount // empty' "$STATE_FILE" 2>/dev/null)
     IS_RUNNING=$(jq -r '.isRunning | tostring // empty' "$STATE_FILE" 2>/dev/null)
     LAST_UPDATE=$(jq -r '.lastUpdateTimestamp // empty' "$STATE_FILE" 2>/dev/null)
 
-    # Validate required fields
-    if [[ -z "$APP_PID" || -z "$PHASE" || -z "$TIME_REMAINING" || -z "$IS_RUNNING" || -z "$LAST_UPDATE" ]]; then
+    # Validate required fields (gauge-based system)
+    if [[ -z "$APP_PID" || -z "$PHASE" || -z "$PROGRESS_PERCENT" || -z "$IS_RUNNING" || -z "$LAST_UPDATE" ]]; then
         echo "❌ Missing required fields in state file"
         set_disconnected_state
         exit 0
@@ -82,13 +109,20 @@ main() {
         exit 0
     fi
 
-    # Format time display (MM:SS)
-    if [[ "$TIME_REMAINING" =~ ^[0-9]+$ ]] && [[ "$TIME_REMAINING" -ge 0 ]]; then
-        MINUTES=$((TIME_REMAINING / 60))
-        SECONDS=$((TIME_REMAINING % 60))
-        TIME_DISPLAY=$(printf "%02d:%02d" $MINUTES $SECONDS)
+    # Generate gauge display from progress percentage
+    if [[ "$PROGRESS_PERCENT" =~ ^[0-9]+\.?[0-9]*$ ]] && (( $(echo "$PROGRESS_PERCENT >= 0" | bc -l) )); then
+        GAUGE_DISPLAY=$(render_gauge "$PROGRESS_PERCENT")
+        # Keep time for tooltip/debugging (preserved as per user request)
+        if [[ "$TIME_REMAINING" =~ ^[0-9]+$ ]] && [[ "$TIME_REMAINING" -ge 0 ]]; then
+            MINUTES=$((TIME_REMAINING / 60))
+            SECONDS=$((TIME_REMAINING % 60))
+            TIME_TOOLTIP=$(printf "%02d:%02d" $MINUTES $SECONDS)
+        else
+            TIME_TOOLTIP="--:--"
+        fi
     else
-        TIME_DISPLAY="--:--"
+        GAUGE_DISPLAY="░░░░░░░░░░"  # Empty gauge fallback
+        TIME_TOOLTIP="--:--"
     fi
 
     # Determine icon and color based on phase and running state
@@ -123,9 +157,9 @@ main() {
             ;;
     esac
 
-    # Update SketchyBar display
+    # Update SketchyBar display with gauge
     sketchybar --set pomodoro_item \
-        label="$TIME_DISPLAY" \
+        label="$GAUGE_DISPLAY" \
         icon="$ICON" \
         icon.color="$COLOR"
 
@@ -133,7 +167,7 @@ main() {
     # sketchybar --set pomodoro_sessions label="$SESSION_COUNT/4"
 
     # Debug output (comment out in production)
-    echo "📊 Updated: $PHASE - $TIME_DISPLAY - running: $IS_RUNNING"
+    echo "📊 Updated: $PHASE - $GAUGE_DISPLAY ($TIME_TOOLTIP) - running: $IS_RUNNING - progress: ${PROGRESS_PERCENT}%"
 }
 
 # Execute main function

@@ -22,6 +22,7 @@ class ThemeRegistry: ObservableObject {
     // MARK: - Public Interface
     
     /// All available themes in the registry
+    // TODO: [PERFORMANCE] Potential main thread blocking - use concurrent queue with barrier pattern
     var availableThemes: [AnyTheme] {
         registrationQueue.sync {
             registeredThemes

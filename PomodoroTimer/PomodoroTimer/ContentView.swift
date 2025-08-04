@@ -16,12 +16,16 @@ struct ContentView: View {
     }
     
     /// Current theme experience for sophisticated behavioral architecture
+    // TODO: [PERFORMANCE] Memory allocation churn - createExperience() called on every SwiftUI render
+    // Cache experience instances with @State or use computed property with memoization
     private var currentExperience: AnyThemeExperience {
         viewModel.currentTheme.createExperience()
     }
     
     // MARK: - Dynamic Sizing Properties
     
+    // TODO: [PERFORMANCE] Expensive calculations on every SwiftUI render - logarithmic math in scaledFont()
+    // Cache these values and only recalculate when screen geometry changes
     /// Dynamic font size for session info primary text
     private var sessionInfoLargeFontSize: CGFloat {
         screenContext.scaledFont(
@@ -96,6 +100,7 @@ struct ContentView: View {
                     .preferredColorScheme(.dark)
                     .id("theme-\(viewModel.currentTheme.id)")
                     .transition(.opacity)
+                    // TODO: [PERFORMANCE] Multiple onReceive calls can cause overhead - consolidate notification handling
                     .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
                         Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
                         rippleTrigger.toggle()

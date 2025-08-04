@@ -3,6 +3,14 @@ import SwiftUI
 import Combine
 import AppKit
 
+// TODO: [ARCHITECTURE] God Object violation - this class handles 6+ responsibilities:
+// - Timer logic and state management
+// - Theme management and picker state  
+// - File I/O for SketchyBar integration
+// - Background activity management
+// - Notification observers
+// - Persistent data management
+// Consider splitting into: TimerController, ThemeController, StateController, AppCoordinator
 class TimerViewModel: ObservableObject {
     @Published var pomodoroState = PomodoroState()
     @Published var totalSessionsToday: Int = 0
@@ -53,6 +61,8 @@ class TimerViewModel: ObservableObject {
     
     // MARK: - Immediate State File Writing
     
+    // TODO: [REFACTOR] Remove redundant Combine infrastructure - scheduleStateFileWrite() already calls writeStateFile() immediately
+    // This entire pipeline can be replaced with direct method calls for better performance
     /// Setup immediate state file writer for responsive JSON updates
     private func setupImmediateStateFileWriter() {
         // Immediate write for any state change
@@ -183,7 +193,9 @@ class TimerViewModel: ObservableObject {
         let shouldComplete = pomodoroState.shouldComplete
         pomodoroState.tick()
         
-        // Schedule state write after tick
+        // TODO: [PERFORMANCE] Critical bottleneck - writing JSON file every second (3,600 times/hour)
+        // Only write on state changes: start/pause/complete/skip to reduce I/O by 99%
+        // Current: 3,600 writes/hour → Target: 10-20 writes/hour
         scheduleStateFileWrite(immediate: false)
         
         if shouldComplete {
@@ -294,6 +306,7 @@ class TimerViewModel: ObservableObject {
         
         highlightedTheme = themes[highlightedThemeIndex]
         
+        // TODO: [SAFETY] Replace force unwrap with safe optional binding
         // Apply live preview
         currentTheme = highlightedTheme!
     }
@@ -339,6 +352,9 @@ class TimerViewModel: ObservableObject {
     // MARK: - SketchyBar Integration
     
     private func triggerSketchyBarEvent(_ event: String) {
+        // TODO: [SECURITY] Command injection risk - validate event parameter
+        // Add allowlist: ["pomodoro_start", "pomodoro_stop"] to prevent injection
+        // TODO: [PERFORMANCE] New Process() spawned every time - use persistent IPC instead
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/sketchybar")
         process.arguments = ["--trigger", event]

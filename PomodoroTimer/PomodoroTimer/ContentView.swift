@@ -43,25 +43,34 @@ struct ContentView: View {
         return cachedExperience!
     }
     
-    /// Cached font size calculation with intelligent cache invalidation
+    /// Get font size with caching - uses direct calculation to avoid state mutation during view updates
     private func getCachedFontSize(key: String, baseSize: CGFloat, minSize: CGFloat, maxSize: CGFloat) -> CGFloat {
         let currentScreenSize = screenContext.screenFrame.size
         
-        // Invalidate cache if screen size changed
+        // Check if screen size changed and cache is invalid
+        if currentScreenSize != cachedScreenSize || cachedFontSizes.isEmpty {
+            // Use direct calculation without modifying state during view update
+            return screenContext.scaledFont(baseSize: baseSize, minSize: minSize, maxSize: maxSize)
+        }
+        
+        // Return cached value if available, otherwise calculate directly
+        return cachedFontSizes[key] ?? screenContext.scaledFont(baseSize: baseSize, minSize: minSize, maxSize: maxSize)
+    }
+    
+    /// Update font cache when screen geometry changes
+    private func updateFontCache() {
+        let currentScreenSize = screenContext.screenFrame.size
+        
         if currentScreenSize != cachedScreenSize {
             cachedFontSizes.removeAll()
             cachedScreenSize = currentScreenSize
+            
+            // Pre-populate cache with commonly used font sizes
+            cachedFontSizes["sessionLarge"] = screenContext.scaledFont(baseSize: 18, minSize: 14, maxSize: 24)
+            cachedFontSizes["sessionSmall"] = screenContext.scaledFont(baseSize: 14, minSize: 11, maxSize: 18)
+            cachedFontSizes["versionLarge"] = screenContext.scaledFont(baseSize: 10, minSize: 8, maxSize: 13)
+            cachedFontSizes["versionSmall"] = screenContext.scaledFont(baseSize: 9, minSize: 7, maxSize: 12)
         }
-        
-        // Return cached value if available
-        if let cached = cachedFontSizes[key] {
-            return cached
-        }
-        
-        // Calculate and cache new value
-        let fontSize = screenContext.scaledFont(baseSize: baseSize, minSize: minSize, maxSize: maxSize)
-        cachedFontSizes[key] = fontSize
-        return fontSize
     }
     
     // MARK: - Dynamic Sizing Properties
@@ -198,6 +207,13 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
             Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
             rippleTrigger.toggle()
+        }
+        // Update font cache when screen context changes
+        .onReceive(screenContext.objectWillChange) { _ in
+            updateFontCache()
+        }
+        .onAppear {
+            updateFontCache()
         }
     }
     

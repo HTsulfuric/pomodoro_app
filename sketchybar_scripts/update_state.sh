@@ -98,12 +98,12 @@ main() {
         exit 0
     fi
 
-    # Check if state is stale (older than 10 seconds)
+    # Check if state is stale (adjusted for 20-second gauge update intervals)
     CURRENT_TIME=$(date +%s)
     LAST_UPDATE_SECONDS=${LAST_UPDATE%.*}  # Remove decimal part
     STALENESS=$((CURRENT_TIME - LAST_UPDATE_SECONDS))
 
-    if [[ $STALENESS -gt 10 ]]; then
+    if [[ $STALENESS -gt 30 ]]; then
         echo "⚠️ State is stale (age: ${STALENESS}s)"
         set_disconnected_state
         exit 0

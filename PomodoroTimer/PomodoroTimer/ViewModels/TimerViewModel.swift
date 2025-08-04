@@ -306,9 +306,10 @@ class TimerViewModel: ObservableObject {
         
         highlightedTheme = themes[highlightedThemeIndex]
         
-        // TODO: [SAFETY] Replace force unwrap with safe optional binding
-        // Apply live preview
-        currentTheme = highlightedTheme!
+        // Apply live preview with safe optional binding
+        if let theme = highlightedTheme {
+            currentTheme = theme
+        }
     }
     
     func confirmThemeSelection() {
@@ -352,8 +353,13 @@ class TimerViewModel: ObservableObject {
     // MARK: - SketchyBar Integration
     
     private func triggerSketchyBarEvent(_ event: String) {
-        // TODO: [SECURITY] Command injection risk - validate event parameter
-        // Add allowlist: ["pomodoro_start", "pomodoro_stop"] to prevent injection
+        // Validate event parameter against allowlist to prevent command injection
+        let allowedEvents: Set<String> = ["pomodoro_start", "pomodoro_stop"]
+        guard allowedEvents.contains(event) else {
+            Logger.debug("Blocked invalid SketchyBar event: \(event)", category: .app)
+            return
+        }
+        
         // TODO: [PERFORMANCE] New Process() spawned every time - use persistent IPC instead
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/sketchybar")

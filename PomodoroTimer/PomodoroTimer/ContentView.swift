@@ -5,6 +5,14 @@ struct ContentView: View {
     @EnvironmentObject var screenContext: ScreenContext
     @State private var rippleTrigger: Bool = false
     
+    // Cached theme experience to prevent memory allocation churn
+    @State private var cachedExperience: AnyThemeExperience?
+    @State private var cachedThemeId: String?
+    
+    // Cached font sizes to prevent expensive logarithmic calculations on every render
+    @State private var cachedFontSizes: [String: CGFloat] = [:]
+    @State private var cachedScreenSize: CGSize = .zero
+    
     // Version info computed properties
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -15,51 +23,67 @@ struct ContentView: View {
         return "\(version.majorVersion).\(version.minorVersion)"
     }
     
-    /// Current theme experience for sophisticated behavioral architecture
-    // TODO: [PERFORMANCE] Memory allocation churn - createExperience() called on every SwiftUI render
-    // Cache experience instances with @State or use computed property with memoization
+    /// Cached theme experience with intelligent memoization to prevent allocation churn
     private var currentExperience: AnyThemeExperience {
-        viewModel.currentTheme.createExperience()
+        let currentThemeId = viewModel.currentTheme.id
+        
+        // Only create new experience if theme changed or cache is empty
+        if cachedThemeId != currentThemeId || cachedExperience == nil {
+            let newExperience = viewModel.currentTheme.createExperience()
+            
+            // Update cache on next render cycle to avoid state mutations during view updates
+            DispatchQueue.main.async {
+                self.cachedExperience = newExperience
+                self.cachedThemeId = currentThemeId
+            }
+            
+            return newExperience
+        }
+        
+        return cachedExperience!
+    }
+    
+    /// Cached font size calculation with intelligent cache invalidation
+    private func getCachedFontSize(key: String, baseSize: CGFloat, minSize: CGFloat, maxSize: CGFloat) -> CGFloat {
+        let currentScreenSize = screenContext.screenSize
+        
+        // Invalidate cache if screen size changed
+        if currentScreenSize != cachedScreenSize {
+            cachedFontSizes.removeAll()
+            cachedScreenSize = currentScreenSize
+        }
+        
+        // Return cached value if available
+        if let cached = cachedFontSizes[key] {
+            return cached
+        }
+        
+        // Calculate and cache new value
+        let fontSize = screenContext.scaledFont(baseSize: baseSize, minSize: minSize, maxSize: maxSize)
+        cachedFontSizes[key] = fontSize
+        return fontSize
     }
     
     // MARK: - Dynamic Sizing Properties
     
-    // TODO: [PERFORMANCE] Expensive calculations on every SwiftUI render - logarithmic math in scaledFont()
-    // Cache these values and only recalculate when screen geometry changes
-    /// Dynamic font size for session info primary text
+    /// Cached dynamic font size for session info primary text
     private var sessionInfoLargeFontSize: CGFloat {
-        screenContext.scaledFont(
-            baseSize: 18,
-            minSize: 14,
-            maxSize: 24
-        )
+        getCachedFontSize(key: "sessionLarge", baseSize: 18, minSize: 14, maxSize: 24)
     }
     
-    /// Dynamic font size for session info secondary text
+    /// Cached dynamic font size for session info secondary text
     private var sessionInfoSmallFontSize: CGFloat {
-        screenContext.scaledFont(
-            baseSize: 14,
-            minSize: 11,
-            maxSize: 18
-        )
+        getCachedFontSize(key: "sessionSmall", baseSize: 14, minSize: 11, maxSize: 18)
     }
     
-    /// Dynamic font size for version info
+    /// Cached dynamic font size for version info
     private var versionInfoLargeFontSize: CGFloat {
-        screenContext.scaledFont(
-            baseSize: 10,
-            minSize: 8,
-            maxSize: 13
-        )
+        getCachedFontSize(key: "versionLarge", baseSize: 10, minSize: 8, maxSize: 13)
     }
     
-    /// Dynamic font size for version info secondary
+    /// Cached dynamic font size for version info secondary
     private var versionInfoSmallFontSize: CGFloat {
-        screenContext.scaledFont(
-            baseSize: 9,
-            minSize: 7,
-            maxSize: 12
-        )
+        getCachedFontSize(key: "versionSmall", baseSize: 9, minSize: 7, maxSize: 12)
     }
     
     /// Dynamic spacing between session info elements

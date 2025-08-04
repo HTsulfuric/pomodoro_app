@@ -10,7 +10,7 @@ class ThemeRegistry: ObservableObject {
     // MARK: - Private Properties
     
     @Published private var registeredThemes: [AnyTheme] = []
-    private let registrationQueue = DispatchQueue(label: "theme.registry", qos: .userInitiated)
+    private let registrationQueue = DispatchQueue(label: "theme.registry", qos: .userInitiated, attributes: .concurrent)
     
     // MARK: - Initialization
     
@@ -21,8 +21,7 @@ class ThemeRegistry: ObservableObject {
     
     // MARK: - Public Interface
     
-    /// All available themes in the registry
-    // TODO: [PERFORMANCE] Potential main thread blocking - use concurrent queue with barrier pattern
+    /// All available themes in the registry (non-blocking concurrent read)
     var availableThemes: [AnyTheme] {
         registrationQueue.sync {
             registeredThemes
@@ -60,7 +59,7 @@ class ThemeRegistry: ObservableObject {
     func register<T: ThemeDefinition>(_ theme: T) {
         let anyTheme = AnyTheme(theme)
         
-        registrationQueue.async { [weak self] in
+        registrationQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             
             // Check for duplicates
@@ -103,10 +102,10 @@ class ThemeRegistry: ObservableObject {
     
     /// Clear all registered themes (useful for testing)
     func clearAll() {
-        registrationQueue.async { [weak self] in
+        registrationQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             
-            let count = self.registeredThemes.count
+            let _ = self.registeredThemes.count
             self.registeredThemes.removeAll()
             
             DispatchQueue.main.async {

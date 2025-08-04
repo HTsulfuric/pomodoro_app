@@ -31,7 +31,7 @@ class SoundManager: ObservableObject {
             sound.volume = 1.0
             
             // Play the sound - simple and reliable
-            let success = sound.play()
+            let _ = sound.play()
         } else {
             // Fallback to system beep
             NSSound.beep()

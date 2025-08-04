@@ -87,7 +87,7 @@ class TimerViewModel: ObservableObject {
         
         // Gauge-based optimization: Only write if enough time has passed
         let timeSinceLastWrite = Date().timeIntervalSince(lastStateWrite)
-        let gaugeUpdateInterval: TimeInterval = 20.0 // 20 seconds for smooth gauge progression
+        let gaugeUpdateInterval: TimeInterval = 15.0 // 20 seconds for smooth gauge progression
         
         if timeSinceLastWrite >= gaugeUpdateInterval {
             writeStateFile()

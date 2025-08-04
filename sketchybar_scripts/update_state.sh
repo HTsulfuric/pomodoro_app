@@ -9,7 +9,7 @@ STATE_FILE="$HOME/.config/pomodoro-timer/state.json"
 # Function to set disconnected state
 set_disconnected_state() {
     sketchybar --set pomodoro_item \
-        label="" \
+        label="[----------]" \
         icon="􀐱" \
         icon.color="0xff7f8490"
     echo "⚠️ App disconnected - showing idle state"

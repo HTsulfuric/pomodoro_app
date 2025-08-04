@@ -158,9 +158,11 @@ main() {
             ;;
     esac
 
-    # Update SketchyBar display with gauge
+    # Update SketchyBar display with gauge (force monospace font with fallbacks)
     sketchybar --set pomodoro_item \
         label="$GAUGE_DISPLAY" \
+        label.font.family="SF Mono" \
+        label.font.size=10 \
         icon="$ICON" \
         icon.color="$COLOR"
 

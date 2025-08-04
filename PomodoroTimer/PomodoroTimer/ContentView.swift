@@ -45,7 +45,7 @@ struct ContentView: View {
     
     /// Cached font size calculation with intelligent cache invalidation
     private func getCachedFontSize(key: String, baseSize: CGFloat, minSize: CGFloat, maxSize: CGFloat) -> CGFloat {
-        let currentScreenSize = screenContext.screenSize
+        let currentScreenSize = screenContext.screenFrame.size
         
         // Invalidate cache if screen size changed
         if currentScreenSize != cachedScreenSize {

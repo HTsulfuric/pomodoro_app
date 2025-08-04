@@ -49,6 +49,15 @@ class AppCoordinator: ObservableObject {
         timerController.delegate = self
         themeController.delegate = self
         integrationController.delegate = self
+        
+        // Wire up controller dependencies
+        timerController.setIntegrationController(integrationController)
+        
+        // Load initial session count from persistent storage
+        totalSessionsToday = integrationController.loadPersistentData()
+        
+        // Load current theme from ThemeController (it initializes with saved theme)
+        currentTheme = themeController.getCurrentTheme()
     }
     
     // MARK: - Public Interface for Views

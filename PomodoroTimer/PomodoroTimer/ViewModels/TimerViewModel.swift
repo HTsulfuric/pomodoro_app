@@ -18,8 +18,9 @@ class TimerViewModel: ObservableObject {
     private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
     
-    // Debounced state file writing to prevent I/O storms
+    // State file writing subjects (debouncing removed for responsive updates)
     private let stateWriteSubject = PassthroughSubject<Bool, Never>()
+    private let timerActiveStateWriteSubject = PassthroughSubject<Bool, Never>()
     
     // Background activity management to prevent App Nap
     private var backgroundActivity: NSObjectProtocol?
@@ -51,26 +52,34 @@ class TimerViewModel: ObservableObject {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     }
     
-    // MARK: - Debounced State File Writing
+    // MARK: - Immediate State File Writing
     
-    /// Setup debounced state file writer to prevent I/O storms
-    /// Critical fix: Was writing to disk every second, now max once per 5 seconds
+    /// Setup immediate state file writer for responsive JSON updates
+    /// Removed debouncing to eliminate 3-10 second delays
     private func setupDebouncedStateFileWriter() {
+        // Immediate write for any state change
         stateWriteSubject
-            .debounce(for: .seconds(5), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.writeStateFile()
+            }
+            .store(in: &cancellables)
+        
+        // Immediate write for timer active state
+        timerActiveStateWriteSubject
             .sink { [weak self] _ in
                 self?.writeStateFile()
             }
             .store(in: &cancellables)
     }
     
-    /// Schedule a state file write - immediate for critical changes, debounced for routine updates
-    /// - Parameter immediate: If true, writes immediately. If false, debounces to max once per 5 seconds
+    /// Schedule a state file write - all writes are now immediate for responsive updates
+    /// - Parameter immediate: Legacy parameter kept for compatibility, all writes are immediate now
     private func scheduleStateFileWrite(immediate: Bool) {
         if immediate {
             writeStateFile()
         } else {
-            stateWriteSubject.send(true)
+            // All writes are now immediate - no more debouncing delays
+            writeStateFile()
         }
     }
     
@@ -162,8 +171,19 @@ class TimerViewModel: ObservableObject {
     
     private func startTimerLoop() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.handleTimerTick()
+        
+        // Ensure timer creation happens on main thread for menu bar apps
+        DispatchQueue.main.async { [weak self] in
+            self?.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                DispatchQueue.main.async {
+                    self?.handleTimerTick()
+                }
+            }
+            
+            // Add timer to run loop with common modes for background operation
+            if let timer = self?.timer {
+                RunLoop.main.add(timer, forMode: .common)
+            }
         }
     }
     
@@ -323,6 +343,7 @@ class TimerViewModel: ObservableObject {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: stateData, options: [.prettyPrinted])
             try jsonData.write(to: stateFileURL)
+            Logger.debug("📄 JSON state file updated immediately", category: .app)
         } catch {
             Logger.error("Failed to write state file", category: .app, error: error)
         }

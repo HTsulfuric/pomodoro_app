@@ -343,16 +343,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - NSWindowDelegate for Auto-Dismiss
     
-    // DISABLED: Auto-hide behavior for dual monitor compatibility
-    // The overlay now stays visible when focus moves to other monitors/applications
-    // Use Opt+Shift+P or O/ESC keys to manually hide the overlay
-    /*
+    // Alfred-style auto-hide behavior: overlay disappears when losing focus
     func windowDidResignKey(_ notification: Notification) {
         // Auto-hide overlay when it loses focus (Alfred-style behavior)
         if notification.object as? NSPanel == overlayPanel {
-            Logger.ui("Overlay lost focus - auto-hiding")
+            Logger.userAction("Overlay lost focus - auto-hiding")
             hideOverlay()
         }
     }
-    */
 }

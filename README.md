@@ -2,7 +2,7 @@
 
 A native macOS Pomodoro timer app built with SwiftUI, featuring lock-screen compatible notifications and SketchyBar integration.
 
-![Version](https://img.shields.io/badge/version-3.0-blue)
+![Version](https://img.shields.io/badge/version-3.2-blue)
 ![Platform](https://img.shields.io/badge/platform-macOS%2013.0+-lightgrey)
 ![Language](https://img.shields.io/badge/language-Swift-orange)
 
@@ -58,27 +58,47 @@ require("items.pomodoro")
 ```
 PomodoroTimer/
 ├── Models/
-│   └── PomodoroTimer.swift      # Core timer logic and state management
+│   ├── PomodoroTimer.swift      # Core timer logic and state management
+│   ├── ThemeDefinition.swift    # Theme protocol and type-erased wrappers
+│   ├── ThemeExperience.swift    # Protocol-based theme behavioral architecture
+│   ├── ScreenContext.swift      # Monitor-aware dynamic sizing context
+│   └── StatusInfo.swift         # Status data structure for full layout themes
 ├── ViewModels/
-│   └── TimerViewModel.swift     # UI state coordination and timer lifecycle
-├── Views/
-│   └── ContentView.swift        # Main SwiftUI interface
+│   └── AppCoordinator.swift     # @MainActor SwiftUI coordination with @Published properties
 ├── Services/
-│   ├── NotificationManager.swift  # UserNotifications integration
-│   ├── SketchyBarManager.swift   # SketchyBar communication and optimization
-│   ├── StateManager.swift        # JSON state persistence
-│   └── SoundManager.swift        # Audio management
-├── Extensions/
-│   ├── NordTheme.swift           # Color theme definitions
-│   └── VisualEffectView.swift    # Transparent background effects
+│   ├── TimerController.swift    # Timer logic, background activity, phase completion
+│   ├── ThemeController.swift    # Theme management, picker state, live preview
+│   ├── IntegrationController.swift # SketchyBar, file I/O, notifications, persistence
+│   ├── KeyboardManager.swift    # Menu bar + local keyboard handling (privacy-safe)
+│   ├── Logger.swift             # Professional logging with categories and os.log
+│   ├── NotificationManager.swift # UserNotifications integration
+│   ├── SleepPreventionManager.swift # System sleep/screensaver prevention
+│   ├── SoundManager.swift       # Audio management
+│   └── ThemeRegistry.swift      # Dynamic theme discovery and registration
+├── Views/
+│   ├── ContentView.swift        # Main SwiftUI interface
+│   ├── TextBasedThemePickerView.swift # nnn/yazi-style theme picker overlay
+│   ├── PermissionView.swift     # Accessibility permission handling
+│   ├── RippleView.swift         # Timer start animation
+│   ├── Themes/                  # Self-contained theme implementations
+│   │   ├── MinimalTheme.swift   # Complete minimal theme (self-contained)
+│   │   ├── GridTheme.swift      # Complete grid theme (self-contained)
+│   │   ├── TerminalTheme.swift  # Complete terminal theme (self-contained)
+│   │   └── AuraMinimalistTheme.swift # Complete aura theme (self-contained)
+│   └── Components/
+│       ├── OverlayPanel.swift   # Alfred-style overlay behavior and window management
+│       ├── VisualEffectView.swift # Blur effects
+│       └── CircleHoverButtonStyle.swift # Theme-aware button styling
 └── Assets.xcassets/
     └── AppIcon.appiconset/       # Pixel art tomato icons (16px-512px@2x)
 ```
 
 ### Key Technologies
-- **SwiftUI**: Declarative UI with reactive state management
+- **SwiftUI**: Declarative UI with reactive state management via @Published properties
+- **Clean Architecture**: Specialized controllers with single responsibilities (eliminated God Object)
+- **MainActor Thread Safety**: Proper Swift Concurrency patterns for UI coordination
+- **Delegate Communication**: Loose coupling between controllers via protocol-based delegates
 - **UserNotifications.framework**: Lock-screen compatible interactive notifications
-- **Combine**: Reactive state updates and notification observation
 - **JSON State File**: `~/.config/pomodoro-timer/state.json` for real-time SketchyBar integration
 
 ## 🎮 Usage
@@ -145,7 +165,7 @@ Switch themes using the `T` key when overlay is visible, or create custom themes
 See [THEME_DEVELOPMENT_GUIDE.md](THEME_DEVELOPMENT_GUIDE.md) for creating custom themes with the new protocol-oriented architecture.
 
 ### SketchyBar Integration
-Toggle integration in the app or modify `Services/SketchyBarManager.swift` for advanced customization.
+Toggle integration in the app or modify `Services/IntegrationController.swift` for advanced customization.
 
 ## 🔧 Development
 
@@ -212,6 +232,6 @@ For complete development history and technical decisions, see `pomodoro_app.md`.
 
 ---
 
-**Current Version**: 3.1.0  
+**Current Version**: 3.2.0  
 **Last Updated**: 2025-08-04  
 **Minimum macOS**: 13.0

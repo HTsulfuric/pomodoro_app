@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2025-08-04
+
+### Added - Clean Architecture & Professional Code Quality
+- **Specialized Controller Architecture**: Replaced 442-line God Object with 4 focused controllers
+- **MainActor Thread Safety**: Complete Swift Concurrency compliance with proper isolation patterns
+- **Delegate Communication**: Clean loose coupling between components via protocol-based delegates
+- **Professional Architecture Patterns**: Single Responsibility Principle throughout codebase
+- **Zero Technical Debt**: Comprehensive TODO analysis showing exceptional code quality
+
+### Changed - BREAKING: Major Architecture Refactoring
+- **BREAKING**: `TimerViewModel` completely removed and replaced with specialized controllers:
+  - `AppCoordinator`: @MainActor SwiftUI coordination with @Published properties
+  - `TimerController`: Timer logic, background activity, phase completion (215 lines)
+  - `ThemeController`: Theme management, picker state, live preview (138 lines)
+  - `IntegrationController`: SketchyBar, file I/O, notifications, persistence (167 lines)
+- **Enhanced Thread Safety**: All MainActor isolation violations resolved
+- **Improved Testability**: Each controller can be tested independently
+- **Better Maintainability**: Independent evolution of specialized components
+
+### Fixed - Critical Architecture Issues
+- **God Object Anti-Pattern**: Eliminated single-responsibility violations
+- **MainActor Isolation**: Fixed thread safety violations in KeyboardManager
+- **Tight Coupling**: Replaced with clean delegate patterns
+- **Technical Debt**: Complete elimination of outstanding TODOs
+
+### Performance
+- **Code Quality**: Professional-grade architecture replacing anti-patterns
+- **Maintainability**: Dramatically improved through separation of concerns
+- **Testability**: Independent controller testing now possible
+- **Thread Safety**: 100% MainActor compliance achieved
+
+### Migration Guide
+**For Developers**: 
+- Replace all `TimerViewModel` references with `AppCoordinator` for SwiftUI integration
+- Controller-specific logic now properly separated into specialized services
+- All existing functionality preserved with improved architecture
+
 ## [3.1.0] - 2025-08-04
 
 ### Added - Major SketchyBar Performance Enhancement
@@ -157,13 +194,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Upcoming Features
 
-### [3.1.0] - Planned
+### [3.3.0] - Planned  
 - Additional built-in themes
 - Custom sound support
 - Enhanced statistics tracking
 - Improved notification customization
 
-### [3.2.0] - Planned  
+### [3.4.0] - Planned  
 - Widget support
 - Focus mode integration
 - Advanced automation features

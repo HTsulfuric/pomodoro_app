@@ -72,11 +72,11 @@ struct PomodoroState {
         guard isRunning && timeRemaining > 0 else { return }
         timeRemaining -= 1
         
-        // Don't auto-complete here - let the TimerViewModel handle completion
+        // Don't auto-complete here - let the TimerController handle completion
         // This prevents the race condition
     }
     
-    // Check if phase should complete (for TimerViewModel to call)
+    // Check if phase should complete (for TimerController to call)
     var shouldComplete: Bool {
         timeRemaining <= 0 && isRunning
     }

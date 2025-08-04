@@ -4,7 +4,7 @@ import Combine
 import AppKit
 import ApplicationServices
 
-class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowDelegate {
+@MainActor class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowDelegate {
     // MARK: - Properties
     var cancellables = Set<AnyCancellable>()
     

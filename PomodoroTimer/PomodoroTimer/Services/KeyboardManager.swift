@@ -19,7 +19,10 @@ class KeyboardManager {
     var isOverlayVisible: Bool = false {
         didSet {
             Logger.keyboard("Overlay visibility changed to \(isOverlayVisible)")
-            updateMenuBarStatus()
+            // Thread-safe MainActor call
+            Task { @MainActor in
+                updateMenuBarStatus()
+            }
         }
     }
     
@@ -47,7 +50,7 @@ class KeyboardManager {
         
         // Local monitoring for overlay keys when app is focused
         localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            self?.handleLocalKeyEvent(event) == true ? nil : event
+            return self?.handleLocalKeyEventSync(event) == true ? nil : event
         }
         
         // Register global hotkey using Carbon (privacy-safe)
@@ -125,7 +128,10 @@ class KeyboardManager {
         
         statusItem.menu = menu
         
-        updateMenuBarStatus()
+        // Thread-safe MainActor call for initial status update
+        Task { @MainActor in
+            updateMenuBarStatus()
+        }
         Logger.keyboard("Menu bar integration setup complete")
     }
     
@@ -183,7 +189,26 @@ class KeyboardManager {
     
     // MARK: - Key Event Handling (Local Only)
     
-    private func handleLocalKeyEvent(_ event: NSEvent) -> Bool {
+    /// Thread-safe wrapper for handling local key events
+    private func handleLocalKeyEventSync(_ event: NSEvent) -> Bool {
+        if Thread.isMainThread {
+            // Already on main thread, can call MainActor method directly
+            return MainActor.assumeIsolated {
+                return handleLocalKeyEvent(event)
+            }
+        } else {
+            // Need to dispatch to main thread synchronously
+            var result = false
+            DispatchQueue.main.sync {
+                result = MainActor.assumeIsolated {
+                    return self.handleLocalKeyEvent(event)
+                }
+            }
+            return result
+        }
+    }
+    
+    @MainActor private func handleLocalKeyEvent(_ event: NSEvent) -> Bool {
         // REMOVED: Global Opt+Shift+P hotkey (privacy violation)
         // Use menu bar or URL schemes for overlay control instead
         

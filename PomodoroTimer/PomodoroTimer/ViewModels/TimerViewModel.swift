@@ -18,9 +18,8 @@ class TimerViewModel: ObservableObject {
     private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
     
-    // State file writing subjects (debouncing removed for responsive updates)
+    // State file writing subject (immediate updates)
     private let stateWriteSubject = PassthroughSubject<Bool, Never>()
-    private let timerActiveStateWriteSubject = PassthroughSubject<Bool, Never>()
     
     // Background activity management to prevent App Nap
     private var backgroundActivity: NSObjectProtocol?
@@ -36,7 +35,7 @@ class TimerViewModel: ObservableObject {
         loadPersistentData()
         loadTheme()
         setupNotificationObservers()
-        setupDebouncedStateFileWriter()
+        setupImmediateStateFileWriter()
         createStateFileDirectory()
         scheduleStateFileWrite(immediate: true)
     }
@@ -55,32 +54,20 @@ class TimerViewModel: ObservableObject {
     // MARK: - Immediate State File Writing
     
     /// Setup immediate state file writer for responsive JSON updates
-    /// Removed debouncing to eliminate 3-10 second delays
-    private func setupDebouncedStateFileWriter() {
+    private func setupImmediateStateFileWriter() {
         // Immediate write for any state change
         stateWriteSubject
             .sink { [weak self] _ in
                 self?.writeStateFile()
             }
             .store(in: &cancellables)
-        
-        // Immediate write for timer active state
-        timerActiveStateWriteSubject
-            .sink { [weak self] _ in
-                self?.writeStateFile()
-            }
-            .store(in: &cancellables)
     }
     
-    /// Schedule a state file write - all writes are now immediate for responsive updates
+    /// Schedule a state file write - all writes are immediate for responsive updates
     /// - Parameter immediate: Legacy parameter kept for compatibility, all writes are immediate now
     private func scheduleStateFileWrite(immediate: Bool) {
-        if immediate {
-            writeStateFile()
-        } else {
-            // All writes are now immediate - no more debouncing delays
-            writeStateFile()
-        }
+        // All writes are now immediate regardless of the parameter
+        writeStateFile()
     }
     
     // MARK: - Background Activity Management
@@ -196,7 +183,7 @@ class TimerViewModel: ObservableObject {
         let shouldComplete = pomodoroState.shouldComplete
         pomodoroState.tick()
         
-        // Only schedule debounced state write during tick
+        // Schedule state write after tick
         scheduleStateFileWrite(immediate: false)
         
         if shouldComplete {

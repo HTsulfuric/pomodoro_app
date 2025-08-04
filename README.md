@@ -16,10 +16,10 @@ A native macOS Pomodoro timer app built with SwiftUI, featuring lock-screen comp
 - **Transparent UI**: Elegant Nord-themed interface with blur effects
 
 ### 📊 SketchyBar Integration
-- **Real-time Display**: Shows current timer state in your SketchyBar with immediate updates
+- **Gauge-Based Display**: Visual progress bars with ASCII rendering for font consistency
+- **Ultra-High Performance**: 95% I/O reduction (3,600 → 180 writes/hour) through smart 20-second intervals
 - **Bidirectional Control**: Click SketchyBar item to control timer
-- **Performance Optimized**: 98% reduction in system calls through intelligent state caching
-- **Fault Tolerant**: Automatic recovery from connection failures with exponential backoff
+- **Fault Tolerant**: Automatic staleness detection and recovery with 30-second timeout
 
 ### 🎨 Design & UX
 - **Alfred-Style Auto-Hide**: Overlay automatically disappears when losing focus - clean, intuitive UX
@@ -112,9 +112,10 @@ When a phase completes, you'll receive an interactive notification with:
 
 ### SketchyBar Display
 The SketchyBar item shows:
-- **Timer Display**: MM:SS format countdown
+- **Progress Gauge**: ASCII bracket-style visual progress `[======----]`
 - **Phase Icons**: 🍅 (work), ☕ (break), 🏖️ (long break)
 - **Color Coding**: Green (work), yellow (short break), orange (long break)
+- **Performance**: Updates every 20 seconds (95% fewer I/O operations)
 - **Click Actions**: Left-click to start/pause, right-click for more options
 
 ## ⚙️ Configuration
@@ -211,6 +212,6 @@ For complete development history and technical decisions, see `pomodoro_app.md`.
 
 ---
 
-**Current Version**: 3.0.2  
+**Current Version**: 3.1.0  
 **Last Updated**: 2025-08-04  
 **Minimum macOS**: 13.0

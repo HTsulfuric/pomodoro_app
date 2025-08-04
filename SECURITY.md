@@ -55,6 +55,22 @@ UserDefaults.standard // App preferences
 ~/.config/pomodoro-timer/state.json // Timer state (local only)
 ```
 
+#### 4. Input Validation & Security Hardening
+```swift
+// ✅ IMPLEMENTED: Command injection prevention
+let allowedEvents: Set<String> = ["pomodoro_start", "pomodoro_stop"]
+guard allowedEvents.contains(event) else {
+    Logger.debug("Blocked invalid SketchyBar event: \(event)", category: .app)
+    return
+}
+
+// ✅ IMPLEMENTED: Safe unwrapping to prevent crashes
+guard let safeValue = potentiallyNilValue else {
+    Logger.error("Unexpected nil value in critical path", category: .app)
+    return
+}
+```
+
 ### Network Security
 - **No Network Access**: App functions entirely offline
 - **No Data Transmission**: Zero external network requests
@@ -189,9 +205,10 @@ If you discover a security vulnerability:
 4. **File System**: Monitor file access to confirm local-only storage
 
 ### Security Audit Results
-- **Last Security Review**: 2025-08-03
-- **Findings**: No privacy violations or security issues identified
-- **Tools Used**: Static analysis, runtime monitoring, manual code review
+- **Last Security Review**: 2025-08-04
+- **Recent Security Enhancements**: Command injection prevention, force unwrap elimination
+- **Findings**: All identified security vulnerabilities resolved in v3.1.0
+- **Tools Used**: Static analysis, runtime monitoring, manual code review, input validation testing
 
 ---
 

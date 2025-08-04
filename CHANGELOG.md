@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-08-04
+
+### Added - Major SketchyBar Performance Enhancement
+- **Gauge-Based Display System**: Revolutionary visual progress bars using ASCII bracket rendering `[======----]`
+- **95% I/O Performance Improvement**: Reduced from 3,600 to 180 file writes per hour through smart 20-second intervals
+- **Font Consistency Solution**: ASCII characters with enforced SF Mono font for reliable SketchyBar rendering
+- **Smart Staleness Detection**: 30-second timeout prevents --:-- display during normal operation
+- **Enhanced JSON Structure**: Added `progressPercent` and `totalDuration` fields for comprehensive gauge rendering
+
+### Changed
+- **SketchyBar Update Frequency**: From 1-second to 20-second intervals (performance optimization)
+- **Display Format**: Time-based MM:SS → Progress gauge visualization
+- **JSON State Structure**: Extended with gauge-specific fields while maintaining backward compatibility
+
+### Fixed - Critical Security & Performance Issues
+- **Command Injection Vulnerability**: Added input validation for SketchyBar events (security hardening)
+- **Force Unwrap Safety**: Eliminated unsafe force unwraps in critical timer logic paths
+- **SwiftUI Performance Bottlenecks**: Fixed memory allocation churn and expensive calculations
+- **Thread Blocking Issues**: Resolved main thread blocking in theme registry operations
+- **EnvironmentObject Access**: Fixed SwiftUI state mutation warnings and access patterns
+- **Staleness Timing Bug**: Corrected 10s/20s interval mismatch causing premature --:-- display
+
+### Performance
+- **Ultra-High I/O Efficiency**: 95% reduction in disk operations (3,600 → 180 writes/hour)
+- **Memory Optimization**: Eliminated SwiftUI memory allocation churn through proper state management
+- **CPU Efficiency**: Reduced expensive font calculations with intelligent caching
+- **Thread Safety**: Concurrent queue implementation for theme registry operations
+
+### Security
+- **Input Validation**: Comprehensive protection against command injection in SketchyBar integration
+- **Safe State Management**: Eliminated force unwraps that could cause crashes or security vulnerabilities
+- **Proper Resource Cleanup**: Enhanced memory management and resource disposal patterns
+
 ## [3.0.2] - 2025-08-04
 
 ### Changed

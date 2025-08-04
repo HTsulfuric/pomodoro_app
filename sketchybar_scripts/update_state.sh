@@ -9,7 +9,7 @@ STATE_FILE="$HOME/.config/pomodoro-timer/state.json"
 # Function to set disconnected state
 set_disconnected_state() {
     sketchybar --set pomodoro_item \
-        label="--:--" \
+        label="" \
         icon="􀐱" \
         icon.color="0xff7f8490"
     echo "⚠️ App disconnected - showing idle state"
@@ -47,13 +47,13 @@ render_gauge() {
     [[ $filled_blocks -lt 0 ]] && filled_blocks=0
     [[ $filled_blocks -gt $total_blocks ]] && filled_blocks=$total_blocks
     
-    # Build gauge string
+    # Build gauge string with consistent block characters
     local gauge=""
     for ((i=1; i<=total_blocks; i++)); do
         if [[ $i -le $filled_blocks ]]; then
-            gauge+="█"  # Filled block
+            gauge+="█"  # U+2588 Full block (filled)
         else
-            gauge+="░"  # Empty block
+            gauge+="▓"  # U+2593 Dark shade (empty but visible)
         fi
     done
     
@@ -121,7 +121,7 @@ main() {
             TIME_TOOLTIP="--:--"
         fi
     else
-        GAUGE_DISPLAY="░░░░░░░░░░"  # Empty gauge fallback
+        GAUGE_DISPLAY="▓▓▓▓▓▓▓▓▓▓"  # Empty gauge fallback with consistent characters
         TIME_TOOLTIP="--:--"
     fi
 

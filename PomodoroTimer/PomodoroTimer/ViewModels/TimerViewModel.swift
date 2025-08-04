@@ -26,8 +26,7 @@ class TimerViewModel: ObservableObject {
     private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
     
-    // State file writing subject (immediate updates)
-    private let stateWriteSubject = PassthroughSubject<Bool, Never>()
+    // State file writing (direct method calls for better performance)
     
     // Background activity management to prevent App Nap
     private var backgroundActivity: NSObjectProtocol?
@@ -46,7 +45,6 @@ class TimerViewModel: ObservableObject {
         loadPersistentData()
         loadTheme()
         setupNotificationObservers()
-        setupImmediateStateFileWriter()
         createStateFileDirectory()
         scheduleStateFileWrite(immediate: true)
     }
@@ -62,19 +60,7 @@ class TimerViewModel: ObservableObject {
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     }
     
-    // MARK: - Immediate State File Writing
-    
-    // TODO: [REFACTOR] Remove redundant Combine infrastructure - scheduleStateFileWrite() already calls writeStateFile() immediately
-    // This entire pipeline can be replaced with direct method calls for better performance
-    /// Setup immediate state file writer for responsive JSON updates
-    private func setupImmediateStateFileWriter() {
-        // Immediate write for any state change
-        stateWriteSubject
-            .sink { [weak self] _ in
-                self?.writeStateFile()
-            }
-            .store(in: &cancellables)
-    }
+    // MARK: - State File Writing
     
     /// Schedule a state file write with gauge-based smart intervals
     /// - Parameter immediate: Force immediate write for state changes, otherwise use 20-second intervals

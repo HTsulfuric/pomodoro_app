@@ -47,15 +47,16 @@ render_gauge() {
     [[ $filled_blocks -lt 0 ]] && filled_blocks=0
     [[ $filled_blocks -gt $total_blocks ]] && filled_blocks=$total_blocks
     
-    # Build gauge string with consistent block characters
-    local gauge=""
+    # Build gauge string with ASCII characters for font consistency
+    local gauge="["
     for ((i=1; i<=total_blocks; i++)); do
         if [[ $i -le $filled_blocks ]]; then
-            gauge+="█"  # U+2588 Full block (filled)
+            gauge+="="  # ASCII equals (filled)
         else
-            gauge+="▓"  # U+2593 Dark shade (empty but visible)
+            gauge+="-"  # ASCII dash (empty)
         fi
     done
+    gauge+="]"
     
     echo "$gauge"
 }
@@ -121,7 +122,7 @@ main() {
             TIME_TOOLTIP="--:--"
         fi
     else
-        GAUGE_DISPLAY="▓▓▓▓▓▓▓▓▓▓"  # Empty gauge fallback with consistent characters
+        GAUGE_DISPLAY="[----------]"  # Empty gauge fallback with ASCII characters
         TIME_TOOLTIP="--:--"
     fi
 

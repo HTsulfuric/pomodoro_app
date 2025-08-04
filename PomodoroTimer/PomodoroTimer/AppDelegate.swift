@@ -8,8 +8,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Properties
     var cancellables = Set<AnyCancellable>()
     
-    // State management (moved from PomodoroTimerApp)
-    let timerViewModel = TimerViewModel()
+    // State management (moved from PomodoroTimerApp) - Using new architecture
+    let appCoordinator = AppCoordinator()
     
     // Screen context for dynamic theme sizing
     let screenContext = ScreenContext()
@@ -35,8 +35,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
         NotificationManager.shared.requestPermission()
         
-        // Setup KeyboardManager with TimerViewModel reference (no permissions needed)
-        KeyboardManager.shared.timerViewModel = timerViewModel
+        // Setup KeyboardManager with AppCoordinator reference (no permissions needed)
+        KeyboardManager.shared.timerViewModel = appCoordinator
         
         // Setup notification observers for overlay control
         setupOverlayNotificationObservers()
@@ -78,10 +78,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - Floating Overlay Setup
     
-    private func setupFloatingOverlay() {
+    @MainActor private func setupFloatingOverlay() {
         // Create floating panel centered on screen (use current theme size, not minimal)
         let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1920, height: 1080)
-        let windowSize = timerViewModel.currentTheme.preferredWindowSize // Use current theme size
+        let windowSize = appCoordinator.currentTheme.preferredWindowSize // Use current theme size
         let panelFrame = NSRect(
             x: (screenFrame.width - windowSize.width) / 2,
             y: (screenFrame.height - windowSize.height) / 2,
@@ -101,7 +101,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // The problematic .frame modifier is removed to prevent a layout feedback loop.
         let contentView = AnyView(
             ContentView()
-                .environmentObject(timerViewModel)
+                .environmentObject(appCoordinator)
                 .environmentObject(screenContext)
         )
 
@@ -115,7 +115,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         panel.contentViewController = hostingController
         
         // CRITICAL: Set panel content size to full screen
-        let fullScreenSize = timerViewModel.currentTheme.preferredWindowSize
+        let fullScreenSize = appCoordinator.currentTheme.preferredWindowSize
         panel.setContentSize(fullScreenSize)
         
         // Ensure hosting controller view fills the panel content
@@ -146,7 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
     
-    private func showOverlay() {
+    @MainActor private func showOverlay() {
         guard let panel = overlayPanel else {
             Logger.error("No overlay panel available", category: .overlay)
             return
@@ -156,7 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let screen = NSScreen.main {
             let screenFrame = screen.frame
             let currentPanelSize = panel.frame.size
-            let expectedPanelSize = timerViewModel.currentTheme.preferredWindowSize
+            let expectedPanelSize = appCoordinator.currentTheme.preferredWindowSize
             
             // Update screen context if screen changed (triggers theme re-sizing)
             screenContext.updateScreen(screen)
@@ -282,29 +282,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
     
-    private func handleToggleCommand() {
+    @MainActor private func handleToggleCommand() {
         Logger.debug("handleToggleCommand called", category: .app)
-        if timerViewModel.pomodoroState.isRunning {
+        if appCoordinator.pomodoroState.isRunning {
             Logger.info("Pausing timer via URL command", category: .app)
-            timerViewModel.pauseTimer()
+            appCoordinator.pauseTimer()
         } else {
             Logger.info("Starting timer via URL command", category: .app)
-            timerViewModel.startTimer()
+            appCoordinator.startTimer()
         }
         Logger.debug("handleToggleCommand completed", category: .app)
     }
     
-    private func handleResetCommand() {
+    @MainActor private func handleResetCommand() {
         Logger.debug("handleResetCommand called", category: .app)
         Logger.info("Resetting timer via URL command", category: .app)
-        timerViewModel.resetTimer()
+        appCoordinator.resetTimer()
         Logger.debug("handleResetCommand completed", category: .app)
     }
     
-    private func handleSkipCommand() {
+    @MainActor private func handleSkipCommand() {
         Logger.debug("handleSkipCommand called", category: .app)
         Logger.info("Skipping phase via URL command", category: .app)
-        timerViewModel.skipPhase()
+        appCoordinator.skipPhase()
         Logger.debug("handleSkipCommand completed", category: .app)
     }
     

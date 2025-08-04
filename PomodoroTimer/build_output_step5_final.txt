@@ -1,0 +1,231 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project PomodoroTimer.xcodeproj -scheme PomodoroTimer -destination platform=macOS build
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00008103-001155510288801E, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00008103-001155510288801E, name:My Mac }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'PomodoroTimer' in project 'PomodoroTimer' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: c477061f1af6d453179c94470255a58b
+Build description path: /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/XCBuildData/c477061f1af6d453179c94470255a58b.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk /Users/itohleo/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx15.5-24F74-8254517eb8b97d462ccbc072ba9094c9.sdkstatcache
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk -o /Users/itohleo/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx15.5-24F74-8254517eb8b97d462ccbc072ba9094c9.sdkstatcache
+
+WriteAuxiliaryFile /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.SwiftConstValuesFileList (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    write-file /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.SwiftFileList (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    write-file /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.SwiftFileList
+
+WriteAuxiliaryFile /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.LinkFileList (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    write-file /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.LinkFileList
+
+SwiftDriver PomodoroTimer normal arm64 com.apple.xcode.tools.swift.compiler (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name PomodoroTimer -Onone -enforce-exclusivity\=checked @/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk -target arm64-apple-macos15.5 -g -module-cache-path /Users/itohleo/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Index.noindex/DataStore -swift-version 5 -I /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Products/Debug -F /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/itohleo/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx15.5-24F74-8254517eb8b97d462ccbc072ba9094c9.sdkstatcache -output-file-map /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/itohleo/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer_const_extract_protocols.json -Xcc -iquote -Xcc /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-generated-files.hmap -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-own-target-headers.hmap -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-all-target-headers.hmap -Xcc -iquote -Xcc /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-project-headers.hmap -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Products/Debug/include -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources-normal/arm64 -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources/arm64 -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer-Swift.h -working-directory /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer -experimental-emit-module-separately -disable-cmo
+
+SwiftCompile normal arm64 Compiling\ StatusInfo.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/StatusInfo.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/StatusInfo.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ PermissionView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/PermissionView.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/PermissionView.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ AuraMinimalistTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/AuraMinimalistTheme.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/AuraMinimalistTheme.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ KeyboardManager.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/ThemeRegistry.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Components/CircleHoverButtonStyle.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/TerminalTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/ThemeController.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/MinimalTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ContentView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/ThemeExperience.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/SoundManager.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/GridTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/AppDelegate.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/ThemeDefinition.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/SleepPreventionManager.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/TimerViewModel.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/AuraMinimalistTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/TextBasedThemePickerView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/StatusInfo.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/NotificationManager.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/ScreenContext.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/Logger.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Components/VisualEffectView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/RippleView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/PomodoroTimerApp.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/PomodoroTimer.swift -primary-file /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/TimerController.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Components/OverlayPanel.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/PermissionView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Models/Themes/NordTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/IntegrationController.swift /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources/GeneratedAssetSymbols.swift -emit-dependencies-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/KeyboardManager.d -emit-const-values-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/KeyboardManager.swiftconstvalues -emit-reference-dependencies-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/KeyboardManager.swiftdeps -serialize-diagnostics-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/KeyboardManager.dia -emit-localized-strings -emit-localized-strings-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64 -target arm64-apple-macos15.5 -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk -I /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Products/Debug -F /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Products/Debug -no-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=5 -module-cache-path /Users/itohleo/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -profile-generate -profile-coverage-mapping -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/PomodoroTimer_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/itohleo/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift -enable-anonymous-context-mangled-names -file-compilation-dir /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer -Xcc -ivfsstatcache -Xcc /Users/itohleo/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx15.5-24F74-8254517eb8b97d462ccbc072ba9094c9.sdkstatcache -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-generated-files.hmap -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-own-target-headers.hmap -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-all-target-headers.hmap -Xcc -iquote -Xcc /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/PomodoroTimer-project-headers.hmap -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Products/Debug/include -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources-normal/arm64 -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources/arm64 -Xcc -I/Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/DerivedSources -Xcc -DDEBUG\=1 -module-name PomodoroTimer -frontend-parseable-output -disable-clang-spi -target-sdk-version 15.5 -target-sdk-name macosx15.5 -external-plugin-path /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -o /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Build/Intermediates.noindex/PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/KeyboardManager.o -index-unit-output-path /PomodoroTimer.build/Debug/PomodoroTimer.build/Objects-normal/arm64/KeyboardManager.o -index-store-path /Users/itohleo/Library/Developer/Xcode/DerivedData/PomodoroTimer-aoksgkvmypjblvdijcrjnjphopye/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:144:26: error: main actor-isolated property 'pomodoroState' can not be referenced from a nonisolated context
+            if viewModel.pomodoroState.isRunning {
+                         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:30:20: note: property declared here
+    @Published var pomodoroState = PomodoroState()
+                   ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:139:18: note: add '@MainActor' to make instance method 'updateMenuBarStatus()' part of global actor 'MainActor'
+    private func updateMenuBarStatus() {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:163:25: error: call to main actor-isolated instance method 'toggleTimer()' in a synchronous nonisolated context
+        timerViewModel?.toggleTimer()
+                        ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:66:10: note: calls to instance method 'toggleTimer()' from outside of its actor context are implicitly asynchronous
+    func toggleTimer() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:161:24: note: add '@MainActor' to make instance method 'menuToggleTimer()' part of global actor 'MainActor'
+    @objc private func menuToggleTimer() {
+                       ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:169:25: error: call to main actor-isolated instance method 'resetTimer()' in a synchronous nonisolated context
+        timerViewModel?.resetTimer()
+                        ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:78:10: note: calls to instance method 'resetTimer()' from outside of its actor context are implicitly asynchronous
+    func resetTimer() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:167:24: note: add '@MainActor' to make instance method 'menuResetTimer()' part of global actor 'MainActor'
+    @objc private func menuResetTimer() {
+                       ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:175:25: error: call to main actor-isolated instance method 'skipPhase()' in a synchronous nonisolated context
+        timerViewModel?.skipPhase()
+                        ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:82:10: note: calls to instance method 'skipPhase()' from outside of its actor context are implicitly asynchronous
+    func skipPhase() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:173:24: note: add '@MainActor' to make instance method 'menuSkipPhase()' part of global actor 'MainActor'
+    @objc private func menuSkipPhase() {
+                       ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:246:59: error: cannot convert value of type 'AppCoordinator' to expected argument type 'TimerViewModel'
+            return handleThemePickerKey(event, viewModel: viewModel)
+                                                          ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:245:22: error: main actor-isolated property 'isThemePickerPresented' can not be referenced from a nonisolated context
+        if viewModel.isThemePickerPresented {
+                     ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:33:20: note: property declared here
+    @Published var isThemePickerPresented: Bool = false
+                   ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:252:23: error: call to main actor-isolated instance method 'presentThemePicker()' in a synchronous nonisolated context
+            viewModel.presentThemePicker()
+                      ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:94:10: note: calls to instance method 'presentThemePicker()' from outside of its actor context are implicitly asynchronous
+    func presentThemePicker() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:259:30: error: main actor-isolated property 'pomodoroState' can not be referenced from a nonisolated context
+                if viewModel.pomodoroState.isRunning {
+                             ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:30:20: note: property declared here
+    @Published var pomodoroState = PomodoroState()
+                   ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:261:31: error: call to main actor-isolated instance method 'pauseTimer()' in a synchronous nonisolated context
+                    viewModel.pauseTimer()
+                              ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:74:10: note: calls to instance method 'pauseTimer()' from outside of its actor context are implicitly asynchronous
+    func pauseTimer() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:266:31: error: call to main actor-isolated instance method 'startTimer()' in a synchronous nonisolated context
+                    viewModel.startTimer()
+                              ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:70:10: note: calls to instance method 'startTimer()' from outside of its actor context are implicitly asynchronous
+    func startTimer() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:275:27: error: call to main actor-isolated instance method 'resetTimer()' in a synchronous nonisolated context
+                viewModel.resetTimer()
+                          ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:78:10: note: calls to instance method 'resetTimer()' from outside of its actor context are implicitly asynchronous
+    func resetTimer() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:283:27: error: call to main actor-isolated instance method 'skipPhase()' in a synchronous nonisolated context
+                viewModel.skipPhase()
+                          ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ViewModels/AppCoordinator.swift:82:10: note: calls to instance method 'skipPhase()' from outside of its actor context are implicitly asynchronous
+    func skipPhase() {
+         ^
+/Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift:238:18: note: add '@MainActor' to make instance method 'handleOverlaySpecificKey' part of global actor 'MainActor'
+    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+                 ^
+    @MainActor 
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ PomodoroTimer (in target 'PomodoroTimer' from project 'PomodoroTimer')
+
+EmitSwiftModule normal arm64 (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ AppDelegate.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/AppDelegate.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/AppDelegate.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ TextBasedThemePickerView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/TextBasedThemePickerView.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/TextBasedThemePickerView.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ ContentView.swift,\ GridTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ContentView.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/GridTheme.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/ContentView.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/GridTheme.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+    cd /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer
+    
+
+SwiftCompile normal arm64 Compiling\ TerminalTheme.swift,\ MinimalTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/TerminalTheme.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Views/Themes/MinimalTheme.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+
+SwiftDriverJobDiscovery normal arm64 Compiling StatusInfo.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ KeyboardManager.swift /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+	SwiftCompile normal arm64 /Users/itohleo/Programs/repo/github.com/HTsulfuric/pomodoro_app/PomodoroTimer/PomodoroTimer/Services/KeyboardManager.swift (in target 'PomodoroTimer' from project 'PomodoroTimer')
+	Building project PomodoroTimer with scheme PomodoroTimer
+(3 failures)

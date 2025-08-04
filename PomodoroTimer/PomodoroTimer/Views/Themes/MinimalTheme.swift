@@ -93,13 +93,13 @@ struct MinimalExperience: ThemeExperience {
     // MARK: - View Factories
     
     @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
+    func makeContentView(viewModel: AppCoordinator, rippleTrigger: Binding<Bool>) -> some View {
         MinimalThemeView(rippleTrigger: rippleTrigger)
             .environmentObject(viewModel)
     }
     
     @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> some View {
+    func makeControlsView(viewModel: AppCoordinator) -> some View {
         StandardControlsView(viewModel: viewModel)
     }
 }
@@ -108,7 +108,7 @@ struct MinimalExperience: ThemeExperience {
 
 /// Standard control layout used by graphical themes (Minimal and Grid)
 struct StandardControlsView: View {
-    @ObservedObject var viewModel: TimerViewModel
+    @ObservedObject var viewModel: AppCoordinator
     
     var body: some View {
         VStack(spacing: 16) {
@@ -184,7 +184,7 @@ struct StandardControlsView: View {
 // MARK: - Preview Support
 
 #Preview("Minimal Theme Controls") {
-    StandardControlsView(viewModel: TimerViewModel())
+    StandardControlsView(viewModel: AppCoordinator())
         .frame(width: 300, height: 150)
         .background(Color.black.opacity(0.8))
 }
@@ -193,7 +193,7 @@ struct StandardControlsView: View {
     @Previewable @State var rippleTrigger = false
     let experience = MinimalExperience()
     
-    experience.makeContentView(viewModel: TimerViewModel(), rippleTrigger: .constant(false))
+    experience.makeContentView(viewModel: AppCoordinator(), rippleTrigger: .constant(false))
         .frame(width: 300, height: 400)
         .background(Color.black.opacity(0.8))
 }
@@ -202,7 +202,7 @@ struct StandardControlsView: View {
 
 /// The classic circular progress timer theme - clean and minimal
 struct MinimalThemeView: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @EnvironmentObject var screenContext: ScreenContext
     @Binding var rippleTrigger: Bool
     
@@ -315,7 +315,7 @@ struct MinimalThemeView: View {
     
     MinimalThemeView(rippleTrigger: .constant(false))
         .frame(minWidth: 300, minHeight: 400)
-        .environmentObject(TimerViewModel())
+        .environmentObject(AppCoordinator())
         .environmentObject(ScreenContext())
         .background(Color.black.opacity(0.8))
 }

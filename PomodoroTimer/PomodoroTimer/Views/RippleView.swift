@@ -43,7 +43,7 @@ struct RippleView: View {
     /// An external trigger to start the animation. The animation runs whenever this value changes.
     let trigger: Bool
     
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     
     private let rippleCount = 4
     private let staggerDelay: Double = 0.3
@@ -70,7 +70,7 @@ struct RippleView: View {
     ZStack {
         Color.black.opacity(0.8)
         RippleView(trigger: trigger)
-            .environmentObject(TimerViewModel())
+            .environmentObject(AppCoordinator())
         
         VStack {
             Spacer()

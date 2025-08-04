@@ -96,7 +96,7 @@ struct AuraMinimalistExperience: ThemeExperience {
     // MARK: - Full Layout Control (Revolutionary!)
     
     @ViewBuilder
-    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
+    func makeFullLayoutView(viewModel: AppCoordinator, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
         AnyView(
             AuraMinimalistFullView(
                 viewModel: viewModel,
@@ -109,13 +109,13 @@ struct AuraMinimalistExperience: ThemeExperience {
     // MARK: - Legacy View Factories (unused when full layout is implemented)
     
     @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
+    func makeContentView(viewModel: AppCoordinator, rippleTrigger: Binding<Bool>) -> some View {
         AuraMinimalistView(rippleTrigger: rippleTrigger)
             .environmentObject(viewModel)
     }
     
     @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> some View {
+    func makeControlsView(viewModel: AppCoordinator) -> some View {
         // No persistent controls - everything is hover-reveal or keyboard
         EmptyView()
     }
@@ -125,7 +125,7 @@ struct AuraMinimalistExperience: ThemeExperience {
 
 /// The perfect Focus Ring: minimal, informative, unobtrusive
 struct AuraMinimalistView: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @EnvironmentObject var screenContext: ScreenContext
     @Binding var rippleTrigger: Bool
     
@@ -191,7 +191,7 @@ struct AuraMinimalistView: View {
 
 /// The revolutionary progress ring that communicates everything at a glance
 struct FocusRing: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @EnvironmentObject var screenContext: ScreenContext
     
     private var ringColor: Color {
@@ -240,7 +240,7 @@ struct FocusRing: View {
 
 /// Minimal controls that appear on hover - Atlassian Design System inspired
 struct HoverControls: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     
     var body: some View {
         HStack(spacing: 20) {
@@ -280,7 +280,7 @@ struct MinimalControlButton: View {
     let isPrimary: Bool
     let action: () -> Void
     
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @State private var isPressed = false
     
     var body: some View {
@@ -329,7 +329,7 @@ struct MinimalControlButton: View {
 /// Revolutionary full layout control for aerospace users
 /// This view has complete control over EVERYTHING - no hardcoded status messages!
 struct AuraMinimalistFullView: View {
-    @ObservedObject var viewModel: TimerViewModel
+    @ObservedObject var viewModel: AppCoordinator
     let statusInfo: StatusInfo
     @Binding var rippleTrigger: Bool
     
@@ -432,14 +432,14 @@ struct AuraMinimalistFullView: View {
 
 #Preview("Aura Minimalist") {
     AuraMinimalistView(rippleTrigger: .constant(false))
-        .environmentObject(TimerViewModel())
+        .environmentObject(AppCoordinator())
         .environmentObject(ScreenContext())
         .frame(width: 300, height: 300)
         .background(Color.black)
 }
 
 #Preview("Aura Minimalist Full Layout") {
-    let viewModel = TimerViewModel()
+    let viewModel = AppCoordinator()
     let statusInfo = StatusInfo.from(viewModel: viewModel)
     
     AuraMinimalistFullView(

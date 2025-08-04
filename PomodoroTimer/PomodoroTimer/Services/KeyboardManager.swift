@@ -13,7 +13,7 @@ class KeyboardManager {
     private var statusItem: NSStatusItem?
     private var hotKeyRef: EventHotKeyRef?
     private var eventHandler: EventHandlerRef?
-    weak var timerViewModel: TimerViewModel?
+    weak var timerViewModel: AppCoordinator?
     
     /// Tracks whether the overlay is visible to determine which keys are active
     var isOverlayVisible: Bool = false {
@@ -136,7 +136,7 @@ class KeyboardManager {
         }
     }
     
-    private func updateMenuBarStatus() {
+    @MainActor private func updateMenuBarStatus() {
         guard let button = statusItem?.button else { return }
         
         // Update menu bar icon based on timer state
@@ -158,19 +158,19 @@ class KeyboardManager {
         handleOverlayToggle()
     }
     
-    @objc private func menuToggleTimer() {
+    @MainActor @objc private func menuToggleTimer() {
         Logger.keyboard("Menu: Toggle timer")
         timerViewModel?.toggleTimer()
         updateMenuBarStatus()
     }
     
-    @objc private func menuResetTimer() {
+    @MainActor @objc private func menuResetTimer() {
         Logger.keyboard("Menu: Reset timer")
         timerViewModel?.resetTimer()
         updateMenuBarStatus()
     }
     
-    @objc private func menuSkipPhase() {
+    @MainActor @objc private func menuSkipPhase() {
         Logger.keyboard("Menu: Skip phase")
         timerViewModel?.skipPhase()
         updateMenuBarStatus()
@@ -200,7 +200,7 @@ class KeyboardManager {
         NotificationCenter.default.post(name: .toggleOverlay, object: nil)
     }
     
-    private func handleThemePickerKey(_ event: NSEvent, viewModel: TimerViewModel) -> Bool {
+    @MainActor private func handleThemePickerKey(_ event: NSEvent, viewModel: AppCoordinator) -> Bool {
         guard !event.modifierFlags.contains([.command, .control, .option, .shift]) else {
             return false // Don't handle modified keys
         }
@@ -235,9 +235,9 @@ class KeyboardManager {
         }
     }
     
-    private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
+    @MainActor private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
         guard let viewModel = timerViewModel else {
-            Logger.warning("TimerViewModel not available", category: .keyboard)
+            Logger.warning("AppCoordinator not available", category: .keyboard)
             return false
         }
         

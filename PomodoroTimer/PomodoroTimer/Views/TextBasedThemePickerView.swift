@@ -2,7 +2,7 @@ import SwiftUI
 
 /// nnn/yazi-inspired theme picker with keyboard navigation
 struct TextBasedThemePickerView: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @ObservedObject private var themeRegistry = ThemeRegistry.shared
     
     var body: some View {
@@ -119,5 +119,5 @@ struct ThemeRowView: View {
 
 #Preview {
     TextBasedThemePickerView()
-        .environmentObject(TimerViewModel())
+        .environmentObject(AppCoordinator())
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @EnvironmentObject var screenContext: ScreenContext
     @State private var rippleTrigger: Bool = false
     
@@ -247,6 +247,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .frame(minWidth: 300, minHeight: 400)
-        .environmentObject(TimerViewModel())
+        .environmentObject(AppCoordinator())
         .environmentObject(ScreenContext())
 }

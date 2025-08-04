@@ -23,11 +23,11 @@ protocol ThemeExperience {
     
     /// Creates the main content view for this theme (timer display, animations, etc.)
     @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> ContentView
+    func makeContentView(viewModel: AppCoordinator, rippleTrigger: Binding<Bool>) -> ContentView
     
     /// Creates the control view for this theme (buttons, input fields, etc.)
     @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> ControlsView
+    func makeControlsView(viewModel: AppCoordinator) -> ControlsView
     
     // MARK: - Advanced Layout Control (Optional)
     
@@ -35,7 +35,7 @@ protocol ThemeExperience {
     /// If implemented, this takes precedence over makeContentView + makeControlsView
     /// Returns nil to use the default layout system (makeContentView + makeControlsView)
     @ViewBuilder
-    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView?
+    func makeFullLayoutView(viewModel: AppCoordinator, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView?
     
     // MARK: - Advanced Keyboard Customization
     
@@ -67,7 +67,7 @@ enum KeyboardBehavior {
 
 extension ThemeExperience {
     /// Default implementation returns nil (use standard layout system)
-    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
+    func makeFullLayoutView(viewModel: AppCoordinator, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
         nil
     }
     
@@ -97,9 +97,9 @@ struct AnyThemeExperience {
     private let _allowsVisualControls: () -> Bool
     private let _preferredInteractionModel: () -> InteractionModel
     private let _requiresKeyboardFocus: () -> Bool
-    private let _makeContentView: (TimerViewModel, Binding<Bool>) -> AnyView
-    private let _makeControlsView: (TimerViewModel) -> AnyView
-    private let _makeFullLayoutView: (TimerViewModel, StatusInfo, Binding<Bool>) -> AnyView?
+    private let _makeContentView: (AppCoordinator, Binding<Bool>) -> AnyView
+    private let _makeControlsView: (AppCoordinator) -> AnyView
+    private let _makeFullLayoutView: (AppCoordinator, StatusInfo, Binding<Bool>) -> AnyView?
     private let _customKeyboardBehavior: (UInt16) -> KeyboardBehavior?
     
     // MARK: - Initialization
@@ -145,17 +145,17 @@ struct AnyThemeExperience {
     }
     
     /// Creates the main content view for this theme
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> AnyView {
+    func makeContentView(viewModel: AppCoordinator, rippleTrigger: Binding<Bool>) -> AnyView {
         _makeContentView(viewModel, rippleTrigger)
     }
     
     /// Creates the control view for this theme
-    func makeControlsView(viewModel: TimerViewModel) -> AnyView {
+    func makeControlsView(viewModel: AppCoordinator) -> AnyView {
         _makeControlsView(viewModel)
     }
     
     /// Creates the full layout view for this theme (if supported)
-    func makeFullLayoutView(viewModel: TimerViewModel, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
+    func makeFullLayoutView(viewModel: AppCoordinator, statusInfo: StatusInfo, rippleTrigger: Binding<Bool>) -> AnyView? {
         _makeFullLayoutView(viewModel, statusInfo, rippleTrigger)
     }
     

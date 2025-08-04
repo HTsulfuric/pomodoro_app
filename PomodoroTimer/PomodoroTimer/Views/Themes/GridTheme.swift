@@ -93,13 +93,13 @@ struct GridExperience: ThemeExperience {
     // MARK: - View Factories
     
     @ViewBuilder
-    func makeContentView(viewModel: TimerViewModel, rippleTrigger: Binding<Bool>) -> some View {
+    func makeContentView(viewModel: AppCoordinator, rippleTrigger: Binding<Bool>) -> some View {
         GridThemeView(rippleTrigger: rippleTrigger)
             .environmentObject(viewModel)
     }
     
     @ViewBuilder
-    func makeControlsView(viewModel: TimerViewModel) -> some View {
+    func makeControlsView(viewModel: AppCoordinator) -> some View {
         StandardControlsView(viewModel: viewModel)
     }
 }
@@ -107,7 +107,7 @@ struct GridExperience: ThemeExperience {
 // MARK: - Preview Support
 
 #Preview("Grid Theme Controls") {
-    StandardControlsView(viewModel: TimerViewModel())
+    StandardControlsView(viewModel: AppCoordinator())
         .frame(width: 300, height: 150)
         .background(Color.nordNight0.opacity(0.95))
 }
@@ -116,7 +116,7 @@ struct GridExperience: ThemeExperience {
     @Previewable @State var rippleTrigger = false
     let experience = GridExperience()
     
-    experience.makeContentView(viewModel: TimerViewModel(), rippleTrigger: .constant(false))
+    experience.makeContentView(viewModel: AppCoordinator(), rippleTrigger: .constant(false))
         .frame(width: 400, height: 380)
         .background(Color.nordNight0.opacity(0.95))
 }
@@ -125,7 +125,7 @@ struct GridExperience: ThemeExperience {
 
 /// A GitHub contribution graph inspired theme with discrete time squares
 struct GridThemeView: View {
-    @EnvironmentObject var viewModel: TimerViewModel
+    @EnvironmentObject var viewModel: AppCoordinator
     @EnvironmentObject var screenContext: ScreenContext
     @Binding var rippleTrigger: Bool
     
@@ -403,7 +403,7 @@ struct RippleIndicator: View {
     
     GridThemeView(rippleTrigger: .constant(false))
         .frame(minWidth: 300, minHeight: 400)
-        .environmentObject(TimerViewModel())
+        .environmentObject(AppCoordinator())
         .environmentObject(ScreenContext())
         .background(Color.black.opacity(0.8))
 }

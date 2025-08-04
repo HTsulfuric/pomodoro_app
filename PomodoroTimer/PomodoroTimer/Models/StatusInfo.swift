@@ -40,9 +40,9 @@ struct StatusInfo {
 // MARK: - Convenience Extensions
 
 extension StatusInfo {
-    /// Creates StatusInfo from TimerViewModel and system information
-    static func from(
-        viewModel: TimerViewModel,
+    /// Creates StatusInfo from AppCoordinator and system information
+    @MainActor static func from(
+        viewModel: AppCoordinator,
         appVersion: String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0",
         macOSVersion: String = {
             let version = ProcessInfo.processInfo.operatingSystemVersion

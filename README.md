@@ -16,7 +16,7 @@ A native macOS Pomodoro timer app built with SwiftUI, featuring lock-screen comp
 - **Transparent UI**: Elegant Nord-themed interface with blur effects
 
 ### 📊 SketchyBar Integration
-- **Real-time Display**: Shows current timer state in your SketchyBar
+- **Real-time Display**: Shows current timer state in your SketchyBar with immediate updates
 - **Bidirectional Control**: Click SketchyBar item to control timer
 - **Performance Optimized**: 98% reduction in system calls through intelligent state caching
 - **Fault Tolerant**: Automatic recovery from connection failures with exponential backoff
@@ -79,7 +79,7 @@ PomodoroTimer/
 - **SwiftUI**: Declarative UI with reactive state management
 - **UserNotifications.framework**: Lock-screen compatible interactive notifications
 - **Combine**: Reactive state updates and notification observation
-- **JSON State File**: `~/.config/pomodoro-timer/state.json` for SketchyBar integration
+- **JSON State File**: `~/.config/pomodoro-timer/state.json` for real-time SketchyBar integration
 
 ## 🎮 Usage
 
@@ -211,6 +211,6 @@ For complete development history and technical decisions, see `pomodoro_app.md`.
 
 ---
 
-**Current Version**: 3.0.1  
-**Last Updated**: 2025-08-03  
+**Current Version**: 3.0.2  
+**Last Updated**: 2025-08-04  
 **Minimum macOS**: 13.0

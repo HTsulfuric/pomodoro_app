@@ -124,11 +124,6 @@ struct ContentView: View {
                     .preferredColorScheme(.dark)
                     .id("theme-\(viewModel.currentTheme.id)")
                     .transition(.opacity)
-                    // TODO: [PERFORMANCE] Multiple onReceive calls can cause overhead - consolidate notification handling
-                    .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
-                        Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
-                        rippleTrigger.toggle()
-                    }
             } else {
                 // Use default layout system (backward compatibility)
                 VStack(spacing: mainSectionSpacing) {
@@ -168,10 +163,6 @@ struct ContentView: View {
                 .preferredColorScheme(.dark)
                 .id("theme-\(viewModel.currentTheme.id)")
                 .transition(.opacity)
-                .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
-                    Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
-                    rippleTrigger.toggle()
-                }
                 
                 // Version info overlay with dynamic sizing (only for default layout)
                 VStack {
@@ -202,6 +193,11 @@ struct ContentView: View {
                     .transition(.opacity)
                     .zIndex(1000) // Ensure it appears above everything else
             }
+        }
+        // Consolidated notification handling to eliminate overhead from multiple onReceive calls
+        .onReceive(NotificationCenter.default.publisher(for: .spaceKeyStartPressed)) { _ in
+            Logger.debug("🌊 Timer start notification received - triggering ripple effect", category: .ui)
+            rippleTrigger.toggle()
         }
     }
     

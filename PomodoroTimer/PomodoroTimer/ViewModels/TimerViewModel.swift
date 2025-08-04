@@ -381,16 +381,24 @@ class TimerViewModel: ObservableObject {
             return
         }
         
-        // TODO: [PERFORMANCE] New Process() spawned every time - use persistent IPC instead
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/sketchybar")
-        process.arguments = ["--trigger", event]
-        
-        do {
-            try process.run()
-            Logger.debug("SketchyBar event triggered: \(event)", category: .app)
-        } catch {
-            Logger.warning("Failed to trigger SketchyBar event '\(event)': \(error.localizedDescription)", category: .app)
+        // Asynchronous process execution to prevent UI blocking (optimized for infrequent usage)
+        DispatchQueue.global(qos: .utility).async {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/sketchybar")
+            process.arguments = ["--trigger", event]
+            
+            do {
+                try process.run()
+                process.waitUntilExit()
+                
+                if process.terminationStatus == 0 {
+                    Logger.debug("SketchyBar event triggered: \(event)", category: .app)
+                } else {
+                    Logger.warning("SketchyBar event '\(event)' failed with exit code: \(process.terminationStatus)", category: .app)
+                }
+            } catch {
+                Logger.warning("Failed to trigger SketchyBar event '\(event)': \(error.localizedDescription)", category: .app)
+            }
         }
     }
     

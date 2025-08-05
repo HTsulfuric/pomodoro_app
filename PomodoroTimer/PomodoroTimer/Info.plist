@@ -23,7 +23,7 @@
     <key>NSUserNotificationAlertStyle</key>
     <string>alert</string>
     <key>LSUIElement</key>
-    <false/>
+    <true/>
     <key>NSSupportsAutomaticTermination</key>
     <true/>
     <key>NSSupportsSuddenTermination</key>

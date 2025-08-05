@@ -90,9 +90,17 @@ class KeyboardManager {
             return
         }
         
-        // Set up the status item button
+        // Set up the status item button with professional SF Symbol
         if let button = statusItem.button {
-            button.title = "🍅"  // Tomato emoji for Pomodoro
+            // Use SF Symbol for professional appearance
+            if let timerImage = NSImage(systemSymbolName: "timer", accessibilityDescription: "Pomodoro Timer") {
+                // Configure as template image for proper menu bar appearance
+                timerImage.isTemplate = true
+                button.image = timerImage
+            } else {
+                // Fallback to simple text if SF Symbol not available
+                button.title = "⏱"
+            }
             button.toolTip = "Pomodoro Timer"
         }
         
@@ -152,14 +160,32 @@ class KeyboardManager {
     @MainActor private func updateMenuBarStatus() {
         guard let button = statusItem?.button else { return }
         
-        // Update menu bar icon based on timer state
+        // Update menu bar icon based on timer state using SF Symbols
         if let viewModel = timerViewModel {
+            var symbolName: String
+            var tintColor: NSColor?
+            
             if viewModel.pomodoroState.isRunning {
-                button.title = "🔴"  // Red for running
+                symbolName = "timer.circle.fill"  // Filled timer for running state
+                tintColor = NSColor.systemRed.withAlphaComponent(0.8)
             } else if isOverlayVisible {
-                button.title = "🟡"  // Yellow for overlay visible
+                symbolName = "timer.circle"  // Outlined timer for overlay visible
+                tintColor = NSColor.systemYellow.withAlphaComponent(0.8)
             } else {
-                button.title = "🍅"  // Default tomato
+                symbolName = "timer"  // Default timer icon
+                tintColor = nil  // Use system default (respects dark/light mode)
+            }
+            
+            if let timerImage = NSImage(systemSymbolName: symbolName, accessibilityDescription: "Pomodoro Timer") {
+                timerImage.isTemplate = (tintColor == nil)  // Template for default, colored for states
+                button.image = timerImage
+                
+                // Apply tint color if specified
+                if let tintColor = tintColor {
+                    button.contentTintColor = tintColor
+                } else {
+                    button.contentTintColor = nil  // Reset to system default
+                }
             }
         }
     }

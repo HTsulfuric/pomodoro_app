@@ -13,6 +13,7 @@ class TimerController {
     private var timer: Timer?
     private var backgroundActivity: NSObjectProtocol?
     private var pomodoroState = PomodoroState()
+    private var cachedSessionCount: Int = 0  // Cache to avoid reading persistent data every second
     
     // External integrations (injected dependencies)
     private var integrationController: IntegrationController?
@@ -30,6 +31,8 @@ class TimerController {
     // MARK: - Dependency Injection
     func setIntegrationController(_ controller: IntegrationController) {
         self.integrationController = controller
+        // Load session count once when integration controller is set
+        self.cachedSessionCount = controller.loadPersistentData()
     }
     
     // MARK: - Public Interface (Moved from TimerViewModel)
@@ -96,9 +99,7 @@ class TimerController {
         
         // Update session count if completing work phase
         if wasWork {
-            let newCount = getCurrentSessionCount() + 1
-            integrationController?.savePersistentData(sessionCount: newCount)
-            delegate?.timerDidUpdateSessionCount(newCount)
+            incrementSessionCount()
         }
         
         pomodoroState.skip()
@@ -157,10 +158,8 @@ class TimerController {
         
         // Update session count if completing work phase
         if completedPhase == .work {
-            let newCount = getCurrentSessionCount() + 1
-            integrationController?.savePersistentData(sessionCount: newCount)
-            delegate?.timerDidUpdateSessionCount(newCount)
-            Logger.timerState("Work session completed. Total today: \(newCount)")
+            incrementSessionCount()
+            Logger.timerState("Work session completed. Total today: \(cachedSessionCount)")
         }
         
         endBackgroundActivity()
@@ -210,6 +209,14 @@ class TimerController {
     // MARK: - Helper Methods
     
     private func getCurrentSessionCount() -> Int {
-        return integrationController?.loadPersistentData() ?? 0
+        return cachedSessionCount
+    }
+    
+    private func incrementSessionCount() {
+        cachedSessionCount += 1
+        // Update persistent storage
+        integrationController?.savePersistentData(sessionCount: cachedSessionCount)
+        // Notify delegate
+        delegate?.timerDidUpdateSessionCount(cachedSessionCount)
     }
 }

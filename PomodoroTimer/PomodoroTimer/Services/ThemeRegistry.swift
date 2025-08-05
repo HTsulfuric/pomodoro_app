@@ -83,7 +83,7 @@ class ThemeRegistry: ObservableObject {
     func unregister(themeWithId id: String) -> Bool {
         registrationQueue.sync {
             if let index = registeredThemes.firstIndex(where: { $0.id == id }) {
-                let removedTheme = registeredThemes.remove(at: index)
+                let _ = registeredThemes.remove(at: index)
                 
                 DispatchQueue.main.async { [weak self] in
                     self?.objectWillChange.send()

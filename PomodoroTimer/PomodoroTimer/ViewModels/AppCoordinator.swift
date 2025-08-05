@@ -33,6 +33,8 @@ class AppCoordinator: ObservableObject {
     @Published var isThemePickerPresented: Bool = false
     @Published var highlightedTheme: AnyTheme?
     @Published var highlightedThemeIndex: Int = 0
+    @Published var isSketchyBarSettingsPresented: Bool = false
+    @Published var isSketchyBarEnabled: Bool = false
     
     // MARK: - Controller Instances
     private let timerController: TimerController
@@ -58,6 +60,22 @@ class AppCoordinator: ObservableObject {
         
         // Load current theme from ThemeController (it initializes with saved theme)
         currentTheme = themeController.getCurrentTheme()
+        
+        // Load initial SketchyBar enabled state
+        isSketchyBarEnabled = SketchyBarConfig.load().isEnabled
+        
+        // Listen for SketchyBar configuration changes
+        NotificationCenter.default.addObserver(
+            forName: .sketchyBarConfigChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            if let config = notification.object as? SketchyBarConfig {
+                Task { @MainActor in
+                    self?.isSketchyBarEnabled = config.isEnabled
+                }
+            }
+        }
     }
     
     // MARK: - Public Interface for Views
@@ -113,6 +131,16 @@ class AppCoordinator: ObservableObject {
     
     func cancelThemeSelection() {
         themeController.cancelThemeSelection()
+    }
+    
+    // MARK: - SketchyBar Settings Methods
+    
+    func presentSketchyBarSettings() {
+        isSketchyBarSettingsPresented = true
+    }
+    
+    func hideSketchyBarSettings() {
+        isSketchyBarSettingsPresented = false
     }
 }
 

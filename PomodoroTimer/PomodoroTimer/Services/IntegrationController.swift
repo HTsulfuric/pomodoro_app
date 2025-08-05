@@ -10,18 +10,19 @@ class IntegrationController {
     weak var delegate: IntegrationControllerDelegate?
     
     // MARK: - Private Properties (Moved from TimerViewModel)
-    private let stateFileURL: URL = {
-        let homeDir = FileManager.default.homeDirectoryForCurrentUser
-        let configDir = homeDir.appendingPathComponent(".config/pomodoro-timer")
-        return configDir.appendingPathComponent("state.json")
-    }()
-    
+    private var sketchyBarConfig: SketchyBarConfig = SketchyBarConfig.load()
     private var lastStateWrite: Date = Date.distantPast
     private var cancellables = Set<AnyCancellable>()
+    
+    private var stateFileURL: URL {
+        let expandedPath = NSString(string: sketchyBarConfig.stateFilePath).expandingTildeInPath
+        return URL(fileURLWithPath: expandedPath)
+    }
     
     init() {
         createStateFileDirectory()
         setupNotificationObservers()
+        setupConfigObserver()
         
         // Write initial state file
         scheduleStateFileWrite(immediate: true, pomodoroState: PomodoroState(), sessionCount: loadPersistentData())
@@ -41,7 +42,7 @@ class IntegrationController {
     private func setupNotificationObservers() {
         // Regular notification center observers (for user notification actions)
         NotificationCenter.default.publisher(for: .startBreak)
-            .sink { [weak self] _ in
+            .sink { _ in
                 // Notify coordinator that timer should start
                 // This will be handled by the coordinator calling TimerController
                 // For now, we just log
@@ -50,19 +51,19 @@ class IntegrationController {
             .store(in: &cancellables)
         
         NotificationCenter.default.publisher(for: .skipBreak)
-            .sink { [weak self] _ in
+            .sink { _ in
                 Logger.debug("Notification: Skip break requested", category: .notifications)
             }
             .store(in: &cancellables)
         
         NotificationCenter.default.publisher(for: .startWork)
-            .sink { [weak self] _ in
+            .sink { _ in
                 Logger.debug("Notification: Start work requested", category: .notifications)
             }
             .store(in: &cancellables)
         
         NotificationCenter.default.publisher(for: .skipWork)
-            .sink { [weak self] _ in
+            .sink { _ in
                 Logger.debug("Notification: Skip work requested", category: .notifications)
             }
             .store(in: &cancellables)
@@ -70,26 +71,47 @@ class IntegrationController {
         Logger.debug("IntegrationController listening for user notification actions", category: .notifications)
     }
     
+    private func setupConfigObserver() {
+        // Listen for SketchyBar configuration changes
+        NotificationCenter.default.publisher(for: .sketchyBarConfigChanged)
+            .sink { [weak self] notification in
+                if let config = notification.object as? SketchyBarConfig {
+                    self?.sketchyBarConfig = config
+                    Logger.debug("SketchyBar configuration updated", category: .app)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
     // MARK: - Public Interface (Moved from TimerViewModel)
     
     func scheduleStateFileWrite(immediate: Bool, pomodoroState: PomodoroState, sessionCount: Int) {
+        // Skip all SketchyBar I/O if disabled
+        guard sketchyBarConfig.isEnabled else {
+            return
+        }
+        
         if immediate {
             // Immediate writes for state changes (start/pause/complete/skip)
             writeStateFile(pomodoroState: pomodoroState, sessionCount: sessionCount)
             return
         }
         
-        // Gauge-based optimization: Only write if enough time has passed
+        // Only write if enough time has passed
         let timeSinceLastWrite = Date().timeIntervalSince(lastStateWrite)
-        let gaugeUpdateInterval: TimeInterval = 15.0 // 20 seconds for smooth gauge progression
         
-        if timeSinceLastWrite >= gaugeUpdateInterval {
+        if timeSinceLastWrite >= sketchyBarConfig.updateInterval {
             writeStateFile(pomodoroState: pomodoroState, sessionCount: sessionCount)
         }
-        // Skip write if interval hasn't elapsed - reduces I/O by 95%
+        // Skip write if interval hasn't elapsed - reduces I/O based on configuration
     }
     
     func triggerSketchyBarEvent(_ event: String) {
+        // Skip all SketchyBar I/O if disabled
+        guard sketchyBarConfig.isEnabled else {
+            return
+        }
+        
         // Validate event parameter against allowlist to prevent command injection
         let allowedEvents: Set<String> = ["pomodoro_start", "pomodoro_stop"]
         guard allowedEvents.contains(event) else {
@@ -98,9 +120,11 @@ class IntegrationController {
         }
         
         // Asynchronous process execution to prevent UI blocking (optimized for infrequent usage)
-        DispatchQueue.global(qos: .utility).async {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self = self else { return }
+            
             let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/sketchybar")
+            process.executableURL = URL(fileURLWithPath: self.sketchyBarConfig.sketchyBarPath)
             process.arguments = ["--trigger", event]
             
             do {

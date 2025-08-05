@@ -184,6 +184,13 @@ struct ContentView: View {
                             Text(statusInfo.macOSVersionDisplayText)
                                 .font(.system(size: versionInfoSmallFontSize, weight: .regular, design: .monospaced))
                                 .foregroundColor(viewModel.currentTheme.secondaryTextColor.color(for: viewModel.pomodoroState.currentPhase).opacity(0.4))
+                            
+                            // SketchyBar I/O status indicator
+                            if viewModel.isSketchyBarEnabled {
+                                Text("SketchyBar I/O permitted")
+                                    .font(.system(size: versionInfoSmallFontSize, weight: .regular, design: .monospaced))
+                                    .foregroundColor(.green.opacity(0.8))
+                            }
                         }
                         Spacer()
                     }
@@ -201,6 +208,13 @@ struct ContentView: View {
                     .environmentObject(viewModel)
                     .transition(.opacity)
                     .zIndex(1000) // Ensure it appears above everything else
+            }
+            
+            // SketchyBar settings popup overlay
+            if viewModel.isSketchyBarSettingsPresented {
+                SketchyBarSettingsPopupView()
+                    .transition(.opacity)
+                    .zIndex(1001) // Ensure it appears above everything else
             }
         }
         // Consolidated notification handling to eliminate overhead from multiple onReceive calls

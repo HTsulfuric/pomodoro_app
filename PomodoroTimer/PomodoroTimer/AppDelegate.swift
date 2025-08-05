@@ -209,6 +209,23 @@ import ApplicationServices
         Logger.overlay("Floating overlay hidden")
     }
     
+    private func showSketchyBarSettingsPopup() {
+        // Show the overlay first if it's not visible
+        if !(overlayPanel?.isVisible ?? false) {
+            showOverlay()
+        }
+        
+        // Present the SketchyBar settings popup
+        appCoordinator.presentSketchyBarSettings()
+        
+        Logger.overlay("SketchyBar settings popup opened")
+    }
+    
+    private func hideSketchyBarSettingsPopup() {
+        appCoordinator.hideSketchyBarSettings()
+        Logger.overlay("SketchyBar settings popup closed")
+    }
+    
     // MARK: - Global Keyboard Monitoring
     
     // MARK: - Overlay Notification Observers
@@ -227,6 +244,22 @@ import ApplicationServices
             .sink { [weak self] _ in
                 Logger.overlay("Hide overlay notification received")
                 self?.hideOverlay()
+            }
+            .store(in: &cancellables)
+        
+        // Listen for SketchyBar settings requests from KeyboardManager
+        NotificationCenter.default.publisher(for: .showSketchyBarSettings)
+            .sink { [weak self] _ in
+                Logger.overlay("Show SketchyBar settings notification received")
+                self?.showSketchyBarSettingsPopup()
+            }
+            .store(in: &cancellables)
+        
+        // Listen for SketchyBar settings hide requests
+        NotificationCenter.default.publisher(for: .hideSketchyBarSettings)
+            .sink { [weak self] _ in
+                Logger.overlay("Hide SketchyBar settings notification received")
+                self?.hideSketchyBarSettingsPopup()
             }
             .store(in: &cancellables)
         

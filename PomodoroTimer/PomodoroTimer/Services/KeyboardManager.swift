@@ -121,6 +121,13 @@ class KeyboardManager {
         
         menu.addItem(NSMenuItem.separator())
         
+        // SketchyBar Settings item
+        let sketchyBarItem = NSMenuItem(title: "SketchyBar Settings...", action: #selector(menuOpenSketchyBarSettings), keyEquivalent: "")
+        sketchyBarItem.target = self
+        menu.addItem(sketchyBarItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        
         // Quit item
         let quitItem = NSMenuItem(title: "Quit", action: #selector(menuQuit), keyEquivalent: "q")
         quitItem.target = self
@@ -180,6 +187,12 @@ class KeyboardManager {
         Logger.keyboard("Menu: Skip phase")
         timerViewModel?.skipPhase()
         updateMenuBarStatus()
+    }
+    
+    @objc private func menuOpenSketchyBarSettings() {
+        Logger.keyboard("Menu: Open SketchyBar settings")
+        // Post notification to show SketchyBar configuration
+        NotificationCenter.default.post(name: .showSketchyBarSettings, object: nil)
     }
     
     @objc private func menuQuit() {
@@ -260,6 +273,22 @@ class KeyboardManager {
         }
     }
     
+    @MainActor private func handleSketchyBarSettingsKey(_ event: NSEvent, viewModel: AppCoordinator) -> Bool {
+        guard !event.modifierFlags.contains([.command, .control, .option, .shift]) else {
+            return false // Don't handle modified keys
+        }
+        
+        // Post the key press for the popup to handle
+        NotificationCenter.default.post(
+            name: .sketchyBarSettingsKeyPress, 
+            object: nil, 
+            userInfo: ["keyCode": event.keyCode]
+        )
+        
+        // Always consume keys when settings popup is visible
+        return true
+    }
+    
     @MainActor private func handleOverlaySpecificKey(_ event: NSEvent) -> Bool {
         guard let viewModel = timerViewModel else {
             Logger.warning("AppCoordinator not available", category: .keyboard)
@@ -271,10 +300,22 @@ class KeyboardManager {
             return handleThemePickerKey(event, viewModel: viewModel)
         }
         
+        // Handle SketchyBar settings keys when settings popup is visible
+        if viewModel.isSketchyBarSettingsPresented {
+            return handleSketchyBarSettingsKey(event, viewModel: viewModel)
+        }
+        
         // Handle T key to activate theme picker when overlay is visible but theme picker is not
         if event.keyCode == 17 && !event.modifierFlags.contains([.command, .control, .option, .shift]) { // T key
             Logger.keyboard("T key - opening theme picker")
             viewModel.presentThemePicker()
+            return true
+        }
+        
+        // Handle B key to activate SketchyBar settings when overlay is visible but no other popup is active
+        if event.keyCode == 11 && !event.modifierFlags.contains([.command, .control, .option, .shift]) { // B key
+            Logger.keyboard("B key - opening SketchyBar settings")
+            viewModel.presentSketchyBarSettings()
             return true
         }
         
@@ -420,6 +461,8 @@ extension Notification.Name {
     static let spaceKeyStartPressed = Notification.Name("spaceKeyStartPressed")
     static let resetKeyPressed = Notification.Name("resetKeyPressed")
     static let skipKeyPressed = Notification.Name("skipKeyPressed")
+    static let showSketchyBarSettings = Notification.Name("showSketchyBarSettings")
+    static let sketchyBarSettingsKeyPress = Notification.Name("sketchyBarSettingsKeyPress")
 }
 
 // MARK: - Carbon Helper Extensions

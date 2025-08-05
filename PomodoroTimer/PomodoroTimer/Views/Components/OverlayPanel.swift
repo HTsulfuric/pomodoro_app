@@ -8,42 +8,42 @@ class OverlayPanel: NSPanel {
             contentRect: contentRect,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
-            defer: false
+            defer: false,
         )
-        
+
         setupAlfredStyleBehavior()
     }
-    
+
     private func setupAlfredStyleBehavior() {
         // CRITICAL: Float above other windows
-        self.level = .floating
-        
+        level = .floating
+
         // Allow transparent background and custom shapes
-        self.isOpaque = false
-        self.backgroundColor = .clear
-        
+        isOpaque = false
+        backgroundColor = .clear
+
         // Add shadow for depth (like Alfred)
-        self.hasShadow = true
-        
+        hasShadow = true
+
         // Configure collection behavior for Alfred-like experience
-        self.collectionBehavior = [
-            .canJoinAllSpaces,      // Appears on whichever Space is active
-            .transient,             // Doesn't show up in Mission Control/Dock
-            .fullScreenAuxiliary    // Works even in full-screen apps (crucial!)
+        collectionBehavior = [
+            .canJoinAllSpaces, // Appears on whichever Space is active
+            .transient, // Doesn't show up in Mission Control/Dock
+            .fullScreenAuxiliary, // Works even in full-screen apps (crucial!)
         ]
-        
+
         // Keep panel in memory when hidden
-        self.isReleasedWhenClosed = false
-        
+        isReleasedWhenClosed = false
+
         Logger.overlay("OverlayPanel configured for Alfred-style behavior")
     }
-    
+
     // ESSENTIAL: Allow panel to become key window for keyboard input
     // without making the entire application active
     override var canBecomeKey: Bool {
         true
     }
-    
+
     // Optional: Ensure we can accept first responder status
     override var canBecomeMain: Bool {
         false // We don't want to be the main window

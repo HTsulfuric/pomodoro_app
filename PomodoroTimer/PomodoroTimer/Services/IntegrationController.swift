@@ -1,44 +1,47 @@
-import Foundation
 import Combine
+import Foundation
 
 // MARK: - IntegrationController
+
 // Specialized controller for external integrations and I/O
 // Handles: SketchyBar integration, file I/O, notifications, persistence
 
 class IntegrationController {
     // MARK: - Delegate Communication
+
     weak var delegate: IntegrationControllerDelegate?
-    
+
     // MARK: - Private Properties (Moved from TimerViewModel)
-    private var sketchyBarConfig: SketchyBarConfig = SketchyBarConfig.load()
-    private var lastStateWrite: Date = Date.distantPast
+
+    private var sketchyBarConfig: SketchyBarConfig = .load()
+    private var lastStateWrite: Date = .distantPast
     private var cancellables = Set<AnyCancellable>()
-    
+
     private var stateFileURL: URL {
         let expandedPath = NSString(string: sketchyBarConfig.stateFilePath).expandingTildeInPath
         return URL(fileURLWithPath: expandedPath)
     }
-    
+
     init() {
         createStateFileDirectory()
         setupNotificationObservers()
         setupConfigObserver()
-        
+
         // Write initial state file
         scheduleStateFileWrite(immediate: true, pomodoroState: PomodoroState(), sessionCount: loadPersistentData())
     }
-    
+
     deinit {
         // Combine cancellables are automatically cleaned up
     }
-    
+
     // MARK: - Private Setup Methods (Moved from TimerViewModel)
-    
+
     private func createStateFileDirectory() {
         let directory = stateFileURL.deletingLastPathComponent()
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     }
-    
+
     private func setupNotificationObservers() {
         // Regular notification center observers (for user notification actions)
         NotificationCenter.default.publisher(for: .startBreak)
@@ -49,28 +52,28 @@ class IntegrationController {
                 Logger.debug("Notification: Start break requested", category: .notifications)
             }
             .store(in: &cancellables)
-        
+
         NotificationCenter.default.publisher(for: .skipBreak)
             .sink { _ in
                 Logger.debug("Notification: Skip break requested", category: .notifications)
             }
             .store(in: &cancellables)
-        
+
         NotificationCenter.default.publisher(for: .startWork)
             .sink { _ in
                 Logger.debug("Notification: Start work requested", category: .notifications)
             }
             .store(in: &cancellables)
-        
+
         NotificationCenter.default.publisher(for: .skipWork)
             .sink { _ in
                 Logger.debug("Notification: Skip work requested", category: .notifications)
             }
             .store(in: &cancellables)
-        
+
         Logger.debug("IntegrationController listening for user notification actions", category: .notifications)
     }
-    
+
     private func setupConfigObserver() {
         // Listen for SketchyBar configuration changes
         NotificationCenter.default.publisher(for: .sketchyBarConfigChanged)
@@ -82,55 +85,55 @@ class IntegrationController {
             }
             .store(in: &cancellables)
     }
-    
+
     // MARK: - Public Interface (Moved from TimerViewModel)
-    
+
     func scheduleStateFileWrite(immediate: Bool, pomodoroState: PomodoroState, sessionCount: Int) {
         // Skip all SketchyBar I/O if disabled
         guard sketchyBarConfig.isEnabled else {
             return
         }
-        
+
         if immediate {
             // Immediate writes for state changes (start/pause/complete/skip)
             writeStateFile(pomodoroState: pomodoroState, sessionCount: sessionCount)
             return
         }
-        
+
         // Only write if enough time has passed
         let timeSinceLastWrite = Date().timeIntervalSince(lastStateWrite)
-        
+
         if timeSinceLastWrite >= sketchyBarConfig.updateInterval {
             writeStateFile(pomodoroState: pomodoroState, sessionCount: sessionCount)
         }
         // Skip write if interval hasn't elapsed - reduces I/O based on configuration
     }
-    
+
     func triggerSketchyBarEvent(_ event: String) {
         // Skip all SketchyBar I/O if disabled
         guard sketchyBarConfig.isEnabled else {
             return
         }
-        
+
         // Validate event parameter against allowlist to prevent command injection
         let allowedEvents: Set<String> = ["pomodoro_start", "pomodoro_stop"]
         guard allowedEvents.contains(event) else {
             Logger.debug("Blocked invalid SketchyBar event: \(event)", category: .app)
             return
         }
-        
+
         // Asynchronous process execution to prevent UI blocking (optimized for infrequent usage)
         DispatchQueue.global(qos: .utility).async { [weak self] in
-            guard let self = self else { return }
-            
+            guard let self else { return }
+
             let process = Process()
-            process.executableURL = URL(fileURLWithPath: self.sketchyBarConfig.sketchyBarPath)
+            process.executableURL = URL(fileURLWithPath: sketchyBarConfig.sketchyBarPath)
             process.arguments = ["--trigger", event]
-            
+
             do {
                 try process.run()
                 process.waitUntilExit()
-                
+
                 if process.terminationStatus == 0 {
                     Logger.debug("SketchyBar event triggered: \(event)", category: .app)
                 } else {
@@ -141,11 +144,11 @@ class IntegrationController {
             }
         }
     }
-    
+
     func loadPersistentData() -> Int {
         let today = Calendar.current.startOfDay(for: Date())
         let lastSessionDate = UserDefaults.standard.object(forKey: "lastSessionDate") as? Date ?? Date.distantPast
-        
+
         if Calendar.current.isDate(lastSessionDate, inSameDayAs: today) {
             let sessionCount = UserDefaults.standard.integer(forKey: "totalSessionsToday")
             Logger.info("📊 Loaded persistent data: \(sessionCount) sessions today", category: .app)
@@ -156,14 +159,14 @@ class IntegrationController {
             return 0
         }
     }
-    
+
     func savePersistentData(sessionCount: Int) {
         UserDefaults.standard.set(sessionCount, forKey: "totalSessionsToday")
         UserDefaults.standard.set(Date(), forKey: "lastSessionDate")
     }
-    
+
     // MARK: - Private Helper Methods (Moved from TimerViewModel)
-    
+
     private func writeStateFile(pomodoroState: PomodoroState, sessionCount: Int) {
         let currentTime = Date()
         let stateData: [String: Any] = [
@@ -174,12 +177,12 @@ class IntegrationController {
             "totalDuration": Int(pomodoroState.currentPhase.duration),
             "sessionCount": sessionCount,
             "isRunning": pomodoroState.isRunning,
-            "lastUpdateTimestamp": currentTime.timeIntervalSince1970
+            "lastUpdateTimestamp": currentTime.timeIntervalSince1970,
         ]
-        
+
         // Update last write time for smart interval tracking
         lastStateWrite = currentTime
-        
+
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: stateData, options: [.prettyPrinted])
             try jsonData.write(to: stateFileURL)

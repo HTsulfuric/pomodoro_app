@@ -1,35 +1,32 @@
-import Foundation
 import AppKit
+import Foundation
 
 class SoundManager: ObservableObject {
     static let shared = SoundManager()
-    
+
     private var currentSound: NSSound?
-    
-    init() {
-    }
-    
+
+    init() {}
+
     func playPhaseChangeSound(for phase: PomodoroPhase) {
         // Use simple NSSound approach - reliable and audible
-        let soundName: String
-        
-        switch phase {
+        let soundName = switch phase {
         case .work:
-            soundName = "Glass" // Work session complete - clear, bright sound
+            "Glass" // Work session complete - clear, bright sound
         case .shortBreak:
-            soundName = "Ping" // Break complete - crisp, clear notification
+            "Ping" // Break complete - crisp, clear notification
         case .longBreak:
-            soundName = "Sosumi" // Long break complete - distinctive sound
+            "Sosumi" // Long break complete - distinctive sound
         }
-        
+
         // NSSound automatically handles system sounds by name (sandbox-friendly)
         if let sound = NSSound(named: soundName) {
             // Store reference to prevent deallocation during playback
             currentSound = sound
-            
+
             // Set maximum volume for notification priority
             sound.volume = 1.0
-            
+
             // Play the sound - simple and reliable
             let _ = sound.play()
         } else {
@@ -37,13 +34,13 @@ class SoundManager: ObservableObject {
             NSSound.beep()
         }
     }
-    
+
     func playCustomSound(named soundName: String) {
         guard let soundURL = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
             Logger.error("Could not find sound file: \(soundName)", category: .sound)
             return
         }
-        
+
         // Use NSSound for custom sounds as well - simpler and more reliable
         if let sound = NSSound(contentsOf: soundURL, byReference: false) {
             currentSound = sound
@@ -58,7 +55,7 @@ class SoundManager: ObservableObject {
             Logger.error("Failed to create NSSound from: \(soundURL)", category: .sound)
         }
     }
-    
+
     func playTimerTickSound() {
         // Subtle tick sound for last 10 seconds
         if let tickSound = NSSound(named: "Tink") {
